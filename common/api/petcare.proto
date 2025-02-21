@@ -1,0 +1,13 @@
+syntax = "proto3";
+option go_package = "github.com/quanbin27/commons/api";
+package api;
+service OrderService{
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+}
+message CreateOrderRequest{
+  string customerID=1;
+
+}
+message CreateOrderResponse{
+  string status=1;
+}
