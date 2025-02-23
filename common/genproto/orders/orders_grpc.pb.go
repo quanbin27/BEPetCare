@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.28.3
-// source: api/petcare.proto
+// source: orders.proto
 
-package api
+package genproto
 
 import (
 	context "context"
@@ -117,5 +117,5 @@ var OrderService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/petcare.proto",
+	Metadata: "orders.proto",
 }
