@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	pb "github.com/quanbin27/commons/api"
+	pb "github.com/quanbin27/commons/genproto"
 	"google.golang.org/grpc"
 	"log"
 )

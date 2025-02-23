@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/labstack/echo/v4"
-	pb "github.com/quanbin27/commons/api"
+	pb "github.com/quanbin27/commons/genproto/orders"
 	"net/http"
 )
 
@@ -17,6 +17,9 @@ func (h *handler) registerRoutes(e *echo.Group) {
 	e.GET("/hello", h.sayHello)
 }
 func (h *handler) sayHello(c echo.Context) error {
-	h.client.CreateOrder(c, &pb.CreateOrderRequest{CustomerID: "1"})
-	return c.JSON(http.StatusOK, "hello world")
+	order, err := h.client.CreateOrder(c.Request().Context(), &pb.CreateOrderRequest{CustomerID: "1"})
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, order)
 }

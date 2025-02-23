@@ -1,7 +1,7 @@
 package main
 
 import (
-	common "github.com/quanbin27/commons"
+	common "github.com/quanbin27/commons/config"
 	"google.golang.org/grpc"
 	"log"
 	"net"

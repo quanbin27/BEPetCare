@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/lpernett/godotenv"
+	"log"
 	"os"
 	"strconv"
 )
@@ -11,17 +12,22 @@ type Config struct {
 	JWTExpirationInSeconds int64
 	JWTSecret              string
 	HTTP_ADDR              string
+	UserGrpcAddr           string
 }
 
 var Envs = initConfig()
 
 func initConfig() Config {
-	godotenv.Load()
+	err := godotenv.Load("../.env")
+	if err != nil {
+		log.Println("Không thể load file .env, sử dụng biến môi trường hệ thống")
+	}
 	return Config{
 		DSN:                    getEnv("DSN", ""),
 		JWTExpirationInSeconds: getEnvAsInt("JWT_EXPIRATION", 3600*24*7),
 		JWTSecret:              getEnv("JWT_SECRET", "not-secret-anymore?"),
 		HTTP_ADDR:              getEnv("HTTP_ADDR", ":8080"),
+		UserGrpcAddr:           getEnv("USER_GRPC_ADDR", ":8081"),
 	}
 }
 func getEnv(key, fallback string) string {
