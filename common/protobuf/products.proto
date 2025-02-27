@@ -1,0 +1,152 @@
+syntax = "proto3";
+
+option go_package = "github.com/quanbin27/commons/products";
+
+import "google/protobuf/timestamp.proto";
+
+service ProductService {
+  rpc GetFoodByID(GetFoodRequest) returns (Food) {}
+  rpc GetAccessoryByID(GetAccessoryRequest) returns (Accessory) {}
+  rpc GetMedicineByID(GetMedicineRequest) returns (Medicine) {}
+
+  rpc ListFoods(ListFoodRequest) returns (ListFoodResponse) {}
+  rpc ListAccessories(ListAccessoryRequest) returns (ListAccessoryResponse) {}
+  rpc ListMedicines(ListMedicineRequest) returns (ListMedicineResponse) {}
+
+  rpc CreateFood(CreateFoodRequest) returns (CreateFoodResponse) {}
+  rpc CreateAccessory(CreateAccessoryRequest) returns (CreateAccessoryResponse) {}
+  rpc CreateMedicine(CreateMedicineRequest) returns (CreateMedicineResponse) {}
+
+  rpc UpdateFood(UpdateFoodRequest) returns (UpdateFoodResponse) {}
+  rpc UpdateAccessory(UpdateAccessoryRequest) returns (UpdateAccessoryResponse) {}
+  rpc UpdateMedicine(UpdateMedicineRequest) returns (UpdateMedicineResponse) {}
+
+  rpc DeleteFood(DeleteFoodRequest) returns (DeleteFoodResponse) {}
+  rpc DeleteAccessory(DeleteAccessoryRequest) returns (DeleteAccessoryResponse) {}
+  rpc DeleteMedicine(DeleteMedicineRequest) returns (DeleteMedicineResponse) {}
+
+  rpc GetBranchByID(GetBranchRequest) returns (Branch) {}
+  rpc ListBranches(ListBranchRequest) returns (ListBranchResponse) {}
+
+  rpc GetBranchInventory(GetBranchInventoryRequest) returns (GetBranchInventoryResponse) {}
+  rpc UpdateBranchInventory(UpdateBranchInventoryRequest) returns (UpdateBranchInventoryResponse) {}
+}
+
+message Food {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  float price = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message Accessory {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  float price = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message Medicine {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  float price = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message Branch {
+  int32 id = 1;
+  string name = 2;
+  string location = 3;
+}
+
+message BranchProduct {
+  int32 branch_id = 1;
+  int32 product_id = 2;
+  string product_type = 3; // "food", "accessory", "medicine"
+  int32 stock_quantity = 4;
+}
+
+/* ------------------- Requests & Responses ------------------- */
+
+message GetFoodRequest { int32 id = 1; }
+message GetAccessoryRequest { int32 id = 1; }
+message GetMedicineRequest { int32 id = 1; }
+message GetBranchRequest { int32 id = 1; }
+
+message ListFoodRequest {}
+message ListAccessoryRequest {}
+message ListMedicineRequest {}
+message ListBranchRequest {}
+
+message ListFoodResponse { repeated Food foods = 1; }
+message ListAccessoryResponse { repeated Accessory accessories = 1; }
+message ListMedicineResponse { repeated Medicine medicines = 1; }
+message ListBranchResponse { repeated Branch branches = 1; }
+
+message CreateFoodRequest {
+  string name = 1;
+  string description = 2;
+  float price = 3;
+}
+message CreateAccessoryRequest {
+  string name = 1;
+  string description = 2;
+  float price = 3;
+}
+message CreateMedicineRequest {
+  string name = 1;
+  string description = 2;
+  float price = 3;
+}
+
+message CreateFoodResponse { string status = 1; }
+message CreateAccessoryResponse { string status = 1; }
+message CreateMedicineResponse { string status = 1; }
+
+message UpdateFoodRequest {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  float price = 4;
+}
+message UpdateAccessoryRequest {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  float price = 4;
+}
+message UpdateMedicineRequest {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  float price = 4;
+}
+
+message UpdateFoodResponse { string status = 1; }
+message UpdateAccessoryResponse { string status = 1; }
+message UpdateMedicineResponse { string status = 1; }
+
+message DeleteFoodRequest { int32 id = 1; }
+message DeleteAccessoryRequest { int32 id = 1; }
+message DeleteMedicineRequest { int32 id = 1; }
+
+message DeleteFoodResponse { string status = 1; }
+message DeleteAccessoryResponse { string status = 1; }
+message DeleteMedicineResponse { string status = 1; }
+
+message GetBranchInventoryRequest { int32 branch_id = 1; }
+message GetBranchInventoryResponse { repeated BranchProduct inventory = 1; }
+
+message UpdateBranchInventoryRequest {
+  int32 branch_id = 1;
+  int32 product_id = 2;
+  string product_type = 3;
+  int32 stock_quantity = 4;
+}
+message UpdateBranchInventoryResponse { string status = 1; }

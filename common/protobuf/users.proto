@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package = "github.com/quanbin27/gRPC-Web-Chat/users";
+option go_package = "github.com/quanbin27/commons/users";
 import "google/protobuf/timestamp.proto";
 service UserService{
   rpc Register(RegisterRequest) returns (RegisterResponse){}
