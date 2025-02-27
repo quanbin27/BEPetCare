@@ -1,13 +1,72 @@
 syntax = "proto3";
-option go_package = "github.com/quanbin27/commons/genproto";
-package api;
-service OrderService{
-  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
-}
-message CreateOrderRequest{
-  string customerID=1;
 
+package orders;
+option go_package = "github.com/quanbin27/commons/genproto/orders";
+service OrderService {
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
+  rpc UpdateOrderStatus(UpdateOrderStatusRequest) returns (UpdateOrderStatusResponse);
+  rpc GetOrderItems(GetOrderItemsRequest) returns (GetOrderItemsResponse);
 }
-message CreateOrderResponse{
+message Order {
+  int32 id = 1;
+  int32 customer_id = 2;
+  int32 branch_id = 3;
+  float total_price = 4;
+  OrderStatus  status = 5; // PENDING, PAID, COMPLETED, CANCELLED
+  string created_at = 6;
+  string updated_at = 7;
+  repeated OrderItem items = 8;
+}
+
+message OrderItem {
+  int32 id = 1;
+  int32 order_id = 2;
+  int32 product_id = 3;
+  int32 quantity = 4;
+  float unit_price = 5;
+}
+enum OrderStatus {
+  ORDER_STATUS_UNSPECIFIED = 0; // Giá trị mặc định (bắt buộc trong Protobuf)
+  PENDING = 1;
+  PAID = 2;
+  COMPLETED = 3;
+  CANCELLED = 4;
+}
+message CreateOrderRequest {
+  int32 customer_id = 1;
+  int32 branch_id = 2;
+  repeated OrderItem items = 3;
+}
+
+message CreateOrderResponse {
+  int32 order_id = 1;
+  string status=2;
+}
+
+message GetOrderRequest {
+  int32 order_id = 1;
+}
+
+message GetOrderResponse {
+  Order order = 1;
+}
+
+message UpdateOrderStatusRequest {
+  int32 order_id = 1;
+  OrderStatus status = 2;
+}
+
+message UpdateOrderStatusResponse {
   string status=1;
 }
+
+message GetOrderItemsRequest{
+  int32 order_id =1;
+}
+
+message GetOrderItemsResponse{
+  repeated OrderItem items=1;
+}
+
+

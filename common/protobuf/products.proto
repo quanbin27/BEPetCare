@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/quanbin27/commons/products";
+option go_package = "github.com/quanbin27/commons/genproto/products";
 
 import "google/protobuf/timestamp.proto";
 
