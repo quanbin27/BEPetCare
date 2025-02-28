@@ -1,0 +1,152 @@
+syntax = "proto3";
+
+package appointments;
+option go_package = "github.com/quanbin27/commons/genproto/appointments";
+
+import "google/protobuf/timestamp.proto";
+
+service AppointmentService {
+  // Đặt lịch hẹn tại nhà khách hàng
+  rpc CreateAppointment(CreateAppointmentRequest) returns (CreateAppointmentResponse);
+
+  // Lấy danh sách lịch hẹn theo khách hàng hoặc nhân viên
+  rpc GetAppointmentsByCustomer(GetAppointmentsByCustomerRequest) returns (GetAppointmentsResponse);
+  rpc GetAppointmentsByEmployee(GetAppointmentsByEmployeeRequest) returns (GetAppointmentsResponse);
+
+  // Cập nhật trạng thái lịch hẹn
+  rpc UpdateAppointmentStatus(UpdateAppointmentStatusRequest) returns (UpdateAppointmentStatusResponse);
+
+  // Lấy chi tiết lịch hẹn
+  rpc GetAppointmentDetails(GetAppointmentDetailsRequest) returns (GetAppointmentDetailsResponse);
+
+  // Quản lý danh sách dịch vụ
+  rpc CreateService(CreateServiceRequest) returns (CreateServiceResponse);
+  rpc GetServices(GetServicesRequest) returns (GetServicesResponse);
+  rpc UpdateService(UpdateServiceRequest) returns (UpdateServiceResponse);
+  rpc DeleteService(DeleteServiceRequest) returns (DeleteServiceResponse);
+}
+
+// Trạng thái lịch hẹn
+enum AppointmentStatus {
+  PENDING = 0;       // Đã đặt
+  IN_PROGRESS = 1;   // Đang thực hiện
+  COMPLETED = 2;     // Hoàn thành
+  CANCELLED = 3;     // Đã hủy
+  UNSPECIFIED=4;
+}
+
+// Dịch vụ thú cưng
+message Service {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  float price = 4;
+}
+
+// Lịch hẹn
+message Appointment {
+  int32 id = 1;
+  int32 customer_id = 2;
+  int32 employee_id = 3;
+  string customer_address = 4;
+  google.protobuf.Timestamp scheduled_time = 5;
+  AppointmentStatus status = 6;
+}
+
+// Chi tiết dịch vụ trong lịch hẹn (Bảng appointment_details)
+message AppointmentDetail {
+  int32 appointment_id = 1;
+  int32 service_id = 2;
+  float service_price = 3;  // Lưu giá dịch vụ tại thời điểm đặt lịch
+}
+
+// --- API Requests & Responses ---
+
+// Đặt lịch hẹn
+message CreateAppointmentRequest {
+  int32 customer_id = 1;
+  int32 employee_id = 2;
+  string customer_address = 3;
+  google.protobuf.Timestamp scheduled_time = 4;
+  repeated int32 service_ids = 5;
+}
+
+message CreateAppointmentResponse {
+  int32 appointment_id = 1;
+  string status = 2;
+}
+
+// Lấy danh sách lịch hẹn theo khách hàng hoặc nhân viên
+message GetAppointmentsByCustomerRequest {
+  int32 customer_id = 1;
+}
+
+message GetAppointmentsByEmployeeRequest {
+  int32 employee_id = 1;
+}
+
+message GetAppointmentsResponse {
+  repeated Appointment appointments = 1;
+}
+
+// Cập nhật trạng thái lịch hẹn
+message UpdateAppointmentStatusRequest {
+  int32 appointment_id = 1;
+  AppointmentStatus status = 2;
+}
+
+message UpdateAppointmentStatusResponse {
+  string status = 1;
+}
+
+// Lấy chi tiết lịch hẹn
+message GetAppointmentDetailsRequest {
+  int32 appointment_id = 1;
+}
+
+message GetAppointmentDetailsResponse {
+  Appointment appointment = 1;
+  repeated AppointmentDetail details = 2;
+}
+
+// --- Quản lý danh sách dịch vụ ---
+
+// Thêm dịch vụ
+message CreateServiceRequest {
+  string name = 1;
+  string description = 2;
+  float price = 3;
+}
+
+message CreateServiceResponse {
+  int32 service_id = 1;
+  string status = 2;
+}
+
+// Lấy danh sách dịch vụ
+message GetServicesRequest {}
+
+message GetServicesResponse {
+  repeated Service services = 1;
+}
+
+// Cập nhật dịch vụ
+message UpdateServiceRequest {
+  int32 service_id = 1;
+  string name = 2;
+  string description = 3;
+  float price = 4;
+}
+
+message UpdateServiceResponse {
+  string status = 1;
+}
+
+// Xóa dịch vụ
+message DeleteServiceRequest {
+  int32 service_id = 1;
+}
+
+message DeleteServiceResponse {
+  string status = 1;
+}

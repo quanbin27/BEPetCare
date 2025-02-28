@@ -13,11 +13,11 @@ gen_records:
 		--proto_path=protobuf "protobuf/records.proto" \
 		--go_out=genproto/records --go_opt=paths=source_relative \
   	--go-grpc_out=genproto/records --go-grpc_opt=paths=source_relative
-gen_appoinments:
+gen_appointments:
 	@protoc \
-		--proto_path=protobuf "protobuf/appoinments.proto" \
-		--go_out=genproto/appoinments --go_opt=paths=source_relative \
-  	--go-grpc_out=genproto/appoinments --go-grpc_opt=paths=source_relative
+		--proto_path=protobuf "protobuf/appointments.proto" \
+		--go_out=genproto/appointments --go_opt=paths=source_relative \
+  	--go-grpc_out=genproto/appointments --go-grpc_opt=paths=source_relative
 gen_products:
 	@protoc \
 		--proto_path=protobuf "protobuf/products.proto" \
