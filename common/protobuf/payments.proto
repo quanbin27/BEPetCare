@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package payment;
+
+option go_package = "github.com/yourusername/yourproject/genproto/payment";
+
+// Enum trạng thái thanh toán
+enum PaymentStatus {
+  PAYMENT_STATUS_UNSPECIFIED = 0;
+  PENDING = 1;      // Chờ thanh toán
+  COMPLETED = 2;    // Đã thanh toán
+  FAILED = 3;       // Thanh toán thất bại
+  CANCELLED = 4;    // Đã hủy
+}
+
+// Yêu cầu tạo thanh toán
+message CreatePaymentRequest {
+  string customer_id = 1; // ID khách hàng từ UserService
+  string order_id = 2;    // ID đơn hàng từ OrderService (nếu có)
+  string appointment_id = 3; // ID lịch hẹn từ AppointmentService (nếu có)
+  float amount = 4;       // Số tiền cần thanh toán
+  string currency = 5;    // Loại tiền tệ (VD: VND, USD)
+  string description = 6; // Mô tả thanh toán
+  string return_url = 7;  // URL trả về sau khi thanh toán
+  string cancel_url = 8;  // URL khi hủy thanh toán
+}
+
+// Phản hồi khi tạo thanh toán
+message CreatePaymentResponse {
+  string payment_id = 1;         // ID thanh toán nội bộ
+  string payos_payment_url = 2;  // URL thanh toán của PayOS
+  PaymentStatus status = 3;
+}
+
+// Yêu cầu kiểm tra trạng thái thanh toán
+message GetPaymentStatusRequest {
+  string payment_id = 1;
+}
+
+// Phản hồi trạng thái thanh toán
+message GetPaymentStatusResponse {
+  PaymentStatus status = 1;
+  string transaction_id = 2; // ID giao dịch từ PayOS
+  string description = 3;    // Mô tả trạng thái
+}
+
+// Yêu cầu hủy thanh toán
+message CancelPaymentRequest {
+  string payment_id = 1;
+}
+
+// Phản hồi hủy thanh toán
+message CancelPaymentResponse {
+  PaymentStatus status = 1;
+  string description = 2; // Mô tả trạng thái
+}
+
+// Service thanh toán
+service PaymentService {
+  rpc CreatePayment(CreatePaymentRequest) returns (CreatePaymentResponse);
+  rpc GetPaymentStatus(GetPaymentStatusRequest) returns (GetPaymentStatusResponse);
+  rpc CancelPayment(CancelPaymentRequest) returns (CancelPaymentResponse);
+}
