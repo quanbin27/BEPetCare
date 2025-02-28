@@ -28,9 +28,9 @@ func initStorage(db *gorm.DB) {
 	log.Println("Successfully connected to database")
 }
 func main() {
-	dsn := config.Envs.DSN
+	dsn := config.Envs.UsersDSN
 	log.Println("Connecting to database ...", dsn)
-	grpcAddr := config.Envs.UserGrpcAddr
+	grpcAddr := config.Envs.UsersGrpcAddr
 	db, err := NewMySQLStorage(dsn)
 	if err != nil {
 		log.Fatal(err)

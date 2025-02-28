@@ -17,75 +17,75 @@ func NewService(userStore UserStore) *Service {
 	return &Service{userStore: userStore}
 }
 
-func (s *Service) CreateUser(ctx context.Context, user *users.RegisterRequest) error {
+func (s *Service) Register(ctx context.Context, user *users.RegisterRequest) (*users.RegisterResponse, error) {
 	_, err := s.userStore.GetUserByEmail(ctx, user.Email)
 	if err == nil {
-		return errors.New("User already exists")
+		return &users.RegisterResponse{Status: "Failed"}, errors.New("User already exists")
 	}
 	hashedPassword, err := auth.HashPassword(user.Password)
 	if err != nil {
-		return errors.New("Failed to hash password")
+		return &users.RegisterResponse{Status: "Failed"}, errors.New("Failed to hash password")
 	}
-	return s.userStore.CreateUser(ctx, &User{Name: user.Name, Email: user.Email, Password: hashedPassword})
+	return &users.RegisterResponse{Status: "Success"}, s.userStore.CreateUser(ctx, &User{Name: user.Name, Email: user.Email, Password: hashedPassword})
 }
 func (s *Service) Login(ctx context.Context, login *users.LoginRequest) (*users.LoginResponse, error) {
 	u, err := s.userStore.GetUserByEmail(ctx, login.Email)
 	if err != nil {
-		return &users.LoginResponse{Status: "not found, invalid email"}, errors.New("not found, invalid email")
+		return &users.LoginResponse{Status: "Failed"}, errors.New("not found, invalid email")
 	}
 	if !auth.CheckPassword(u.Password, []byte(login.Password)) {
-		return &users.LoginResponse{Status: "invalid passwor"}, errors.New("invalid password")
+		return &users.LoginResponse{Status: "Failed"}, errors.New("invalid password")
 	}
 	secret := []byte(config.Envs.JWTSecret)
 	token, err := auth.CreateJWT(secret, u.ID, config.Envs.JWTExpirationInSeconds)
 	if err != nil {
-		return &users.LoginResponse{Status: "Failed to create JWT"}, errors.New("Failed to create JWT")
+		return &users.LoginResponse{Status: "Failed"}, errors.New("Failed to create JWT")
 	}
 	return &users.LoginResponse{Status: "Success", Token: token}, nil
 }
-func (s *Service) UpdateUser(ctx context.Context, update *users.ChangeInfoRequest) error {
+func (s *Service) ChangeInfo(ctx context.Context, update *users.ChangeInfoRequest) (*users.ChangeInfoResponse, error) {
 	updatedData := map[string]interface{}{
 		"name":  update.Name,
 		"email": update.Email,
 	}
 	err := s.userStore.UpdateInfo(ctx, update.Id, updatedData)
 	if err != nil {
-		return errors.New("Failed to update user")
+		return &users.ChangeInfoResponse{Email: update.Email, Name: update.Name, Status: "Failed"}, errors.New("Failed to update user")
 	}
-	return nil
+	return &users.ChangeInfoResponse{Email: update.Email, Name: update.Name, Status: "Success"}, nil
 }
-func (s *Service) UpdatePassword(ctx context.Context, update *users.ChangePasswordRequest) error {
+func (s *Service) ChangePassword(ctx context.Context, update *users.ChangePasswordRequest) (*users.ChangePasswordResponse, error) {
 	if update.NewPassword == "" {
-		return errors.New("Invalid password")
+		return &users.ChangePasswordResponse{Status: "Failed"}, errors.New("Invalid password")
 	}
 	user, err := s.userStore.GetUserByID(ctx, update.Id)
 	if err != nil {
-		return errors.New("User not found")
+		return &users.ChangePasswordResponse{Status: "Failed"}, errors.New("User not found")
 	}
 	if !auth.CheckPassword(user.Password, []byte(update.OldPassword)) {
-		return errors.New("Invalid old password")
+		return &users.ChangePasswordResponse{Status: "Failed"}, errors.New("Invalid old password")
 	}
 	password, err := auth.HashPassword(update.NewPassword)
 	err = s.userStore.UpdatePassword(ctx, user.ID, password)
 	if err != nil {
-		return errors.New("Failed to update user")
+		return &users.ChangePasswordResponse{Status: "Failed"}, errors.New("Failed to update user")
 	}
-	return nil
+	return &users.ChangePasswordResponse{Status: "Success"}, nil
 }
-func (s *Service) GetUserByID(ctx context.Context, id int32) (*users.User, error) {
-	user, err := s.userStore.GetUserByID(ctx, id)
+func (s *Service) GetUserInfo(ctx context.Context, id *users.GetUserInfoRequest) (*users.User, error) {
+	user, err := s.userStore.GetUserByID(ctx, id.ID)
 	if err != nil {
 		return nil, errors.New("User not found")
 	}
 	return &users.User{
 		Name:      user.Name,
 		Email:     user.Email,
-		ID:        id,
+		ID:        user.ID,
 		CreatedAt: timestamppb.New(user.CreatedAt),
 	}, nil
 }
-func (s *Service) GetUserByEmail(ctx context.Context, email string) (*users.User, error) {
-	user, err := s.userStore.GetUserByEmail(ctx, email)
+func (s *Service) GetUserInfoByEmail(ctx context.Context, email *users.GetUserInfoByEmailRequest) (*users.User, error) {
+	user, err := s.userStore.GetUserByEmail(ctx, email.Email)
 	if err != nil {
 		return nil, errors.New("User not found")
 	}

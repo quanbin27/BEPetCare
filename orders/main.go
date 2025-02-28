@@ -1,25 +1,51 @@
 package main
 
 import (
-	common "github.com/quanbin27/commons/config"
+	"github.com/quanbin27/commons/config"
 	"google.golang.org/grpc"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"log"
 	"net"
 )
 
-var (
-	grpcAddr = common.EnvString("GRPC_ADDR", ":2000")
-)
-
+func NewMySQLStorage(dsn string) (*gorm.DB, error) {
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	return db, nil
+}
+func initStorage(db *gorm.DB) {
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = sqlDB.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Successfully connected to database")
+}
 func main() {
+	dsn := config.Envs.OrdersDSN
+	log.Println("Connecting to database ...", dsn)
+	grpcAddr := config.Envs.OrdersGrpcAddr
+	db, err := NewMySQLStorage(dsn)
+	if err != nil {
+		log.Fatal(err)
+	}
+	initStorage(db)
+	db.AutoMigrate(Order{}, OrderItem{})
 	grpcServer := grpc.NewServer()
 	l, err := net.Listen("tcp", grpcAddr)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.Fatal("failed to listen")
 	}
 	defer l.Close()
-	NewGRPCHandler(grpcServer)
-	if err := grpcServer.Serve(l); err != nil {
-		log.Fatalf("failed to serve: %s", err.Error())
-	}
+	orderStore := NewOrderStore(db)
+	orderService := NewOrderService(orderStore)
+	NewGrpcOrderHandler(grpcServer, orderService)
+	log.Println("Orders Service Listening on", grpcAddr)
+	grpcServer.Serve(l)
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 
 	"gorm.io/gorm"
 )
@@ -24,12 +25,29 @@ func (s *Store) CreateAppointment(ctx context.Context, appointment *Appointment,
 			return err
 		}
 
-		// Lưu chi tiết dịch vụ
+		// Lấy giá dịch vụ từ bảng `services`
+		var services []Service
+		if err := tx.Where("id IN ?", serviceIDs).Find(&services).Error; err != nil {
+			return err
+		}
+
+		// Lưu chi tiết dịch vụ vào `appointment_details`
 		var details []AppointmentDetail
+		servicePriceMap := make(map[int32]float32)
+		for _, svc := range services {
+			servicePriceMap[svc.ID] = svc.Price
+		}
+
 		for _, serviceID := range serviceIDs {
+			price, exists := servicePriceMap[serviceID]
+			if !exists {
+				return errors.New("service ID not found")
+			}
+
 			details = append(details, AppointmentDetail{
 				AppointmentID: appointment.ID,
 				ServiceID:     serviceID,
+				ServicePrice:  price,
 			})
 		}
 

@@ -16,12 +16,12 @@ type UserStore interface {
 	GetUsersByIDs(ctx context.Context, userIDs []int32) ([]User, error)
 }
 type UserService interface {
-	CreateUser(ctx context.Context, user *users.RegisterRequest) error
+	Register(ctx context.Context, user *users.RegisterRequest) (*users.RegisterResponse, error)
 	Login(ctx context.Context, login *users.LoginRequest) (*users.LoginResponse, error)
-	UpdateUser(ctx context.Context, update *users.ChangeInfoRequest) error
-	UpdatePassword(ctx context.Context, update *users.ChangePasswordRequest) error
-	GetUserByID(ctx context.Context, id int32) (*users.User, error)
-	GetUserByEmail(ctx context.Context, email string) (*users.User, error)
+	ChangeInfo(ctx context.Context, update *users.ChangeInfoRequest) (*users.ChangeInfoResponse, error)
+	ChangePassword(ctx context.Context, update *users.ChangePasswordRequest) (*users.ChangePasswordResponse, error)
+	GetUserInfo(ctx context.Context, id *users.GetUserInfoRequest) (*users.User, error)
+	GetUserInfoByEmail(ctx context.Context, email *users.GetUserInfoByEmailRequest) (*users.User, error)
 }
 
 type User struct {

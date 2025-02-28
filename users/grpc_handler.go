@@ -18,12 +18,9 @@ func NewGrpcUsersHandler(grpc *grpc.Server, userService UserService) {
 	users.RegisterUserServiceServer(grpc, grpcHandler)
 }
 func (h *UsersGrpcHandler) Register(ctx context.Context, req *users.RegisterRequest) (*users.RegisterResponse, error) {
-	err := h.userService.CreateUser(ctx, req)
+	res, err := h.userService.Register(ctx, req)
 	if err != nil {
 		return nil, err
-	}
-	res := &users.RegisterResponse{
-		Status: "success",
 	}
 	return res, nil
 }
@@ -35,36 +32,28 @@ func (h *UsersGrpcHandler) Login(ctx context.Context, req *users.LoginRequest) (
 	return res, nil
 }
 func (h *UsersGrpcHandler) ChangeInfo(ctx context.Context, req *users.ChangeInfoRequest) (*users.ChangeInfoResponse, error) {
-	err := h.userService.UpdateUser(ctx, req)
+	res, err := h.userService.ChangeInfo(ctx, req)
 	if err != nil {
 		return nil, err
-	}
-	res := &users.ChangeInfoResponse{
-		Status: "success",
-		Name:   req.Name,
-		Email:  req.Email,
 	}
 	return res, nil
 }
 func (h *UsersGrpcHandler) ChangePassword(ctx context.Context, req *users.ChangePasswordRequest) (*users.ChangePasswordResponse, error) {
-	err := h.userService.UpdatePassword(ctx, req)
+	res, err := h.userService.ChangePassword(ctx, req)
 	if err != nil {
 		return nil, err
-	}
-	res := &users.ChangePasswordResponse{
-		Status: "success",
 	}
 	return res, nil
 }
 func (h *UsersGrpcHandler) GetUserInfo(ctx context.Context, req *users.GetUserInfoRequest) (*users.User, error) {
-	res, err := h.userService.GetUserByID(ctx, req.ID)
+	res, err := h.userService.GetUserInfo(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 	return res, nil
 }
 func (h *UsersGrpcHandler) GetUserInfoByEmail(ctx context.Context, req *users.GetUserInfoByEmailRequest) (*users.User, error) {
-	res, err := h.userService.GetUserByEmail(ctx, req.Email)
+	res, err := h.userService.GetUserInfoByEmail(ctx, req)
 	if err != nil {
 		return nil, err
 	}
