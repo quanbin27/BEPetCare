@@ -43,6 +43,13 @@ message GetPaymentStatusResponse {
   string transaction_id = 2; // ID giao dịch từ PayOS
   string description = 3;    // Mô tả trạng thái
 }
+message UpdatePaymentStatusResponse{
+  string status=1;
+}
+message UpdatePaymentStatusRequest {
+  string transaction_id = 1; // ID từ PayOS
+  string status = 2;         // Cập nhật trạng thái (SUCCESS, FAILED, PENDING)
+}
 
 // Yêu cầu hủy thanh toán
 message CancelPaymentRequest {
