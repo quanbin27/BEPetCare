@@ -1,0 +1,279 @@
+syntax = "proto3";
+
+package petrecord;
+
+option go_package = "./proto";
+
+// Pet message
+message Pet {
+  string id = 1;
+  string name = 2;
+  string species = 3;
+  int32 age = 4;
+  string owner_id = 5;
+  string color = 6;         // Màu sắc
+  float weight = 7;         // Cân nặng (kg)
+  string size = 8;          // Kích thước (e.g., "small", "medium", "large")
+}
+
+// Examination message
+message Examination {
+  string id = 1;
+  string pet_id = 2;
+  string date = 3;           // ISO 8601 format, e.g., "2025-03-02"
+  string vet_id = 4;
+  string diagnosis = 5;
+  string notes = 6;
+}
+
+// Vaccination message
+message Vaccination {
+  string id = 1;
+  string pet_id = 2;
+  string vaccine_name = 3;
+  string date = 4;           // ISO 8601 format
+  string vet_id = 5;
+}
+
+// Prescription message
+message Prescription {
+  string id = 1;
+  string pet_id = 2;
+  string medication = 3;
+  string dosage = 4;
+  string start_date = 5;     // ISO 8601 format
+  string end_date = 6;       // ISO 8601 format
+}
+
+// --- Pet CRUD ---
+message CreatePetRequest {
+  string name = 1;
+  string species = 2;
+  int32 age = 3;
+  string owner_id = 4;
+  string color = 5;
+  float weight = 6;
+  string size = 7;
+}
+
+message CreatePetResponse {
+  string id = 1;
+}
+
+message GetPetRequest {
+  string id = 1;
+}
+
+message GetPetResponse {
+  Pet pet = 1;
+}
+
+message UpdatePetRequest {
+  string id = 1;
+  string name = 2;
+  string species = 3;
+  int32 age = 4;
+  string owner_id = 5;
+  string color = 6;
+  float weight = 7;
+  string size = 8;
+}
+
+message UpdatePetResponse {
+  Pet pet = 1;
+}
+
+message DeletePetRequest {
+  string id = 1;
+}
+
+message DeletePetResponse {
+  bool success = 1;
+}
+
+message ListPetsRequest {
+  string owner_id = 1;  // Optional filter by owner
+}
+
+message ListPetsResponse {
+  repeated Pet pets = 1;
+}
+
+// --- Examination CRUD ---
+message CreateExaminationRequest {
+  string pet_id = 1;
+  string date = 2;
+  string vet_id = 3;
+  string diagnosis = 4;
+  string notes = 5;
+}
+
+message CreateExaminationResponse {
+  string id = 1;
+}
+
+message GetExaminationRequest {
+  string id = 1;
+}
+
+message GetExaminationResponse {
+  Examination examination = 1;
+}
+
+message UpdateExaminationRequest {
+  string id = 1;
+  string pet_id = 2;
+  string date = 3;
+  string vet_id = 4;
+  string diagnosis = 5;
+  string notes = 6;
+}
+
+message UpdateExaminationResponse {
+  Examination examination = 1;
+}
+
+message DeleteExaminationRequest {
+  string id = 1;
+}
+
+message DeleteExaminationResponse {
+  bool success = 1;
+}
+
+message ListExaminationsRequest {
+  string pet_id = 1;
+}
+
+message ListExaminationsResponse {
+  repeated Examination examinations = 1;
+}
+
+// --- Vaccination CRUD ---
+message CreateVaccinationRequest {
+  string pet_id = 1;
+  string vaccine_name = 2;
+  string date = 3;
+  string vet_id = 4;
+}
+
+message CreateVaccinationResponse {
+  string id = 1;
+}
+
+message GetVaccinationRequest {
+  string id = 1;
+}
+
+message GetVaccinationResponse {
+  Vaccination vaccination = 1;
+}
+
+message UpdateVaccinationRequest {
+  string id = 1;
+  string pet_id = 2;
+  string vaccine_name = 3;
+  string date = 4;
+  string vet_id = 5;
+}
+
+message UpdateVaccinationResponse {
+  Vaccination vaccination = 1;
+}
+
+message DeleteVaccinationRequest {
+  string id = 1;
+}
+
+message DeleteVaccinationResponse {
+  bool success = 1;
+}
+
+message ListVaccinationsRequest {
+  string pet_id = 1;
+}
+
+message ListVaccinationsResponse {
+  repeated Vaccination vaccinations = 1;
+}
+
+// --- Prescription CRUD ---
+message CreatePrescriptionRequest {
+  string pet_id = 1;
+  string medication = 2;
+  string dosage = 3;
+  string start_date = 4;
+  string end_date = 5;
+}
+
+message CreatePrescriptionResponse {
+  string id = 1;
+}
+
+message GetPrescriptionRequest {
+  string id = 1;
+}
+
+message GetPrescriptionResponse {
+  Prescription prescription = 1;
+}
+
+message UpdatePrescriptionRequest {
+  string id = 1;
+  string pet_id = 2;
+  string medication = 3;
+  string dosage = 4;
+  string start_date = 5;
+  string end_date = 6;
+}
+
+message UpdatePrescriptionResponse {
+  Prescription prescription = 1;
+}
+
+message DeletePrescriptionRequest {
+  string id = 1;
+}
+
+message DeletePrescriptionResponse {
+  bool success = 1;
+}
+
+message ListPrescriptionsRequest {
+  string pet_id = 1;
+}
+
+message ListPrescriptionsResponse {
+  repeated Prescription prescriptions = 1;
+}
+
+// Service definition
+service PetRecordService {
+  // Pet operations
+  rpc CreatePet(CreatePetRequest) returns (CreatePetResponse) {}
+  rpc GetPet(GetPetRequest) returns (GetPetResponse) {}
+  rpc UpdatePet(UpdatePetRequest) returns (UpdatePetResponse) {}
+  rpc DeletePet(DeletePetRequest) returns (DeletePetResponse) {}
+  rpc ListPets(ListPetsRequest) returns (ListPetsResponse) {}
+
+  // Examination operations
+  rpc CreateExamination(CreateExaminationRequest) returns (CreateExaminationResponse) {}
+  rpc GetExamination(GetExaminationRequest) returns (GetExaminationResponse) {}
+  rpc UpdateExamination(UpdateExaminationRequest) returns (UpdateExaminationResponse) {}
+  rpc DeleteExamination(DeleteExaminationRequest) returns (DeleteExaminationResponse) {}
+  rpc ListExaminations(ListExaminationsRequest) returns (ListExaminationsResponse) {}
+
+  // Vaccination operations
+  rpc CreateVaccination(CreateVaccinationRequest) returns (CreateVaccinationResponse) {}
+  rpc GetVaccination(GetVaccinationRequest) returns (GetVaccinationResponse) {}
+  rpc UpdateVaccination(UpdateVaccinationRequest) returns (UpdateVaccinationResponse) {}
+  rpc DeleteVaccination(DeleteVaccinationRequest) returns (DeleteVaccinationResponse) {}
+  rpc ListVaccinations(ListVaccinationsRequest) returns (ListVaccinationsResponse) {}
+
+  // Prescription operations
+  rpc CreatePrescription(CreatePrescriptionRequest) returns (CreatePrescriptionResponse) {}
+  rpc GetPrescription(GetPrescriptionRequest) returns (GetPrescriptionResponse) {}
+  rpc UpdatePrescription(UpdatePrescriptionRequest) returns (UpdatePrescriptionResponse) {}
+  rpc DeletePrescription(DeletePrescriptionRequest) returns (DeletePrescriptionResponse) {}
+  rpc ListPrescriptions(ListPrescriptionsRequest) returns (ListPrescriptionsResponse) {}
+}

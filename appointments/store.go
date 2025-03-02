@@ -13,7 +13,7 @@ type Store struct {
 }
 
 // NewStore khởi tạo Store
-func NewStore(db *gorm.DB) AppointmentStore {
+func NewStore(db *gorm.DB) *Store {
 	return &Store{db: db}
 }
 
