@@ -4,7 +4,7 @@
 // - protoc             v5.28.3
 // source: payments.proto
 
-package payment
+package payments
 
 import (
 	context "context"
@@ -19,9 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PaymentService_CreatePayment_FullMethodName    = "/payment.PaymentService/CreatePayment"
-	PaymentService_GetPaymentStatus_FullMethodName = "/payment.PaymentService/GetPaymentStatus"
-	PaymentService_CancelPayment_FullMethodName    = "/payment.PaymentService/CancelPayment"
+	PaymentService_CreatePayment_FullMethodName       = "/payment.PaymentService/CreatePayment"
+	PaymentService_GetPaymentInfo_FullMethodName      = "/payment.PaymentService/GetPaymentInfo"
+	PaymentService_CreatePaymentURL_FullMethodName    = "/payment.PaymentService/CreatePaymentURL"
+	PaymentService_CancelPaymentLink_FullMethodName   = "/payment.PaymentService/CancelPaymentLink"
+	PaymentService_UpdatePaymentStatus_FullMethodName = "/payment.PaymentService/UpdatePaymentStatus"
+	PaymentService_UpdatePaymentMethod_FullMethodName = "/payment.PaymentService/UpdatePaymentMethod"
+	PaymentService_UpdatePaymentAmount_FullMethodName = "/payment.PaymentService/UpdatePaymentAmount"
 )
 
 // PaymentServiceClient is the client API for PaymentService service.
@@ -31,8 +35,12 @@ const (
 // Service thanh toán
 type PaymentServiceClient interface {
 	CreatePayment(ctx context.Context, in *CreatePaymentRequest, opts ...grpc.CallOption) (*CreatePaymentResponse, error)
-	GetPaymentStatus(ctx context.Context, in *GetPaymentStatusRequest, opts ...grpc.CallOption) (*GetPaymentStatusResponse, error)
-	CancelPayment(ctx context.Context, in *CancelPaymentRequest, opts ...grpc.CallOption) (*CancelPaymentResponse, error)
+	GetPaymentInfo(ctx context.Context, in *GetPaymentInfoRequest, opts ...grpc.CallOption) (*GetPaymentInfoResponse, error)
+	CreatePaymentURL(ctx context.Context, in *CreatePaymentURLRequest, opts ...grpc.CallOption) (*CreatePaymentURLResponse, error)
+	CancelPaymentLink(ctx context.Context, in *CancelPaymentLinkRequest, opts ...grpc.CallOption) (*CancelPaymentLinkResponse, error)
+	UpdatePaymentStatus(ctx context.Context, in *UpdatePaymentStatusRequest, opts ...grpc.CallOption) (*UpdatePaymentStatusResponse, error)
+	UpdatePaymentMethod(ctx context.Context, in *UpdatePaymentMethodRequest, opts ...grpc.CallOption) (*UpdatePaymentMethodResponse, error)
+	UpdatePaymentAmount(ctx context.Context, in *UpdatePaymentAmountRequest, opts ...grpc.CallOption) (*UpdatePaymentAmountResponse, error)
 }
 
 type paymentServiceClient struct {
@@ -53,20 +61,60 @@ func (c *paymentServiceClient) CreatePayment(ctx context.Context, in *CreatePaym
 	return out, nil
 }
 
-func (c *paymentServiceClient) GetPaymentStatus(ctx context.Context, in *GetPaymentStatusRequest, opts ...grpc.CallOption) (*GetPaymentStatusResponse, error) {
+func (c *paymentServiceClient) GetPaymentInfo(ctx context.Context, in *GetPaymentInfoRequest, opts ...grpc.CallOption) (*GetPaymentInfoResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetPaymentStatusResponse)
-	err := c.cc.Invoke(ctx, PaymentService_GetPaymentStatus_FullMethodName, in, out, cOpts...)
+	out := new(GetPaymentInfoResponse)
+	err := c.cc.Invoke(ctx, PaymentService_GetPaymentInfo_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *paymentServiceClient) CancelPayment(ctx context.Context, in *CancelPaymentRequest, opts ...grpc.CallOption) (*CancelPaymentResponse, error) {
+func (c *paymentServiceClient) CreatePaymentURL(ctx context.Context, in *CreatePaymentURLRequest, opts ...grpc.CallOption) (*CreatePaymentURLResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CancelPaymentResponse)
-	err := c.cc.Invoke(ctx, PaymentService_CancelPayment_FullMethodName, in, out, cOpts...)
+	out := new(CreatePaymentURLResponse)
+	err := c.cc.Invoke(ctx, PaymentService_CreatePaymentURL_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *paymentServiceClient) CancelPaymentLink(ctx context.Context, in *CancelPaymentLinkRequest, opts ...grpc.CallOption) (*CancelPaymentLinkResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CancelPaymentLinkResponse)
+	err := c.cc.Invoke(ctx, PaymentService_CancelPaymentLink_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *paymentServiceClient) UpdatePaymentStatus(ctx context.Context, in *UpdatePaymentStatusRequest, opts ...grpc.CallOption) (*UpdatePaymentStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdatePaymentStatusResponse)
+	err := c.cc.Invoke(ctx, PaymentService_UpdatePaymentStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *paymentServiceClient) UpdatePaymentMethod(ctx context.Context, in *UpdatePaymentMethodRequest, opts ...grpc.CallOption) (*UpdatePaymentMethodResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdatePaymentMethodResponse)
+	err := c.cc.Invoke(ctx, PaymentService_UpdatePaymentMethod_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *paymentServiceClient) UpdatePaymentAmount(ctx context.Context, in *UpdatePaymentAmountRequest, opts ...grpc.CallOption) (*UpdatePaymentAmountResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdatePaymentAmountResponse)
+	err := c.cc.Invoke(ctx, PaymentService_UpdatePaymentAmount_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -80,8 +128,12 @@ func (c *paymentServiceClient) CancelPayment(ctx context.Context, in *CancelPaym
 // Service thanh toán
 type PaymentServiceServer interface {
 	CreatePayment(context.Context, *CreatePaymentRequest) (*CreatePaymentResponse, error)
-	GetPaymentStatus(context.Context, *GetPaymentStatusRequest) (*GetPaymentStatusResponse, error)
-	CancelPayment(context.Context, *CancelPaymentRequest) (*CancelPaymentResponse, error)
+	GetPaymentInfo(context.Context, *GetPaymentInfoRequest) (*GetPaymentInfoResponse, error)
+	CreatePaymentURL(context.Context, *CreatePaymentURLRequest) (*CreatePaymentURLResponse, error)
+	CancelPaymentLink(context.Context, *CancelPaymentLinkRequest) (*CancelPaymentLinkResponse, error)
+	UpdatePaymentStatus(context.Context, *UpdatePaymentStatusRequest) (*UpdatePaymentStatusResponse, error)
+	UpdatePaymentMethod(context.Context, *UpdatePaymentMethodRequest) (*UpdatePaymentMethodResponse, error)
+	UpdatePaymentAmount(context.Context, *UpdatePaymentAmountRequest) (*UpdatePaymentAmountResponse, error)
 	mustEmbedUnimplementedPaymentServiceServer()
 }
 
@@ -95,11 +147,23 @@ type UnimplementedPaymentServiceServer struct{}
 func (UnimplementedPaymentServiceServer) CreatePayment(context.Context, *CreatePaymentRequest) (*CreatePaymentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePayment not implemented")
 }
-func (UnimplementedPaymentServiceServer) GetPaymentStatus(context.Context, *GetPaymentStatusRequest) (*GetPaymentStatusResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetPaymentStatus not implemented")
+func (UnimplementedPaymentServiceServer) GetPaymentInfo(context.Context, *GetPaymentInfoRequest) (*GetPaymentInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPaymentInfo not implemented")
 }
-func (UnimplementedPaymentServiceServer) CancelPayment(context.Context, *CancelPaymentRequest) (*CancelPaymentResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CancelPayment not implemented")
+func (UnimplementedPaymentServiceServer) CreatePaymentURL(context.Context, *CreatePaymentURLRequest) (*CreatePaymentURLResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePaymentURL not implemented")
+}
+func (UnimplementedPaymentServiceServer) CancelPaymentLink(context.Context, *CancelPaymentLinkRequest) (*CancelPaymentLinkResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CancelPaymentLink not implemented")
+}
+func (UnimplementedPaymentServiceServer) UpdatePaymentStatus(context.Context, *UpdatePaymentStatusRequest) (*UpdatePaymentStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePaymentStatus not implemented")
+}
+func (UnimplementedPaymentServiceServer) UpdatePaymentMethod(context.Context, *UpdatePaymentMethodRequest) (*UpdatePaymentMethodResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePaymentMethod not implemented")
+}
+func (UnimplementedPaymentServiceServer) UpdatePaymentAmount(context.Context, *UpdatePaymentAmountRequest) (*UpdatePaymentAmountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePaymentAmount not implemented")
 }
 func (UnimplementedPaymentServiceServer) mustEmbedUnimplementedPaymentServiceServer() {}
 func (UnimplementedPaymentServiceServer) testEmbeddedByValue()                        {}
@@ -140,38 +204,110 @@ func _PaymentService_CreatePayment_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PaymentService_GetPaymentStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetPaymentStatusRequest)
+func _PaymentService_GetPaymentInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPaymentInfoRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PaymentServiceServer).GetPaymentStatus(ctx, in)
+		return srv.(PaymentServiceServer).GetPaymentInfo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PaymentService_GetPaymentStatus_FullMethodName,
+		FullMethod: PaymentService_GetPaymentInfo_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PaymentServiceServer).GetPaymentStatus(ctx, req.(*GetPaymentStatusRequest))
+		return srv.(PaymentServiceServer).GetPaymentInfo(ctx, req.(*GetPaymentInfoRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PaymentService_CancelPayment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CancelPaymentRequest)
+func _PaymentService_CreatePaymentURL_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePaymentURLRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PaymentServiceServer).CancelPayment(ctx, in)
+		return srv.(PaymentServiceServer).CreatePaymentURL(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PaymentService_CancelPayment_FullMethodName,
+		FullMethod: PaymentService_CreatePaymentURL_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PaymentServiceServer).CancelPayment(ctx, req.(*CancelPaymentRequest))
+		return srv.(PaymentServiceServer).CreatePaymentURL(ctx, req.(*CreatePaymentURLRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PaymentService_CancelPaymentLink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelPaymentLinkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PaymentServiceServer).CancelPaymentLink(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PaymentService_CancelPaymentLink_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PaymentServiceServer).CancelPaymentLink(ctx, req.(*CancelPaymentLinkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PaymentService_UpdatePaymentStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePaymentStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PaymentServiceServer).UpdatePaymentStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PaymentService_UpdatePaymentStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PaymentServiceServer).UpdatePaymentStatus(ctx, req.(*UpdatePaymentStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PaymentService_UpdatePaymentMethod_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePaymentMethodRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PaymentServiceServer).UpdatePaymentMethod(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PaymentService_UpdatePaymentMethod_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PaymentServiceServer).UpdatePaymentMethod(ctx, req.(*UpdatePaymentMethodRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PaymentService_UpdatePaymentAmount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePaymentAmountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PaymentServiceServer).UpdatePaymentAmount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PaymentService_UpdatePaymentAmount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PaymentServiceServer).UpdatePaymentAmount(ctx, req.(*UpdatePaymentAmountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -188,12 +324,28 @@ var PaymentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _PaymentService_CreatePayment_Handler,
 		},
 		{
-			MethodName: "GetPaymentStatus",
-			Handler:    _PaymentService_GetPaymentStatus_Handler,
+			MethodName: "GetPaymentInfo",
+			Handler:    _PaymentService_GetPaymentInfo_Handler,
 		},
 		{
-			MethodName: "CancelPayment",
-			Handler:    _PaymentService_CancelPayment_Handler,
+			MethodName: "CreatePaymentURL",
+			Handler:    _PaymentService_CreatePaymentURL_Handler,
+		},
+		{
+			MethodName: "CancelPaymentLink",
+			Handler:    _PaymentService_CancelPaymentLink_Handler,
+		},
+		{
+			MethodName: "UpdatePaymentStatus",
+			Handler:    _PaymentService_UpdatePaymentStatus_Handler,
+		},
+		{
+			MethodName: "UpdatePaymentMethod",
+			Handler:    _PaymentService_UpdatePaymentMethod_Handler,
+		},
+		{
+			MethodName: "UpdatePaymentAmount",
+			Handler:    _PaymentService_UpdatePaymentAmount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

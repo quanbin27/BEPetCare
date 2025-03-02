@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"gorm.io/gorm"
 )
 
@@ -14,49 +15,51 @@ func NewStore(db *gorm.DB) PaymentStore {
 }
 
 // CreatePayment lưu thông tin thanh toán vào cơ sở dữ liệu
-func (s *Store) CreatePayment(ctx context.Context, payment *Payment) error {
-	return s.db.WithContext(ctx).Create(payment).Error
+func (s *Store) CreatePayment(ctx context.Context, payment *Payment) (int32, error) {
+	if payment == nil {
+		return 0, errors.New("payment cannot be nil")
+	}
+	err := s.db.WithContext(ctx).Create(payment).Error
+	if err != nil {
+		return 0, err
+	}
+	return payment.ID, nil
 }
-
-// GetPaymentByID lấy thông tin thanh toán theo ID
-func (s *Store) GetPaymentByID(ctx context.Context, id string) (*Payment, error) {
+func (s *Store) GetPaymentByID(ctx context.Context, paymentID int32) (*Payment, error) {
 	var payment Payment
-	if err := s.db.WithContext(ctx).First(&payment, id).Error; err != nil {
+	err := s.db.WithContext(ctx).Where("payment_id = ?", paymentID).First(&payment).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return &payment, nil
 }
 
-// UpdatePaymentStatus cập nhật trạng thái thanh toán
-func (s *Store) UpdatePaymentStatus(ctx context.Context, transactionID string, status string) error {
-	return s.db.WithContext(ctx).Model(&Payment{}).
-		Where("transaction_id = ?", transactionID).
-		Update("status", status).Error
+// UpdatePaymentStatus - Cập nhật trạng thái thanh toán
+func (s *Store) UpdatePaymentStatus(ctx context.Context, paymentID int32, status PaymentStatus) error {
+	return s.db.WithContext(ctx).
+		Model(&Payment{}).
+		Where("payment_id = ?", paymentID).
+		Update("status", status).
+		Error
 }
 
-// GetPaymentsByUser lấy danh sách thanh toán theo ID khách hàng
-func (s *Store) GetPaymentsByUser(ctx context.Context, userID int32) ([]Payment, error) {
-	var payments []Payment
-	if err := s.db.WithContext(ctx).Where("user_id = ?", userID).Find(&payments).Error; err != nil {
-		return nil, err
-	}
-	return payments, nil
+// UpdatePaymentMethod - Cập nhật phương thức thanh toán
+func (s *Store) UpdatePaymentMethod(ctx context.Context, paymentID int32, method PaymentMethod) error {
+	return s.db.WithContext(ctx).
+		Model(&Payment{}).
+		Where("payment_id = ?", paymentID).
+		Update("method", method).
+		Error
 }
 
-// GetPaymentsByOrder lấy danh sách thanh toán theo ID đơn hàng
-func (s *Store) GetPaymentsByOrder(ctx context.Context, orderID int32) ([]Payment, error) {
-	var payments []Payment
-	if err := s.db.WithContext(ctx).Where("order_id = ?", orderID).Find(&payments).Error; err != nil {
-		return nil, err
-	}
-	return payments, nil
-}
-
-// GetPaymentsByAppointment lấy danh sách thanh toán theo ID lịch hẹn
-func (s *Store) GetPaymentsByAppointment(ctx context.Context, appointmentID int32) ([]Payment, error) {
-	var payments []Payment
-	if err := s.db.WithContext(ctx).Where("appointment_id = ?", appointmentID).Find(&payments).Error; err != nil {
-		return nil, err
-	}
-	return payments, nil
+// UpdatePaymentAmount - Cập nhật số tiền thanh toán
+func (s *Store) UpdatePaymentAmount(ctx context.Context, paymentID int32, amount float32) error {
+	return s.db.WithContext(ctx).
+		Model(&Payment{}).
+		Where("payment_id = ?", paymentID).
+		Update("amount", amount).
+		Error
 }
