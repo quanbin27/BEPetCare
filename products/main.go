@@ -44,8 +44,8 @@ func main() {
 	}
 	defer l.Close()
 	productStore := NewStore(db)
-	productService := NewService(productStore)
-	NewGrpcProductHandler(grpcServer, productService)
+	productService := NewProductService(productStore)
+	NewProductGrpcHandler(grpcServer, productService)
 	log.Println("Product Service Listening on", grpcAddr)
 	grpcServer.Serve(l)
 }

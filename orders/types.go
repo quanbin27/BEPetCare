@@ -4,24 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/quanbin27/commons/genproto/orders"
+	pb "github.com/quanbin27/commons/genproto/orders"
 )
-
-// OrderStore interface làm việc với database
-type OrderStore interface {
-	CreateOrder(ctx context.Context, order *Order) error
-	GetOrderByID(ctx context.Context, orderID int32) (*Order, error)
-	UpdateOrderStatus(ctx context.Context, orderID int32, status OrderStatus) error
-	GetOrderItems(ctx context.Context, orderID int32) ([]OrderItem, error)
-}
-
-// OrderService interface cho gRPC
-type OrderService interface {
-	CreateOrder(ctx context.Context, req *orders.CreateOrderRequest) (*orders.CreateOrderResponse, error)
-	GetOrder(ctx context.Context, req *orders.GetOrderRequest) (*orders.GetOrderResponse, error)
-	UpdateOrderStatus(ctx context.Context, req *orders.UpdateOrderStatusRequest) (*orders.UpdateOrderStatusResponse, error)
-	GetOrderItems(ctx context.Context, req *orders.GetOrderItemsRequest) (*orders.GetOrderItemsResponse, error)
-}
 
 // OrderStatus định nghĩa trạng thái đơn hàng
 type OrderStatus string
@@ -53,4 +37,84 @@ type OrderItem struct {
 	Quantity  int32   `gorm:"not null"`
 	UnitPrice float32 `gorm:"not null"`
 	Total     float32 `gorm:"not null"`
+}
+
+// OrderStore interface làm việc với database
+type OrderStore interface {
+	CreateOrder(ctx context.Context, order *Order) error
+	GetOrderByID(ctx context.Context, orderID int32) (*Order, error)
+	UpdateOrderStatus(ctx context.Context, orderID int32, status OrderStatus) error
+	GetOrderItems(ctx context.Context, orderID int32) ([]OrderItem, error)
+}
+
+// OrderService interface cho logic xử lý với dữ liệu nội bộ
+type OrderService interface {
+	CreateOrder(ctx context.Context, customerID, branchID int32, items []OrderItem) (int32, string, error) // Trả về orderID, status
+	GetOrder(ctx context.Context, orderID int32) (*Order, error)
+	UpdateOrderStatus(ctx context.Context, orderID int32, status OrderStatus) (string, error) // Trả về status
+	GetOrderItems(ctx context.Context, orderID int32) ([]OrderItem, error)
+}
+
+// Helper functions to convert between internal types and protobuf types
+func toPbOrderStatus(status OrderStatus) pb.OrderStatus {
+	switch status {
+	case OrderStatusPending:
+		return pb.OrderStatus_PENDING
+	case OrderStatusPaid:
+		return pb.OrderStatus_PAID
+	case OrderStatusCompleted:
+		return pb.OrderStatus_COMPLETED
+	case OrderStatusCancelled:
+		return pb.OrderStatus_CANCELLED
+	default:
+		return pb.OrderStatus_ORDER_STATUS_UNSPECIFIED
+	}
+}
+
+func fromPbOrderStatus(pbStatus pb.OrderStatus) OrderStatus {
+	switch pbStatus {
+	case pb.OrderStatus_PENDING:
+		return OrderStatusPending
+	case pb.OrderStatus_PAID:
+		return OrderStatusPaid
+	case pb.OrderStatus_COMPLETED:
+		return OrderStatusCompleted
+	case pb.OrderStatus_CANCELLED:
+		return OrderStatusCancelled
+	default:
+		return OrderStatusPending // Mặc định là PENDING nếu không xác định
+	}
+}
+
+func toPbOrder(o *Order) *pb.Order {
+	pbItems := make([]*pb.OrderItem, len(o.Items))
+	for i, item := range o.Items {
+		pbItems[i] = &pb.OrderItem{
+			Id:        item.ID,
+			OrderId:   item.OrderID,
+			ProductId: item.ProductID,
+			Quantity:  item.Quantity,
+			UnitPrice: item.UnitPrice,
+		}
+	}
+	return &pb.Order{
+		Id:         o.ID,
+		CustomerId: o.CustomerID,
+		BranchId:   o.BranchID,
+		TotalPrice: o.TotalPrice,
+		Status:     toPbOrderStatus(o.Status),
+		CreatedAt:  o.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:  o.UpdatedAt.Format(time.RFC3339),
+		Items:      pbItems,
+	}
+}
+
+func toPbOrderItem(item OrderItem) *pb.OrderItem {
+	return &pb.OrderItem{
+		Id:        item.ID,
+		OrderId:   item.OrderID,
+		ProductId: item.ProductID,
+		Quantity:  item.Quantity,
+		UnitPrice: item.UnitPrice,
+	}
 }

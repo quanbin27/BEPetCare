@@ -3,10 +3,9 @@ package main
 import (
 	"context"
 	"errors"
+
 	"github.com/quanbin27/commons/auth"
 	"github.com/quanbin27/commons/config"
-	"github.com/quanbin27/commons/genproto/users"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Service struct {
@@ -17,82 +16,105 @@ func NewService(userStore UserStore) *Service {
 	return &Service{userStore: userStore}
 }
 
-func (s *Service) Register(ctx context.Context, user *users.RegisterRequest) (*users.RegisterResponse, error) {
-	_, err := s.userStore.GetUserByEmail(ctx, user.Email)
+// Register creates a new user
+func (s *Service) Register(ctx context.Context, email, password, name string) (string, error) {
+	_, err := s.userStore.GetUserByEmail(ctx, email)
 	if err == nil {
-		return &users.RegisterResponse{Status: "Failed"}, errors.New("User already exists")
+		return "Failed", errors.New("user already exists")
 	}
-	hashedPassword, err := auth.HashPassword(user.Password)
+	hashedPassword, err := auth.HashPassword(password)
 	if err != nil {
-		return &users.RegisterResponse{Status: "Failed"}, errors.New("Failed to hash password")
+		return "Failed", errors.New("failed to hash password")
 	}
-	return &users.RegisterResponse{Status: "Success"}, s.userStore.CreateUser(ctx, &User{Name: user.Name, Email: user.Email, Password: hashedPassword})
+	user := &User{
+		Email:    email,
+		Password: hashedPassword,
+		Name:     name,
+	}
+	if err := s.userStore.CreateUser(ctx, user); err != nil {
+		return "Failed", err
+	}
+	return "Success", nil
 }
-func (s *Service) Login(ctx context.Context, login *users.LoginRequest) (*users.LoginResponse, error) {
-	u, err := s.userStore.GetUserByEmail(ctx, login.Email)
+
+// Login authenticates a user and generates a JWT token
+func (s *Service) Login(ctx context.Context, email, password string) (string, string, error) {
+	u, err := s.userStore.GetUserByEmail(ctx, email)
 	if err != nil {
-		return &users.LoginResponse{Status: "Failed"}, errors.New("not found, invalid email")
+		return "Failed", "", errors.New("not found, invalid email")
 	}
-	if !auth.CheckPassword(u.Password, []byte(login.Password)) {
-		return &users.LoginResponse{Status: "Failed"}, errors.New("invalid password")
+	if !auth.CheckPassword(u.Password, []byte(password)) {
+		return "Failed", "", errors.New("invalid password")
 	}
 	secret := []byte(config.Envs.JWTSecret)
 	token, err := auth.CreateJWT(secret, u.ID, config.Envs.JWTExpirationInSeconds)
 	if err != nil {
-		return &users.LoginResponse{Status: "Failed"}, errors.New("Failed to create JWT")
+		return "Failed", "", errors.New("failed to create JWT")
 	}
-	return &users.LoginResponse{Status: "Success", Token: token}, nil
+	return "Success", token, nil
 }
-func (s *Service) ChangeInfo(ctx context.Context, update *users.ChangeInfoRequest) (*users.ChangeInfoResponse, error) {
-	updatedData := map[string]interface{}{
-		"name":  update.Name,
-		"email": update.Email,
+
+// ChangeInfo updates user info
+func (s *Service) ChangeInfo(ctx context.Context, userID int32, email, name string) (string, string, string, error) {
+	updatedData := make(map[string]interface{})
+	if email != "" {
+		updatedData["email"] = email
 	}
-	err := s.userStore.UpdateInfo(ctx, update.Id, updatedData)
+	if name != "" {
+		updatedData["name"] = name
+	}
+	if len(updatedData) == 0 {
+		return "Failed", "", "", errors.New("no data to update")
+	}
+	err := s.userStore.UpdateInfo(ctx, userID, updatedData)
 	if err != nil {
-		return &users.ChangeInfoResponse{Email: update.Email, Name: update.Name, Status: "Failed"}, errors.New("Failed to update user")
+		return "Failed", "", "", errors.New("failed to update user")
 	}
-	return &users.ChangeInfoResponse{Email: update.Email, Name: update.Name, Status: "Success"}, nil
+	// Lấy thông tin user sau khi cập nhật để trả về
+	user, err := s.userStore.GetUserByID(ctx, userID)
+	if err != nil {
+		return "Failed", "", "", err
+	}
+	return "Success", user.Email, user.Name, nil
 }
-func (s *Service) ChangePassword(ctx context.Context, update *users.ChangePasswordRequest) (*users.ChangePasswordResponse, error) {
-	if update.NewPassword == "" {
-		return &users.ChangePasswordResponse{Status: "Failed"}, errors.New("Invalid password")
+
+// ChangePassword updates user password
+func (s *Service) ChangePassword(ctx context.Context, userID int32, oldPassword, newPassword string) (string, error) {
+	if newPassword == "" {
+		return "Failed", errors.New("invalid password")
 	}
-	user, err := s.userStore.GetUserByID(ctx, update.Id)
+	user, err := s.userStore.GetUserByID(ctx, userID)
 	if err != nil {
-		return &users.ChangePasswordResponse{Status: "Failed"}, errors.New("User not found")
+		return "Failed", errors.New("user not found")
 	}
-	if !auth.CheckPassword(user.Password, []byte(update.OldPassword)) {
-		return &users.ChangePasswordResponse{Status: "Failed"}, errors.New("Invalid old password")
+	if !auth.CheckPassword(user.Password, []byte(oldPassword)) {
+		return "Failed", errors.New("invalid old password")
 	}
-	password, err := auth.HashPassword(update.NewPassword)
-	err = s.userStore.UpdatePassword(ctx, user.ID, password)
+	hashedPassword, err := auth.HashPassword(newPassword)
 	if err != nil {
-		return &users.ChangePasswordResponse{Status: "Failed"}, errors.New("Failed to update user")
+		return "Failed", errors.New("failed to hash password")
 	}
-	return &users.ChangePasswordResponse{Status: "Success"}, nil
+	err = s.userStore.UpdatePassword(ctx, userID, hashedPassword)
+	if err != nil {
+		return "Failed", errors.New("failed to update user")
+	}
+	return "Success", nil
 }
-func (s *Service) GetUserInfo(ctx context.Context, id *users.GetUserInfoRequest) (*users.User, error) {
-	user, err := s.userStore.GetUserByID(ctx, id.ID)
+
+// GetUserInfo retrieves user info by ID
+func (s *Service) GetUserInfo(ctx context.Context, id int32) (*User, error) {
+	user, err := s.userStore.GetUserByID(ctx, id)
 	if err != nil {
-		return nil, errors.New("User not found")
+		return nil, errors.New("user not found")
 	}
-	return &users.User{
-		Name:      user.Name,
-		Email:     user.Email,
-		ID:        user.ID,
-		CreatedAt: timestamppb.New(user.CreatedAt),
-	}, nil
+	return user, nil
 }
-func (s *Service) GetUserInfoByEmail(ctx context.Context, email *users.GetUserInfoByEmailRequest) (*users.User, error) {
-	user, err := s.userStore.GetUserByEmail(ctx, email.Email)
+
+// GetUserInfoByEmail retrieves user info by email
+func (s *Service) GetUserInfoByEmail(ctx context.Context, email string) (*User, error) {
+	user, err := s.userStore.GetUserByEmail(ctx, email)
 	if err != nil {
-		return nil, errors.New("User not found")
+		return nil, errors.New("user not found")
 	}
-	return &users.User{
-		Name:      user.Name,
-		Email:     user.Email,
-		ID:        user.ID,
-		CreatedAt: timestamppb.New(user.CreatedAt),
-	}, nil
+	return user, nil
 }

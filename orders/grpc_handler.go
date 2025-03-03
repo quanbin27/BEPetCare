@@ -2,38 +2,67 @@ package main
 
 import (
 	"context"
-	"google.golang.org/grpc"
 
 	pb "github.com/quanbin27/commons/genproto/orders"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-// OrdersGrpcHandler triển khai gRPC handler cho OrderService
-type OrdersGrpcHandler struct {
+type OrderGrpcHandler struct {
+	orderService OrderService
 	pb.UnimplementedOrderServiceServer
-	service OrderService
 }
 
-// NewGrpcOrderHandler đăng ký gRPC handler vào server
-func NewGrpcOrderHandler(grpcServer *grpc.Server, service OrderService) {
-	pb.RegisterOrderServiceServer(grpcServer, &OrdersGrpcHandler{service: service})
+func NewOrderGrpcHandler(grpc *grpc.Server, orderService OrderService) {
+	grpcHandler := &OrderGrpcHandler{
+		orderService: orderService,
+	}
+	pb.RegisterOrderServiceServer(grpc, grpcHandler)
 }
 
-// CreateOrder xử lý tạo đơn hàng
-func (h *OrdersGrpcHandler) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
-	return h.service.CreateOrder(ctx, req)
+func (h *OrderGrpcHandler) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
+	// Chuyển đổi OrderItem từ protobuf sang nội bộ
+	items := make([]OrderItem, len(req.Items))
+	for i, item := range req.Items {
+		items[i] = OrderItem{
+			ProductID: item.ProductId,
+			Quantity:  item.Quantity,
+			UnitPrice: item.UnitPrice,
+		}
+	}
+
+	orderID, statusMsg, err := h.orderService.CreateOrder(ctx, req.CustomerId, req.BranchId, items)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &pb.CreateOrderResponse{OrderId: orderID, Status: statusMsg}, nil
 }
 
-// GetOrder xử lý lấy đơn hàng theo ID
-func (h *OrdersGrpcHandler) GetOrder(ctx context.Context, req *pb.GetOrderRequest) (*pb.GetOrderResponse, error) {
-	return h.service.GetOrder(ctx, req)
+func (h *OrderGrpcHandler) GetOrder(ctx context.Context, req *pb.GetOrderRequest) (*pb.GetOrderResponse, error) {
+	order, err := h.orderService.GetOrder(ctx, req.OrderId)
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, err.Error())
+	}
+	return &pb.GetOrderResponse{Order: toPbOrder(order)}, nil
 }
 
-// UpdateOrderStatus xử lý cập nhật trạng thái đơn hàng
-func (h *OrdersGrpcHandler) UpdateOrderStatus(ctx context.Context, req *pb.UpdateOrderStatusRequest) (*pb.UpdateOrderStatusResponse, error) {
-	return h.service.UpdateOrderStatus(ctx, req)
+func (h *OrderGrpcHandler) UpdateOrderStatus(ctx context.Context, req *pb.UpdateOrderStatusRequest) (*pb.UpdateOrderStatusResponse, error) {
+	statusMsg, err := h.orderService.UpdateOrderStatus(ctx, req.OrderId, fromPbOrderStatus(req.Status))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &pb.UpdateOrderStatusResponse{Status: statusMsg}, nil
 }
 
-// GetOrderItems xử lý lấy danh sách sản phẩm trong đơn hàng
-func (h *OrdersGrpcHandler) GetOrderItems(ctx context.Context, req *pb.GetOrderItemsRequest) (*pb.GetOrderItemsResponse, error) {
-	return h.service.GetOrderItems(ctx, req)
+func (h *OrderGrpcHandler) GetOrderItems(ctx context.Context, req *pb.GetOrderItemsRequest) (*pb.GetOrderItemsResponse, error) {
+	items, err := h.orderService.GetOrderItems(ctx, req.OrderId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	pbItems := make([]*pb.OrderItem, len(items))
+	for i, item := range items {
+		pbItems[i] = toPbOrderItem(item)
+	}
+	return &pb.GetOrderItemsResponse{Items: pbItems}, nil
 }

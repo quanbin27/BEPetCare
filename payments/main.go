@@ -45,7 +45,7 @@ func main() {
 	defer l.Close()
 	paymentStore := NewStore(db)
 	paymentService := NewPaymentService(paymentStore)
-	NewGrpcPaymentHandler(grpcServer, paymentService)
+	NewPaymentGrpcHandler(grpcServer, paymentService)
 	log.Println("Payments Service Listening on", grpcAddr)
 	grpcServer.Serve(l)
 }

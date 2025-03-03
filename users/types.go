@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
-	"github.com/quanbin27/commons/genproto/users"
 	"time"
+
+	"github.com/quanbin27/commons/genproto/users"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+// UserStore defines the interface for data storage operations
 type UserStore interface {
 	GetUserByID(ctx context.Context, id int32) (*User, error)
 	GetUserByEmail(ctx context.Context, email string) (*User, error)
@@ -15,15 +18,18 @@ type UserStore interface {
 	GetNameByID(ctx context.Context, id int32) (string, error)
 	GetUsersByIDs(ctx context.Context, userIDs []int32) ([]User, error)
 }
+
+// UserService defines the interface for business logic operations with internal types
 type UserService interface {
-	Register(ctx context.Context, user *users.RegisterRequest) (*users.RegisterResponse, error)
-	Login(ctx context.Context, login *users.LoginRequest) (*users.LoginResponse, error)
-	ChangeInfo(ctx context.Context, update *users.ChangeInfoRequest) (*users.ChangeInfoResponse, error)
-	ChangePassword(ctx context.Context, update *users.ChangePasswordRequest) (*users.ChangePasswordResponse, error)
-	GetUserInfo(ctx context.Context, id *users.GetUserInfoRequest) (*users.User, error)
-	GetUserInfoByEmail(ctx context.Context, email *users.GetUserInfoByEmailRequest) (*users.User, error)
+	Register(ctx context.Context, email, password, name string) (string, error)
+	Login(ctx context.Context, email, password string) (string, string, error)                         // Trả về status và token
+	ChangeInfo(ctx context.Context, userID int32, email, name string) (string, string, string, error)  // Trả về status, email, name
+	ChangePassword(ctx context.Context, userID int32, oldPassword, newPassword string) (string, error) // Trả về status
+	GetUserInfo(ctx context.Context, id int32) (*User, error)
+	GetUserInfoByEmail(ctx context.Context, email string) (*User, error)
 }
 
+// User represents a user in the internal system
 type User struct {
 	ID        int32     `gorm:"primaryKey"`
 	Email     string    `gorm:"unique;not null"`
@@ -51,4 +57,23 @@ type UserRole struct {
 type EmployeeBranch struct {
 	UserID   int32 `gorm:"primaryKey"`
 	BranchID int32 `gorm:"primaryKey"`
+}
+
+// Helper functions to convert between internal User and protobuf User
+func toProtoUser(u *User) *users.User {
+	return &users.User{
+		ID:        u.ID,
+		Email:     u.Email,
+		Name:      u.Name,
+		Password:  u.Password,
+		CreatedAt: timestamppb.New(u.CreatedAt),
+	}
+}
+
+func fromProtoRegisterRequest(req *users.RegisterRequest) *User {
+	return &User{
+		Email:    req.Email,
+		Password: req.Password, // Lưu ý: Service sẽ mã hóa password
+		Name:     req.Name,
+	}
 }

@@ -3,152 +3,73 @@ package main
 import (
 	"context"
 	"errors"
-	pb "github.com/quanbin27/commons/genproto/payments"
 )
 
-type paymentService struct {
+type PaymentServiceImpl struct {
 	store PaymentStore
 }
 
-// NewPaymentService - Khởi tạo service
 func NewPaymentService(store PaymentStore) PaymentService {
-	return &paymentService{store: store}
+	return &PaymentServiceImpl{store: store}
 }
 
-// CreatePayment - Tạo thanh toán mới
-func (s *paymentService) CreatePayment(ctx context.Context, req *pb.CreatePaymentRequest) (*pb.CreatePaymentResponse, error) {
+func (s *PaymentServiceImpl) CreatePayment(ctx context.Context, orderID, appointmentID int32, amount float32, description string, method PaymentMethod) (int32, error) {
 	payment := &Payment{
-		OrderID:       req.OrderId,
-		AppointmentID: req.AppointmentId,
-		Amount:        req.Amount,
-		Description:   req.Description,
-		Status:        PaymentStatusPending,
-		Method:        fromPbPaymentMethod(req.Method),
+		OrderID:       orderID,
+		AppointmentID: appointmentID,
+		Amount:        amount,
+		Description:   description,
+		Status:        PaymentStatusPending, // Mặc định là PENDING
+		Method:        method,
 	}
+	return s.store.CreatePayment(ctx, payment)
+}
 
-	paymentId, err := s.store.CreatePayment(ctx, payment)
+func (s *PaymentServiceImpl) GetPaymentInfo(ctx context.Context, paymentID int32) (*Payment, error) {
+	return s.store.GetPaymentByID(ctx, paymentID)
+}
+
+func (s *PaymentServiceImpl) CreatePaymentURL(ctx context.Context, paymentID int32, amount float32, description string) (string, string, error) {
+	// Giả lập logic tạo URL thanh toán (có thể tích hợp PayOS hoặc dịch vụ khác)
+	// Đây là giả lập, trả về payment_link_id và checkout_url
+	paymentLinkID := "fake-link-id-" + string(rune(paymentID))
+	checkoutURL := "https://fake-checkout-url.com/" + paymentLinkID
+	return paymentLinkID, checkoutURL, nil
+}
+
+func (s *PaymentServiceImpl) CancelPaymentLink(ctx context.Context, paymentID int32, cancellationReason string) (string, error) {
+	// Giả lập logic hủy link thanh toán
+	// Cập nhật trạng thái thanh toán thành CANCELLED
+	err := s.store.UpdatePaymentStatus(ctx, paymentID, PaymentStatusCancelled)
 	if err != nil {
-		return nil, err
+		return "Failed", err
 	}
-
-	return &pb.CreatePaymentResponse{
-		PaymentId: paymentId,
-	}, nil
+	return "Success", nil
 }
 
-// GetPaymentInfo - Lấy thông tin thanh toán
-func (s *paymentService) GetPaymentInfo(ctx context.Context, req *pb.GetPaymentInfoRequest) (*pb.GetPaymentInfoResponse, error) {
-	payment, err := s.store.GetPaymentByID(ctx, req.PaymentId)
+func (s *PaymentServiceImpl) UpdatePaymentStatus(ctx context.Context, paymentID int32, status PaymentStatus) (string, error) {
+	err := s.store.UpdatePaymentStatus(ctx, paymentID, status)
 	if err != nil {
-		return nil, err
+		return "Failed", err
 	}
-	if payment == nil {
-		return nil, errors.New("payment not found")
-	}
-
-	return &pb.GetPaymentInfoResponse{
-		Status:        toPbPaymentStatus(payment.Status),
-		Method:        toPbPaymentMethod(payment.Method),
-		OrderId:       payment.OrderID,
-		AppointmentId: payment.AppointmentID,
-		Amount:        payment.Amount,
-		Description:   payment.Description,
-	}, nil
+	return "Success", nil
 }
 
-// CreatePaymentURL - Tạo URL thanh toán (tích hợp PayOS)
-func (s *paymentService) CreatePaymentURL(ctx context.Context, req *pb.CreatePaymentURLRequest) (*pb.CreatePaymentURLResponse, error) {
-	// Gửi request đến PayOS API để tạo link thanh toán
-	paymentLinkID := "test"
-	checkoutURL := "https://payos.vn/checkout/" + paymentLinkID
-
-	return &pb.CreatePaymentURLResponse{
-		PaymentLinkId: paymentLinkID,
-		CheckoutUrl:   checkoutURL,
-	}, nil
-}
-
-// CancelPaymentLink - Hủy link thanh toán
-func (s *paymentService) CancelPaymentLink(ctx context.Context, req *pb.CancelPaymentLinkRequest) (*pb.CancelPaymentLinkResponse, error) {
-	// Giả lập hủy thanh toán trên PayOS
-	return &pb.CancelPaymentLinkResponse{Status: "Cancelled"}, nil
-}
-
-// UpdatePaymentStatus - Cập nhật trạng thái thanh toán
-func (s *paymentService) UpdatePaymentStatus(ctx context.Context, req *pb.UpdatePaymentStatusRequest) (*pb.UpdatePaymentStatusResponse, error) {
-	err := s.store.UpdatePaymentStatus(ctx, req.PaymentId, fromPbPaymentStatus(req.Status))
+func (s *PaymentServiceImpl) UpdatePaymentMethod(ctx context.Context, paymentID int32, method PaymentMethod) (string, error) {
+	err := s.store.UpdatePaymentMethod(ctx, paymentID, method)
 	if err != nil {
-		return nil, err
+		return "Failed", err
 	}
-	return &pb.UpdatePaymentStatusResponse{Status: "Updated"}, nil
+	return "Success", nil
 }
 
-// UpdatePaymentMethod - Cập nhật phương thức thanh toán
-func (s *paymentService) UpdatePaymentMethod(ctx context.Context, req *pb.UpdatePaymentMethodRequest) (*pb.UpdatePaymentMethodResponse, error) {
-	err := s.store.UpdatePaymentMethod(ctx, req.PaymentId, fromPbPaymentMethod(req.Method))
+func (s *PaymentServiceImpl) UpdatePaymentAmount(ctx context.Context, paymentID int32, amount float32) (string, error) {
+	if amount <= 0 {
+		return "Failed", errors.New("invalid amount")
+	}
+	err := s.store.UpdatePaymentAmount(ctx, paymentID, amount)
 	if err != nil {
-		return nil, err
+		return "Failed", err
 	}
-	return &pb.UpdatePaymentMethodResponse{Status: "Updated"}, nil
-}
-
-// UpdatePaymentAmount - Cập nhật số tiền thanh toán
-func (s *paymentService) UpdatePaymentAmount(ctx context.Context, req *pb.UpdatePaymentAmountRequest) (*pb.UpdatePaymentAmountResponse, error) {
-	err := s.store.UpdatePaymentAmount(ctx, req.PaymentId, req.Amount)
-	if err != nil {
-		return nil, err
-	}
-	return &pb.UpdatePaymentAmountResponse{Status: "Updated"}, nil
-}
-
-// toPbPaymentStatus chuyển đổi từ PaymentStatus sang pb.PaymentStatus
-func toPbPaymentStatus(status PaymentStatus) pb.PaymentStatus {
-	switch status {
-	case PaymentStatusPending:
-		return pb.PaymentStatus_PENDING
-	case PaymentStatusCompleted:
-		return pb.PaymentStatus_COMPLETED
-	case PaymentStatusFailed:
-		return pb.PaymentStatus_FAILED
-	case PaymentStatusCancelled:
-		return pb.PaymentStatus_CANCELLED
-	default:
-		return pb.PaymentStatus_PAYMENT_STATUS_UNSPECIFIED
-	}
-}
-
-// fromPbPaymentStatus chuyển đổi từ pb.PaymentStatus sang PaymentStatus
-func fromPbPaymentStatus(pbStatus pb.PaymentStatus) PaymentStatus {
-	switch pbStatus {
-	case pb.PaymentStatus_PENDING:
-		return PaymentStatusPending
-	case pb.PaymentStatus_COMPLETED:
-		return PaymentStatusCompleted
-	case pb.PaymentStatus_FAILED:
-		return PaymentStatusFailed
-	case pb.PaymentStatus_CANCELLED:
-		return PaymentStatusCancelled
-	default:
-		return "unknown"
-	}
-}
-func fromPbPaymentMethod(pbMethod pb.PaymentMethod) PaymentMethod {
-	switch pbMethod {
-	case pb.PaymentMethod_BANK:
-		return PaymentMethodBank
-	case pb.PaymentMethod_CASH:
-		return PaymentMethodCash
-	default:
-		return "unknown"
-	}
-}
-func toPbPaymentMethod(paymentMethod PaymentMethod) pb.PaymentMethod {
-	switch paymentMethod {
-	case PaymentMethodBank:
-		return pb.PaymentMethod_BANK
-	case PaymentMethodCash:
-		return pb.PaymentMethod_CASH
-	default:
-		return pb.PaymentMethod_CASH
-	}
+	return "Success", nil
 }

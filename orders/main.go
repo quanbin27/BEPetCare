@@ -45,7 +45,7 @@ func main() {
 	defer l.Close()
 	orderStore := NewOrderStore(db)
 	orderService := NewOrderService(orderStore)
-	NewGrpcOrderHandler(grpcServer, orderService)
+	NewOrderGrpcHandler(grpcServer, orderService)
 	log.Println("Orders Service Listening on", grpcAddr)
 	grpcServer.Serve(l)
 }

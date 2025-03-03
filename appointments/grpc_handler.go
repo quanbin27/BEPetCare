@@ -3,67 +3,113 @@ package main
 import (
 	"context"
 
-	"google.golang.org/grpc"
-
 	pb "github.com/quanbin27/commons/genproto/appointments"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-// AppointmentGrpcHandler triển khai gRPC server cho AppointmentService
 type AppointmentGrpcHandler struct {
+	appointmentService AppointmentService
 	pb.UnimplementedAppointmentServiceServer
-	service AppointmentService
 }
 
-// NewGrpcAppointmentHandler đăng ký gRPC handler vào server
-func NewGrpcAppointmentHandler(grpc *grpc.Server, service AppointmentService) {
-	pb.RegisterAppointmentServiceServer(grpc, &AppointmentGrpcHandler{service: service})
+func NewAppointmentGrpcHandler(grpc *grpc.Server, appointmentService AppointmentService) {
+	grpcHandler := &AppointmentGrpcHandler{
+		appointmentService: appointmentService,
+	}
+	pb.RegisterAppointmentServiceServer(grpc, grpcHandler)
 }
 
-// --- 🗓 LỊCH HẸN --- //
-
-// Tạo lịch hẹn mới
+// --- LỊCH HẸN ---
 func (h *AppointmentGrpcHandler) CreateAppointment(ctx context.Context, req *pb.CreateAppointmentRequest) (*pb.CreateAppointmentResponse, error) {
-	return h.service.CreateAppointment(ctx, req)
+	appointmentID, statusMsg, err := h.appointmentService.CreateAppointment(ctx, req.CustomerId, req.EmployeeId, req.CustomerAddress, req.ScheduledTime.AsTime(), req.ServiceIds)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &pb.CreateAppointmentResponse{AppointmentId: appointmentID, Status: statusMsg}, nil
 }
 
-// Lấy danh sách lịch hẹn theo khách hàng
 func (h *AppointmentGrpcHandler) GetAppointmentsByCustomer(ctx context.Context, req *pb.GetAppointmentsByCustomerRequest) (*pb.GetAppointmentsResponse, error) {
-	return h.service.GetAppointmentsByCustomer(ctx, req)
+	appointments, err := h.appointmentService.GetAppointmentsByCustomer(ctx, req.CustomerId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	pbAppointments := make([]*pb.Appointment, len(appointments))
+	for i, a := range appointments {
+		pbAppointments[i] = toProtoAppointment(&a)
+	}
+	return &pb.GetAppointmentsResponse{Appointments: pbAppointments}, nil
 }
 
-// Lấy danh sách lịch hẹn theo nhân viên
 func (h *AppointmentGrpcHandler) GetAppointmentsByEmployee(ctx context.Context, req *pb.GetAppointmentsByEmployeeRequest) (*pb.GetAppointmentsResponse, error) {
-	return h.service.GetAppointmentsByEmployee(ctx, req)
+	appointments, err := h.appointmentService.GetAppointmentsByEmployee(ctx, req.EmployeeId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	pbAppointments := make([]*pb.Appointment, len(appointments))
+	for i, a := range appointments {
+		pbAppointments[i] = toProtoAppointment(&a)
+	}
+	return &pb.GetAppointmentsResponse{Appointments: pbAppointments}, nil
 }
 
-// Cập nhật trạng thái lịch hẹn
 func (h *AppointmentGrpcHandler) UpdateAppointmentStatus(ctx context.Context, req *pb.UpdateAppointmentStatusRequest) (*pb.UpdateAppointmentStatusResponse, error) {
-	return h.service.UpdateAppointmentStatus(ctx, req)
+	statusMsg, err := h.appointmentService.UpdateAppointmentStatus(ctx, req.AppointmentId, fromPbAppointmentStatus(req.Status))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &pb.UpdateAppointmentStatusResponse{Status: statusMsg}, nil
 }
 
-// Lấy chi tiết lịch hẹn
 func (h *AppointmentGrpcHandler) GetAppointmentDetails(ctx context.Context, req *pb.GetAppointmentDetailsRequest) (*pb.GetAppointmentDetailsResponse, error) {
-	return h.service.GetAppointmentDetails(ctx, req)
+	appointment, details, err := h.appointmentService.GetAppointmentDetails(ctx, req.AppointmentId)
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, err.Error())
+	}
+	pbDetails := make([]*pb.AppointmentDetail, len(details))
+	for i, d := range details {
+		pbDetails[i] = toProtoAppointmentDetail(&d)
+	}
+	return &pb.GetAppointmentDetailsResponse{
+		Appointment: toProtoAppointment(appointment),
+		Details:     pbDetails,
+	}, nil
 }
 
-// --- 🛠 DỊCH VỤ --- //
-
-// Tạo dịch vụ thú cưng mới
+// --- DỊCH VỤ ---
 func (h *AppointmentGrpcHandler) CreateService(ctx context.Context, req *pb.CreateServiceRequest) (*pb.CreateServiceResponse, error) {
-	return h.service.CreateService(ctx, req)
+	serviceID, statusMsg, err := h.appointmentService.CreateService(ctx, req.Name, req.Description, req.Price)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &pb.CreateServiceResponse{ServiceId: serviceID, Status: statusMsg}, nil
 }
 
-// Lấy danh sách dịch vụ
 func (h *AppointmentGrpcHandler) GetServices(ctx context.Context, req *pb.GetServicesRequest) (*pb.GetServicesResponse, error) {
-	return h.service.GetServices(ctx, req)
+	services, err := h.appointmentService.GetServices(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	pbServices := make([]*pb.Service, len(services))
+	for i, s := range services {
+		pbServices[i] = toProtoService(&s)
+	}
+	return &pb.GetServicesResponse{Services: pbServices}, nil
 }
 
-// Cập nhật thông tin dịch vụ
 func (h *AppointmentGrpcHandler) UpdateService(ctx context.Context, req *pb.UpdateServiceRequest) (*pb.UpdateServiceResponse, error) {
-	return h.service.UpdateService(ctx, req)
+	statusMsg, err := h.appointmentService.UpdateService(ctx, req.ServiceId, req.Name, req.Description, req.Price)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &pb.UpdateServiceResponse{Status: statusMsg}, nil
 }
 
-// Xóa dịch vụ
 func (h *AppointmentGrpcHandler) DeleteService(ctx context.Context, req *pb.DeleteServiceRequest) (*pb.DeleteServiceResponse, error) {
-	return h.service.DeleteService(ctx, req)
+	statusMsg, err := h.appointmentService.DeleteService(ctx, req.ServiceId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &pb.DeleteServiceResponse{Status: statusMsg}, nil
 }

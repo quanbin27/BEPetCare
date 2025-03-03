@@ -5,6 +5,7 @@ import (
 	"time"
 
 	pb "github.com/quanbin27/commons/genproto/products"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Food - Bảng thực phẩm cho thú cưng
@@ -84,34 +85,85 @@ type ProductStore interface {
 	UpdateBranchInventory(ctx context.Context, branchID int32, productID int32, productType string, stockQuantity int32) error
 }
 
-// ProductService Interface - Implement gRPC server logic
+// ProductService Interface - Implement business logic with internal types
 type ProductService interface {
 	// Thực phẩm
-	GetFoodByID(ctx context.Context, req *pb.GetFoodRequest) (*pb.Food, error)
-	ListFoods(ctx context.Context, req *pb.ListFoodRequest) (*pb.ListFoodResponse, error)
-	CreateFood(ctx context.Context, req *pb.CreateFoodRequest) (*pb.CreateFoodResponse, error)
-	UpdateFood(ctx context.Context, req *pb.UpdateFoodRequest) (*pb.UpdateFoodResponse, error)
-	DeleteFood(ctx context.Context, req *pb.DeleteFoodRequest) (*pb.DeleteFoodResponse, error)
+	GetFoodByID(ctx context.Context, id int32) (*Food, error)
+	ListFoods(ctx context.Context) ([]Food, error)
+	CreateFood(ctx context.Context, name, description string, price float32) (string, error)
+	UpdateFood(ctx context.Context, id int32, name, description string, price float32) (string, error)
+	DeleteFood(ctx context.Context, id int32) (string, error)
 
 	// Phụ kiện
-	GetAccessoryByID(ctx context.Context, req *pb.GetAccessoryRequest) (*pb.Accessory, error)
-	ListAccessories(ctx context.Context, req *pb.ListAccessoryRequest) (*pb.ListAccessoryResponse, error)
-	CreateAccessory(ctx context.Context, req *pb.CreateAccessoryRequest) (*pb.CreateAccessoryResponse, error)
-	UpdateAccessory(ctx context.Context, req *pb.UpdateAccessoryRequest) (*pb.UpdateAccessoryResponse, error)
-	DeleteAccessory(ctx context.Context, req *pb.DeleteAccessoryRequest) (*pb.DeleteAccessoryResponse, error)
+	GetAccessoryByID(ctx context.Context, id int32) (*Accessory, error)
+	ListAccessories(ctx context.Context) ([]Accessory, error)
+	CreateAccessory(ctx context.Context, name, description string, price float32) (string, error)
+	UpdateAccessory(ctx context.Context, id int32, name, description string, price float32) (string, error)
+	DeleteAccessory(ctx context.Context, id int32) (string, error)
 
 	// Thuốc
-	GetMedicineByID(ctx context.Context, req *pb.GetMedicineRequest) (*pb.Medicine, error)
-	ListMedicines(ctx context.Context, req *pb.ListMedicineRequest) (*pb.ListMedicineResponse, error)
-	CreateMedicine(ctx context.Context, req *pb.CreateMedicineRequest) (*pb.CreateMedicineResponse, error)
-	UpdateMedicine(ctx context.Context, req *pb.UpdateMedicineRequest) (*pb.UpdateMedicineResponse, error)
-	DeleteMedicine(ctx context.Context, req *pb.DeleteMedicineRequest) (*pb.DeleteMedicineResponse, error)
+	GetMedicineByID(ctx context.Context, id int32) (*Medicine, error)
+	ListMedicines(ctx context.Context) ([]Medicine, error)
+	CreateMedicine(ctx context.Context, name, description string, price float32) (string, error)
+	UpdateMedicine(ctx context.Context, id int32, name, description string, price float32) (string, error)
+	DeleteMedicine(ctx context.Context, id int32) (string, error)
 
 	// Chi nhánh
-	GetBranchByID(ctx context.Context, req *pb.GetBranchRequest) (*pb.Branch, error)
-	ListBranches(ctx context.Context, req *pb.ListBranchRequest) (*pb.ListBranchResponse, error)
+	GetBranchByID(ctx context.Context, id int32) (*Branch, error)
+	ListBranches(ctx context.Context) ([]Branch, error)
 
 	// Tồn kho
-	GetBranchInventory(ctx context.Context, req *pb.GetBranchInventoryRequest) (*pb.GetBranchInventoryResponse, error)
-	UpdateBranchInventory(ctx context.Context, req *pb.UpdateBranchInventoryRequest) (*pb.UpdateBranchInventoryResponse, error)
+	GetBranchInventory(ctx context.Context, branchID int32) ([]BranchProduct, error)
+	UpdateBranchInventory(ctx context.Context, branchID, productID int32, productType string, stockQuantity int32) (string, error)
+}
+
+// Helper functions to convert between internal types and protobuf types
+func toProtoFood(f *Food) *pb.Food {
+	return &pb.Food{
+		Id:          f.ID,
+		Name:        f.Name,
+		Description: f.Description,
+		Price:       f.Price,
+		CreatedAt:   timestamppb.New(f.CreatedAt),
+		UpdatedAt:   timestamppb.New(f.UpdatedAt),
+	}
+}
+
+func toProtoAccessory(a *Accessory) *pb.Accessory {
+	return &pb.Accessory{
+		Id:          a.ID,
+		Name:        a.Name,
+		Description: a.Description,
+		Price:       a.Price,
+		CreatedAt:   timestamppb.New(a.CreatedAt),
+		UpdatedAt:   timestamppb.New(a.UpdatedAt),
+	}
+}
+
+func toProtoMedicine(m *Medicine) *pb.Medicine {
+	return &pb.Medicine{
+		Id:          m.ID,
+		Name:        m.Name,
+		Description: m.Description,
+		Price:       m.Price,
+		CreatedAt:   timestamppb.New(m.CreatedAt),
+		UpdatedAt:   timestamppb.New(m.UpdatedAt),
+	}
+}
+
+func toProtoBranch(b *Branch) *pb.Branch {
+	return &pb.Branch{
+		Id:       b.ID,
+		Name:     b.Name,
+		Location: b.Location,
+	}
+}
+
+func toProtoBranchProduct(bp *BranchProduct) *pb.BranchProduct {
+	return &pb.BranchProduct{
+		BranchId:      bp.BranchID,
+		ProductId:     bp.ProductID,
+		ProductType:   bp.ProductType,
+		StockQuantity: bp.StockQuantity,
+	}
 }
