@@ -1,3 +1,3 @@
-module github.com/quanbin27/BEPetCare-appoinments
+module github.com/quanbin27/BEPetCare-appointments
 
 go 1.22.5
