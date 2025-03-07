@@ -19,7 +19,7 @@ func NewOrderHandler(client pb.OrderServiceClient) *OrderHandler {
 }
 
 // RegisterRoutes đăng ký các route cho Orders service với tiền tố "/orders"
-func (h *OrderHandler) RegisterRoutes(e *echo.Echo) {
+func (h *OrderHandler) RegisterRoutes(e *echo.Group) {
 	e.POST("/orders", h.CreateOrder)
 	e.GET("/orders/:order_id", h.GetOrder)
 	e.PUT("/orders/update-status", h.UpdateOrderStatus)

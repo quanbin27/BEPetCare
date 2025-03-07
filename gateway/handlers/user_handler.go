@@ -19,7 +19,7 @@ func NewUserHandler(client pb.UserServiceClient) *UserHandler {
 }
 
 // RegisterRoutes đăng ký các route cho Users service với tiền tố "/users"
-func (h *UserHandler) RegisterRoutes(e *echo.Echo) {
+func (h *UserHandler) RegisterRoutes(e *echo.Group) {
 	e.POST("/users/register", h.RegisterUser)
 	e.POST("/users/login", h.LoginUser)
 	e.PUT("/users/change-info", h.ChangeInfo)
