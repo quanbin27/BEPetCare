@@ -12,11 +12,13 @@ import (
 type UserStore interface {
 	GetUserByID(ctx context.Context, id int32) (*User, error)
 	GetUserByEmail(ctx context.Context, email string) (*User, error)
-	CreateUser(ctx context.Context, user *User) error
+	CreateUser(ctx context.Context, user *User) (int32, error)
 	UpdateInfo(ctx context.Context, userID int32, updatedData map[string]interface{}) error
 	UpdatePassword(ctx context.Context, userID int32, password string) error
 	GetNameByID(ctx context.Context, id int32) (string, error)
 	GetUsersByIDs(ctx context.Context, userIDs []int32) ([]User, error)
+	CreateRole(ctx context.Context, userId int32, roleId int32) error
+	UpdateRole(ctx context.Context, userId int32, roleId int32) error
 }
 
 // UserService defines the interface for business logic operations with internal types

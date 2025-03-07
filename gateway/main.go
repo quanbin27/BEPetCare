@@ -83,8 +83,14 @@ func main() {
 	userHandler := handlers.NewUserHandler(gateway.UsersClient)
 	userHandler.RegisterRoutes(subrouter)
 	productHandler := handlers.NewProductHandler(gateway.ProductsClient)
-	productHandler.
-		log.Println("Starting server on", httpAddr)
+	productHandler.RegisterRoutes(subrouter)
+	paymentHandler := handlers.NewPaymentHandler(gateway.PaymentsClient)
+	paymentHandler.RegisterRoutes(subrouter)
+	appointmentHandler := handlers.NewAppointmentHandler(gateway.AppointmentsClient)
+	appointmentHandler.RegisterRoutes(subrouter)
+	recordsHandler := handlers.NewRecordsHandler(gateway.PetRecordClient)
+	recordsHandler.RegisterRoutes(subrouter)
+	log.Println("Starting server on", httpAddr)
 	if err := e.Start(httpAddr); err != nil {
 		log.Fatal("Failed to start server:", err)
 	}

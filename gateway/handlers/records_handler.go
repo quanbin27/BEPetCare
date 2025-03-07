@@ -19,7 +19,7 @@ func NewRecordsHandler(client pb.PetRecordServiceClient) *RecordsHandler {
 }
 
 // RegisterRoutes đăng ký các route cho PetRecord service
-func (h *RecordsHandler) RegisterRoutes(e *echo.Echo) {
+func (h *RecordsHandler) RegisterRoutes(e *echo.Group) {
 	// Pet routes
 	e.POST("/pets", h.CreatePet)
 	e.GET("/pets/:id", h.GetPet)

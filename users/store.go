@@ -23,7 +23,14 @@ func (s *Store) GetUserByEmail(ctx context.Context, email string) (*User, error)
 	}
 	return &user, nil
 }
-
+func (s *Store) CreateRole(ctx context.Context, userId int32, roleId int32) error {
+	err := s.db.WithContext(ctx).Create(&UserRole{UserID: userId, RoleID: roleId}).Error
+	return err
+}
+func (s *Store) UpdateRole(ctx context.Context, userId int32, roleId int32) error {
+	err := s.db.WithContext(ctx).Save(&UserRole{UserID: userId, RoleID: roleId}).Error
+	return err
+}
 func (s *Store) GetNameByID(ctx context.Context, id int32) (string, error) {
 	var user User
 	result := s.db.WithContext(ctx).Where("id = ?", id).First(&user)
@@ -54,9 +61,9 @@ func (s *Store) GetUserByID(ctx context.Context, id int32) (*User, error) {
 	return &user, nil
 }
 
-func (s *Store) CreateUser(ctx context.Context, user *User) error {
+func (s *Store) CreateUser(ctx context.Context, user *User) (int32, error) {
 	result := s.db.WithContext(ctx).Create(&user)
-	return result.Error
+	return user.ID, result.Error
 }
 
 func (s *Store) UpdateInfo(ctx context.Context, userID int32, updatedData map[string]interface{}) error {

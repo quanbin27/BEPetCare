@@ -19,7 +19,7 @@ func NewProductHandler(client pb.ProductServiceClient) *ProductHandler {
 }
 
 // RegisterRoutes đăng ký các route cho Products service
-func (h *ProductHandler) RegisterRoutes(e *echo.Echo) {
+func (h *ProductHandler) RegisterRoutes(e *echo.Group) {
 	// Thực phẩm
 	e.GET("/products/foods/:id", h.GetFoodByID)
 	e.GET("/products/foods", h.ListFoods)

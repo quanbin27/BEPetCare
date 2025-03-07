@@ -31,7 +31,13 @@ func (s *Service) Register(ctx context.Context, email, password, name string) (s
 		Password: hashedPassword,
 		Name:     name,
 	}
-	if err := s.userStore.CreateUser(ctx, user); err != nil {
+
+	userId, err := s.userStore.CreateUser(ctx, user)
+	if err != nil {
+		return "Failed", err
+	}
+	err = s.userStore.CreateRole(ctx, userId, 3)
+	if err != nil {
 		return "Failed", err
 	}
 	return "Success", nil

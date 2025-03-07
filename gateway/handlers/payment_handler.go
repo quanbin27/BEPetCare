@@ -19,7 +19,7 @@ func NewPaymentHandler(client pb.PaymentServiceClient) *PaymentHandler {
 }
 
 // RegisterRoutes đăng ký các route cho Payments service với tiền tố "/payments"
-func (h *PaymentHandler) RegisterRoutes(e *echo.Echo) {
+func (h *PaymentHandler) RegisterRoutes(e *echo.Group) {
 	e.POST("/payments", h.CreatePayment)
 	e.GET("/payments/:payment_id", h.GetPaymentInfo)
 	e.POST("/payments/url", h.CreatePaymentURL)
