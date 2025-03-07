@@ -4,15 +4,27 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/quanbin27/BEPetCare-gateway/handlers"
 	config "github.com/quanbin27/commons/config"
+	pbAppointments "github.com/quanbin27/commons/genproto/appointments"
+	pbOrders "github.com/quanbin27/commons/genproto/orders"
+	pbPayments "github.com/quanbin27/commons/genproto/payments"
+	pbProducts "github.com/quanbin27/commons/genproto/products"
+	pbPetRecord "github.com/quanbin27/commons/genproto/records"
+	pbUsers "github.com/quanbin27/commons/genproto/users"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 )
 
-func main() {
-	httpAddr := config.Envs.HTTP_ADDR
-	e := echo.New()
-	subrouter := e.Group("/api/v1")
+type Gateway struct {
+	PetRecordClient    pbPetRecord.PetRecordServiceClient
+	UsersClient        pbUsers.UserServiceClient
+	ProductsClient     pbProducts.ProductServiceClient
+	PaymentsClient     pbPayments.PaymentServiceClient
+	OrdersClient       pbOrders.OrderServiceClient
+	AppointmentsClient pbAppointments.AppointmentServiceClient
+}
+
+func NewGateway() (*Gateway, error) {
 	usersServiceAddr := config.Envs.UsersGrpcAddr
 	ordersServiceAddr := config.Envs.OrdersGrpcAddr
 	recordsServiceAddr := config.Envs.RecordsGrpcAddr
@@ -48,11 +60,31 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to dial order server: %v", err)
 	}
-	orderHandler := handlers.NewOrderHandler(orderClient)
-	orderHandler.registerRoutes(subrouter)
-	userHandler := handlers.NewUserHandler(userClient)
-	userHandler.registerRoutes(subrouter)
-	log.Println("Starting server on", httpAddr)
+
+	return &Gateway{
+		PetRecordClient:    pbPetRecord.NewPetRecordServiceClient(petRecordConn),
+		UsersClient:        pbUsers.NewUserServiceClient(usersConn),
+		ProductsClient:     pbProducts.NewProductServiceClient(productsConn),
+		PaymentsClient:     pbPayments.NewPaymentServiceClient(paymentsConn),
+		OrdersClient:       pbOrders.NewOrderServiceClient(ordersConn),
+		AppointmentsClient: pbAppointments.NewAppointmentServiceClient(appointmentsConn),
+	}, nil
+}
+func main() {
+	httpAddr := config.Envs.HTTP_ADDR
+	e := echo.New()
+	subrouter := e.Group("/api/v1")
+	gateway, err := NewGateway()
+	if err != nil {
+		log.Fatalf("Failed to initialize gateway: %v", err)
+	}
+	orderHandler := handlers.NewOrderHandler(gateway.OrdersClient)
+	orderHandler.RegisterRoutes(subrouter)
+	userHandler := handlers.NewUserHandler(gateway.UsersClient)
+	userHandler.RegisterRoutes(subrouter)
+	productHandler := handlers.NewProductHandler(gateway.ProductsClient)
+	productHandler.
+		log.Println("Starting server on", httpAddr)
 	if err := e.Start(httpAddr); err != nil {
 		log.Fatal("Failed to start server:", err)
 	}
