@@ -11,8 +11,8 @@ type EmailNotification struct {
 	Email     string    `gorm:"type:varchar(255);not null"`
 	Subject   string    `gorm:"type:varchar(255);not null"`
 	Body      string    `gorm:"type:text;not null"`
-	CreatedAt time.Time `gorm:"not null"`
-	SentAt    time.Time // Có thể null trong MySQL
+	CreatedAt time.Time `gorm:"autoCreateTime"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime"`
 	Status    string    `gorm:"type:varchar(50);not null"`
 }
 

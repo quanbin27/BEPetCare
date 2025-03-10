@@ -19,6 +19,7 @@ type UserStore interface {
 	GetUsersByIDs(ctx context.Context, userIDs []int32) ([]User, error)
 	CreateRole(ctx context.Context, userId int32, roleId int32) error
 	UpdateRole(ctx context.Context, userId int32, roleId int32) error
+	GetRole(ctx context.Context, userId int32) (int32, error)
 }
 
 // UserService defines the interface for business logic operations with internal types

@@ -60,6 +60,16 @@ func (s *Store) GetUserByID(ctx context.Context, id int32) (*User, error) {
 	}
 	return &user, nil
 }
+func (s *Store) GetRole(ctx context.Context, id int32) (int32, error) {
+	var userRole UserRole
+	if err := s.db.WithContext(ctx).Where("user_id = ?", id).First(&userRole).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, nil // Không tìm thấy role nhưng không phải lỗi
+		}
+		return 0, err // Lỗi khác khi truy vấn database
+	}
+	return userRole.RoleID, nil
+}
 
 func (s *Store) CreateUser(ctx context.Context, user *User) (int32, error) {
 	result := s.db.WithContext(ctx).Create(&user)

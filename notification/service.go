@@ -24,7 +24,7 @@ func NewService(store NotificationStore, mailDialer *gomail.Dialer) *Service {
 // SendVerificationEmail gửi email xác minh
 func (s *Service) SendVerificationEmail(ctx context.Context, email, token, baseURL string) (string, error) {
 	// Tạo thông báo
-	verifyURL := fmt.Sprintf("%s/verify?token=%s", baseURL, token)
+	verifyURL := fmt.Sprintf("%s%s/verify?token=%s", baseURL, "/api/v1/users", token)
 	notification := &EmailNotification{
 		Email:   email,
 		Subject: "Verify Your Email",
@@ -39,7 +39,7 @@ func (s *Service) SendVerificationEmail(ctx context.Context, email, token, baseU
 
 	// Gửi email
 	m := gomail.NewMessage()
-	m.SetHeader("From", "no-reply@yourdomain.com")
+	m.SetHeader("From", "votrungquan2002@gmail.com")
 	m.SetHeader("To", email)
 	m.SetHeader("Subject", notification.Subject)
 	m.SetBody("text/plain", notification.Body)

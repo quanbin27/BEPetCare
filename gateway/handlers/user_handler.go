@@ -20,7 +20,8 @@ func NewUserHandler(client pb.UserServiceClient) *UserHandler {
 
 // RegisterRoutes đăng ký các route cho Users service với tiền tố "/users"
 func (h *UserHandler) RegisterRoutes(e *echo.Group) {
-	e.POST("/users/register", h.RegisterUser)
+	e.POST("/users/register", h.Register)
+	e.GET("/users/verify", h.VerifyEmail)
 	e.POST("/users/login", h.LoginUser)
 	e.PUT("/users/change-info", h.ChangeInfo)
 	e.PUT("/users/change-password", h.ChangePassword)
@@ -28,8 +29,7 @@ func (h *UserHandler) RegisterRoutes(e *echo.Group) {
 	e.GET("/users/info-by-email", h.GetUserInfoByEmail)
 }
 
-// RegisterUser xử lý yêu cầu đăng ký người dùng
-func (h *UserHandler) RegisterUser(c echo.Context) error {
+func (h *UserHandler) Register(c echo.Context) error {
 	var req struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
@@ -39,9 +39,11 @@ func (h *UserHandler) RegisterUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
-	// Lấy context từ Echo request
-	ctx := c.Request().Context()
+	if req.Email == "" || req.Password == "" || req.Name == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Email, password, and name are required"})
+	}
 
+	ctx := c.Request().Context()
 	resp, err := h.client.Register(ctx, &pb.RegisterRequest{
 		Email:    req.Email,
 		Password: req.Password,
@@ -60,7 +62,33 @@ func (h *UserHandler) RegisterUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{
-		"status": resp.Status,
+		"message": resp.Status, // "Verification email sent"
+	})
+}
+
+// VerifyEmail xử lý xác minh email
+func (h *UserHandler) VerifyEmail(c echo.Context) error {
+	token := c.QueryParam("token")
+	if token == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Token is required"})
+	}
+
+	ctx := c.Request().Context()
+	resp, err := h.client.VerifyEmail(ctx, &pb.VerifyEmailRequest{Token: token})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.InvalidArgument:
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": grpcErr.Message()})
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, map[string]int32{
+		"id": resp.Id,
 	})
 }
 

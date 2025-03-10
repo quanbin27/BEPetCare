@@ -57,7 +57,7 @@ func (s *Service) Register(ctx context.Context, email, password, name string) (s
 	}
 	err = s.savePendingUser(ctx, pu)
 	if err != nil {
-		return "", errors.New("failed to save pending user")
+		return "", err
 	}
 	_, err = s.notificationSvc.SendVerificationEmail(ctx, &pbNotification.SendVerificationEmailRequest{
 		Email:   email,
@@ -66,7 +66,7 @@ func (s *Service) Register(ctx context.Context, email, password, name string) (s
 	})
 	if err != nil {
 		s.redis.Del(ctx, "pending:"+token)
-		return "", errors.New("failed to send verification email")
+		return "", err
 	}
 	return "Verification email sent", nil
 }
@@ -111,12 +111,17 @@ func (s *Service) Login(ctx context.Context, email, password string, rememberMe 
 	if !auth.CheckPassword(u.Password, []byte(password)) {
 		return "Failed", "", errors.New("invalid password")
 	}
+
 	secret := []byte(config.Envs.JWTSecret)
+	roleId, err := s.userStore.GetRole(ctx, u.ID)
+	if err != nil {
+		return "Failed", "", err
+	}
 	var token string
 	if rememberMe {
-		token, err = auth.CreateJWT(secret, u.ID, config.Envs.JWTExpirationInSeconds)
+		token, err = auth.CreateJWT(secret, u.ID, config.Envs.JWTExpirationInSeconds, roleId)
 	} else {
-		token, err = auth.CreateJWT(secret, u.ID, 3600)
+		token, err = auth.CreateJWT(secret, u.ID, 3600, roleId)
 	}
 	if err != nil {
 		return "Failed", "", errors.New("failed to create JWT")
@@ -215,11 +220,13 @@ func (s *Service) savePendingUser(ctx context.Context, pu *PendingUser) error {
 		"token":    pu.Token,
 		"expires":  pu.Expires.Format(time.RFC3339),
 	}
+	println("toi day")
 	err := s.redis.HMSet(ctx, key, data).Err()
 	if err != nil {
 		return err
 	}
 	s.redis.Expire(ctx, key, 24*time.Hour)
+	println("toi day Done")
 	return nil
 }
 func (s *Service) getPendingUser(ctx context.Context, token string) (*PendingUser, error) {
