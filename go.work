@@ -9,4 +9,5 @@ use (
 	./products
 	./records
 	./users
+	./notification
 )

@@ -24,11 +24,12 @@ type UserStore interface {
 // UserService defines the interface for business logic operations with internal types
 type UserService interface {
 	Register(ctx context.Context, email, password, name string) (string, error)
-	Login(ctx context.Context, email, password string) (string, string, error)                         // Trả về status và token
+	Login(ctx context.Context, email, password string, rememberMe bool) (string, string, error)        // Trả về status và token
 	ChangeInfo(ctx context.Context, userID int32, email, name string) (string, string, string, error)  // Trả về status, email, name
 	ChangePassword(ctx context.Context, userID int32, oldPassword, newPassword string) (string, error) // Trả về status
 	GetUserInfo(ctx context.Context, id int32) (*User, error)
 	GetUserInfoByEmail(ctx context.Context, email string) (*User, error)
+	VerifyEmail(ctx context.Context, token string) (int32, error)
 }
 
 // User represents a user in the internal system
@@ -40,6 +41,13 @@ type User struct {
 	Roles     []Role    `gorm:"many2many:user_roles;"` // Quan hệ nhiều-nhiều với Role
 	BranchID  *int32    `gorm:"index"`                 // ID của chi nhánh hiện tại
 	CreatedAt time.Time `gorm:"autoCreateTime"`
+}
+type PendingUser struct {
+	Email    string
+	Password string
+	Name     string
+	Token    string
+	Expires  time.Time
 }
 
 // Role - Bảng quyền (Admin, Employee, Customer)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/quanbin27/BEPetCare-gateway/handlers"
 	config "github.com/quanbin27/commons/config"
 	pbAppointments "github.com/quanbin27/commons/genproto/appointments"
@@ -73,6 +74,18 @@ func NewGateway() (*Gateway, error) {
 func main() {
 	httpAddr := config.Envs.HTTP_ADDR
 	e := echo.New()
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:3000", "https://aa6d-2402-800-6375-845a-8417-eba3-c3d5-84b7.ngrok-free.app"},
+		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE},
+		AllowHeaders: []string{
+			echo.HeaderOrigin,
+			echo.HeaderContentType,
+			echo.HeaderAccept,
+			echo.HeaderAuthorization, // Thêm dòng này để cho phép Authorization
+		},
+		AllowCredentials: true,
+	}))
+
 	subrouter := e.Group("/api/v1")
 	gateway, err := NewGateway()
 	if err != nil {

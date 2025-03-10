@@ -2,18 +2,32 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
+	"github.com/go-redis/redis/v8"
+	"google.golang.org/grpc"
+	"time"
 
 	"github.com/quanbin27/commons/auth"
 	"github.com/quanbin27/commons/config"
+	pbNotification "github.com/quanbin27/commons/genproto/notifications"
 )
 
 type Service struct {
-	userStore UserStore
+	userStore       UserStore
+	redis           *redis.Client
+	notificationSvc pbNotification.NotificationServiceClient
+	baseURL         string
 }
 
-func NewService(userStore UserStore) *Service {
-	return &Service{userStore: userStore}
+func NewService(store UserStore, redisClient *redis.Client, notificationConn *grpc.ClientConn, baseURL string) *Service {
+	return &Service{
+		userStore:       store,
+		redis:           redisClient,
+		notificationSvc: pbNotification.NewNotificationServiceClient(notificationConn),
+		baseURL:         baseURL,
+	}
 }
 
 // Register creates a new user
@@ -22,29 +36,74 @@ func (s *Service) Register(ctx context.Context, email, password, name string) (s
 	if err == nil {
 		return "Failed", errors.New("user already exists")
 	}
+	if s.isPendingEmail(ctx, email) {
+		return "", errors.New("email is already pending verification")
+	}
 	hashedPassword, err := auth.HashPassword(password)
 	if err != nil {
 		return "Failed", errors.New("failed to hash password")
 	}
-	user := &User{
+	token, err := generateToken()
+	if err != nil {
+		return "", errors.New("failed to generate token")
+	}
+
+	pu := &PendingUser{
 		Email:    email,
 		Password: hashedPassword,
 		Name:     name,
+		Token:    token,
+		Expires:  time.Now().Add(24 * time.Hour),
+	}
+	err = s.savePendingUser(ctx, pu)
+	if err != nil {
+		return "", errors.New("failed to save pending user")
+	}
+	_, err = s.notificationSvc.SendVerificationEmail(ctx, &pbNotification.SendVerificationEmailRequest{
+		Email:   email,
+		Token:   token,
+		BaseUrl: s.baseURL,
+	})
+	if err != nil {
+		s.redis.Del(ctx, "pending:"+token)
+		return "", errors.New("failed to send verification email")
+	}
+	return "Verification email sent", nil
+}
+func (s *Service) VerifyEmail(ctx context.Context, token string) (int32, error) {
+	// Lấy thông tin từ Redis
+	pu, err := s.getPendingUser(ctx, token)
+	if err != nil {
+		return 0, err
 	}
 
+	// Kiểm tra lại email trong DB (tránh race condition)
+	if _, err := s.userStore.GetUserByEmail(ctx, pu.Email); err == nil {
+		s.redis.Del(ctx, "pending:"+token)
+		return 0, errors.New("user already exists")
+	}
+	// Tạo user để lưu vào DB
+	user := &User{
+		Email:    pu.Email,
+		Password: pu.Password,
+		Name:     pu.Name,
+	}
 	userId, err := s.userStore.CreateUser(ctx, user)
 	if err != nil {
-		return "Failed", err
+		return 0, errors.New("failed to create user: " + err.Error())
 	}
+
+	// Xóa dữ liệu tạm trong Redis
+	s.redis.Del(ctx, "pending:"+token)
 	err = s.userStore.CreateRole(ctx, userId, 3)
 	if err != nil {
-		return "Failed", err
+		return userId, err
 	}
-	return "Success", nil
+	return userId, nil
 }
 
 // Login authenticates a user and generates a JWT token
-func (s *Service) Login(ctx context.Context, email, password string) (string, string, error) {
+func (s *Service) Login(ctx context.Context, email, password string, rememberMe bool) (string, string, error) {
 	u, err := s.userStore.GetUserByEmail(ctx, email)
 	if err != nil {
 		return "Failed", "", errors.New("not found, invalid email")
@@ -53,7 +112,12 @@ func (s *Service) Login(ctx context.Context, email, password string) (string, st
 		return "Failed", "", errors.New("invalid password")
 	}
 	secret := []byte(config.Envs.JWTSecret)
-	token, err := auth.CreateJWT(secret, u.ID, config.Envs.JWTExpirationInSeconds)
+	var token string
+	if rememberMe {
+		token, err = auth.CreateJWT(secret, u.ID, config.Envs.JWTExpirationInSeconds)
+	} else {
+		token, err = auth.CreateJWT(secret, u.ID, 3600)
+	}
 	if err != nil {
 		return "Failed", "", errors.New("failed to create JWT")
 	}
@@ -123,4 +187,59 @@ func (s *Service) GetUserInfoByEmail(ctx context.Context, email string) (*User, 
 		return nil, errors.New("user not found")
 	}
 	return user, nil
+}
+func (s *Service) isPendingEmail(ctx context.Context, email string) bool {
+	iter := s.redis.Keys(ctx, "pending:*").Val()
+	for _, key := range iter {
+		data, _ := s.redis.HGetAll(ctx, key).Result()
+		if data["email"] == email {
+			return true
+		}
+	}
+	return false
+}
+func generateToken() (string, error) {
+	b := make([]byte, 16)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(b), nil
+}
+func (s *Service) savePendingUser(ctx context.Context, pu *PendingUser) error {
+	key := "pending:" + pu.Token
+	data := map[string]interface{}{
+		"email":    pu.Email,
+		"password": pu.Password,
+		"name":     pu.Name,
+		"token":    pu.Token,
+		"expires":  pu.Expires.Format(time.RFC3339),
+	}
+	err := s.redis.HMSet(ctx, key, data).Err()
+	if err != nil {
+		return err
+	}
+	s.redis.Expire(ctx, key, 24*time.Hour)
+	return nil
+}
+func (s *Service) getPendingUser(ctx context.Context, token string) (*PendingUser, error) {
+	key := "pending:" + token
+	data, err := s.redis.HGetAll(ctx, key).Result()
+	if err != nil || len(data) == 0 {
+		return nil, errors.New("invalid or expired token")
+	}
+
+	expires, err := time.Parse(time.RFC3339, data["expires"])
+	if err != nil || time.Now().After(expires) {
+		s.redis.Del(ctx, key)
+		return nil, errors.New("token expired")
+	}
+
+	return &PendingUser{
+		Email:    data["email"],
+		Password: data["password"],
+		Name:     data["name"],
+		Token:    data["token"],
+		Expires:  expires,
+	}, nil
 }

@@ -67,8 +67,9 @@ func (h *UserHandler) RegisterUser(c echo.Context) error {
 // LoginUser xử lý yêu cầu đăng nhập người dùng
 func (h *UserHandler) LoginUser(c echo.Context) error {
 	var req struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
+		Email      string `json:"email"`
+		Password   string `json:"password"`
+		RememberMe bool   `json:"rememberMe"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
@@ -78,8 +79,9 @@ func (h *UserHandler) LoginUser(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	resp, err := h.client.Login(ctx, &pb.LoginRequest{
-		Email:    req.Email,
-		Password: req.Password,
+		Email:      req.Email,
+		Password:   req.Password,
+		RememberMe: req.RememberMe,
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
@@ -92,7 +94,6 @@ func (h *UserHandler) LoginUser(c echo.Context) error {
 		}
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status": resp.Status,
 		"token":  resp.Token,

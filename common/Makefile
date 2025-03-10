@@ -28,3 +28,8 @@ gen_payments:
 		--proto_path=protobuf "protobuf/payments.proto" \
 		--go_out=genproto/payments --go_opt=paths=source_relative \
   	--go-grpc_out=genproto/payments --go-grpc_opt=paths=source_relative
+gen_notifications:
+	@protoc \
+		--proto_path=protobuf "protobuf/notifications.proto" \
+		--go_out=genproto/notifications --go_opt=paths=source_relative \
+  	--go-grpc_out=genproto/notifications --go-grpc_opt=paths=source_relative

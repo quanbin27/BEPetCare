@@ -1,0 +1,22 @@
+syntax = "proto3";
+package notifications;
+
+option go_package = "github.com/quanbin27/commons/genproto/notifications";
+
+// NotificationService định nghĩa các phương thức gRPC
+service NotificationService {
+  // Gửi email xác minh
+  rpc SendVerificationEmail (SendVerificationEmailRequest) returns (SendVerificationEmailResponse) {}
+}
+
+// Request để gửi email xác minh
+message SendVerificationEmailRequest {
+  string email = 1;      // Email người nhận
+  string token = 2;      // Token xác minh
+  string base_url = 3;   // URL cơ sở cho link xác minh
+}
+
+// Response từ việc gửi email
+message SendVerificationEmailResponse {
+  string status = 1;     // Trạng thái (e.g., "Email sent" hoặc lỗi)
+}

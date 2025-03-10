@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 
 	pb "github.com/quanbin27/commons/genproto/users"
 	"google.golang.org/grpc"
@@ -22,19 +23,27 @@ func NewGrpcUsersHandler(grpc *grpc.Server, userService UserService) {
 }
 
 func (h *UsersGrpcHandler) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
-	stt, err := h.userService.Register(ctx, req.Email, req.Password, req.Name)
+	statusMsg, err := h.userService.Register(ctx, req.Email, req.Password, req.Name)
 	if err != nil {
-		// Nếu Service trả về lỗi, ánh xạ thành mã gRPC phù hợp
-		if stt == "Failed" {
+		if errors.Is(err, errors.New("user already exists")) {
 			return nil, status.Errorf(codes.AlreadyExists, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
-	return &pb.RegisterResponse{Status: stt}, nil
+	return &pb.RegisterResponse{Status: statusMsg}, nil
 }
-
+func (h *UsersGrpcHandler) VerifyEmail(ctx context.Context, req *pb.VerifyEmailRequest) (*pb.VerifyEmailResponse, error) {
+	id, err := h.userService.VerifyEmail(ctx, req.Token)
+	if err != nil {
+		if errors.Is(err, errors.New("invalid or expired token")) {
+			return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		}
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &pb.VerifyEmailResponse{Id: id}, nil
+}
 func (h *UsersGrpcHandler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	stt, token, err := h.userService.Login(ctx, req.Email, req.Password)
+	stt, token, err := h.userService.Login(ctx, req.Email, req.Password, req.RememberMe)
 	if err != nil {
 		// Ánh xạ lỗi từ Service sang mã gRPC
 		if stt == "Failed" {

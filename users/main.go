@@ -1,8 +1,10 @@
 package main
 
 import (
+	"github.com/go-redis/redis/v8"
 	"github.com/quanbin27/commons/config"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
@@ -43,8 +45,14 @@ func main() {
 		log.Fatal("failed to listen")
 	}
 	defer l.Close()
+	redisClient := redis.NewClient(&redis.Options{Addr: "localhost:6379"})
+	notificationsConn, err := grpc.NewClient(config.Envs.Notification_Addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Failed to dial order server: %v", err)
+	}
+	defer notificationsConn.Close()
 	userStore := NewStore(db)
-	userService := NewService(userStore)
+	userService := NewService(userStore, redisClient, notificationsConn, config.Envs.BaseURL)
 	NewGrpcUsersHandler(grpcServer, userService)
 	log.Println("User Service Listening on", grpcAddr)
 	grpcServer.Serve(l)
