@@ -32,7 +32,7 @@ func (h *OrderGrpcHandler) CreateOrder(ctx context.Context, req *pb.CreateOrderR
 		}
 	}
 
-	orderID, statusMsg, err := h.orderService.CreateOrder(ctx, req.CustomerId, req.BranchId, items)
+	orderID, statusMsg, err := h.orderService.CreateOrder(ctx, req.CustomerId, req.BranchId, items, &req.AppointmentId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}

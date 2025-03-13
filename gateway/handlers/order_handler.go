@@ -34,9 +34,10 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 		UnitPrice float32 `json:"unit_price"`
 	}
 	var req struct {
-		CustomerID int32          `json:"customer_id"`
-		BranchID   int32          `json:"branch_id"`
-		Items      []OrderItemReq `json:"items"`
+		CustomerID    int32          `json:"customer_id"`
+		BranchID      int32          `json:"branch_id"`
+		AppointmentID int32          `json:"appointment_id"`
+		Items         []OrderItemReq `json:"items"`
 	}
 
 	if err := c.Bind(&req); err != nil {
@@ -57,9 +58,10 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	resp, err := h.client.CreateOrder(ctx, &pb.CreateOrderRequest{
-		CustomerId: req.CustomerID,
-		BranchId:   req.BranchID,
-		Items:      pbItems,
+		CustomerId:    req.CustomerID,
+		BranchId:      req.BranchID,
+		Items:         pbItems,
+		AppointmentId: req.AppointmentID,
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {

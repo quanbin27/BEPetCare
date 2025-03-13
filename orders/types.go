@@ -19,24 +19,23 @@ const (
 
 // Order đại diện cho đơn hàng
 type Order struct {
-	ID         int32       `gorm:"primaryKey"`
-	CustomerID int32       `gorm:"index;not null"`
-	BranchID   int32       `gorm:"index;not null"`
-	TotalPrice float32     `gorm:"not null"`
-	Status     OrderStatus `gorm:"not null"`
-	CreatedAt  time.Time   `gorm:"autoCreateTime"`
-	UpdatedAt  time.Time   `gorm:"autoUpdateTime"`
-	Items      []OrderItem `gorm:"foreignKey:OrderID"`
+	ID            int32 `gorm:"primaryKey"`
+	CustomerID    int32 `gorm:"index;not null"`
+	BranchID      int32 `gorm:"index;not null"`
+	AppointmentID *int32
+	TotalPrice    float32     `gorm:"not null"`
+	Status        OrderStatus `gorm:"not null"`
+	CreatedAt     time.Time   `gorm:"autoCreateTime"`
+	UpdatedAt     time.Time   `gorm:"autoUpdateTime"`
+	Items         []OrderItem `gorm:"foreignKey:OrderID"`
 }
 
 // OrderItem đại diện cho sản phẩm trong đơn hàng
 type OrderItem struct {
-	ID        int32   `gorm:"primaryKey"`
-	OrderID   int32   `gorm:"index;not null"`
-	ProductID int32   `gorm:"index;not null"`
+	OrderID   int32   `gorm:"primaryKey"`
+	ProductID int32   `gorm:"primaryKey"`
 	Quantity  int32   `gorm:"not null"`
 	UnitPrice float32 `gorm:"not null"`
-	Total     float32 `gorm:"not null"`
 }
 
 // OrderStore interface làm việc với database
@@ -49,7 +48,7 @@ type OrderStore interface {
 
 // OrderService interface cho logic xử lý với dữ liệu nội bộ
 type OrderService interface {
-	CreateOrder(ctx context.Context, customerID, branchID int32, items []OrderItem) (int32, string, error) // Trả về orderID, status
+	CreateOrder(ctx context.Context, customerID, branchID int32, items []OrderItem, appointmentID *int32) (int32, string, error) // Trả về orderID, status
 	GetOrder(ctx context.Context, orderID int32) (*Order, error)
 	UpdateOrderStatus(ctx context.Context, orderID int32, status OrderStatus) (string, error) // Trả về status
 	GetOrderItems(ctx context.Context, orderID int32) ([]OrderItem, error)
@@ -90,7 +89,6 @@ func toPbOrder(o *Order) *pb.Order {
 	pbItems := make([]*pb.OrderItem, len(o.Items))
 	for i, item := range o.Items {
 		pbItems[i] = &pb.OrderItem{
-			Id:        item.ID,
 			OrderId:   item.OrderID,
 			ProductId: item.ProductID,
 			Quantity:  item.Quantity,
@@ -111,7 +109,6 @@ func toPbOrder(o *Order) *pb.Order {
 
 func toPbOrderItem(item OrderItem) *pb.OrderItem {
 	return &pb.OrderItem{
-		Id:        item.ID,
 		OrderId:   item.OrderID,
 		ProductId: item.ProductID,
 		Quantity:  item.Quantity,

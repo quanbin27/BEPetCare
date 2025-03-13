@@ -58,7 +58,7 @@ func initConfig() Config {
 		PaymentsGrpcAddr:       getEnv("PAYMENTS_GRPC_ADDR", ":8086"),
 		EmailAddr:              getEnv("EMAIL_ADDR", ""),
 		EmailPassword:          getEnv("EMAIL_PASSWORD", ""),
-		BaseURL:                getEnv("BASE_URL", "http://localhost:8080"),
+		BaseURL:                getEnv("BASE_URL", "http://26.30.229.237:3000"),
 		RedisAddr:              getEnv("REDIS_ADDR", "localhost:6379"),
 	}
 }

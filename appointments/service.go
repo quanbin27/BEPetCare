@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"time"
 )
 
@@ -15,22 +16,43 @@ func NewAppointmentService(store AppointmentStore) AppointmentService {
 
 // --- LỊCH HẸN ---
 // Tạo lịch hẹn
-func (s *AppService) CreateAppointment(ctx context.Context, customerID, employeeID int32, customerAddress string, scheduledTime time.Time, serviceIDs []int32) (int32, string, error) {
-	appointment := &Appointment{
-		CustomerID:      customerID,
-		EmployeeID:      employeeID,
-		CustomerAddress: customerAddress,
-		ScheduledTime:   scheduledTime,
-		Status:          StatusPending,
-		CreatedAt:       time.Now(),
+func (s *AppService) CreateAppointment(ctx context.Context, customerID int32, customerAddress string, scheduledTime time.Time, services []AppointmentDetail, note string) (int32, string, error) {
+	// Lấy danh sách service IDs từ request
+	var serviceIDs []int32
+	for _, item := range services {
+		serviceIDs = append(serviceIDs, item.ServiceID)
 	}
 
-	// Lưu vào DB
-	if err := s.store.CreateAppointment(ctx, appointment, serviceIDs); err != nil {
+	// Truy vấn database để lấy giá dịch vụ
+	serviceList, err := s.store.GetServicesByIDs(ctx, serviceIDs)
+	if err != nil {
 		return 0, "Failed", err
 	}
 
-	return appointment.ID, "Success", nil
+	// Tạo map giá dịch vụ từ database
+	servicePriceMap := make(map[int32]float32)
+	for _, svc := range serviceList {
+		servicePriceMap[svc.ID] = svc.Price
+	}
+
+	// Tính lại total dựa trên giá từ database
+	var total float32 = 0
+	for i, item := range services {
+		price, exists := servicePriceMap[item.ServiceID]
+		if !exists {
+			return 0, "Failed", fmt.Errorf("service ID %d not found", item.ServiceID)
+		}
+		services[i].ServicePrice = price // Gán giá từ database vào struct
+		total += float32(item.Quantity) * price
+	}
+
+	// Gọi Store để tạo lịch hẹn
+	id, err := s.store.CreateAppointment(ctx, customerID, customerAddress, scheduledTime, services, total, note)
+	if err != nil {
+		return 0, "Failed", err
+	}
+
+	return id, "Success", nil
 }
 
 // Lấy lịch hẹn theo khách hàng

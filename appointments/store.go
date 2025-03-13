@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"errors"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -18,47 +18,59 @@ func NewStore(db *gorm.DB) *Store {
 }
 
 // Tạo lịch hẹn + chi tiết dịch vụ
-func (s *Store) CreateAppointment(ctx context.Context, appointment *Appointment, serviceIDs []int32) error {
-	return s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+func (s *Store) CreateAppointment(ctx context.Context, customerID int32, customerAddress string, scheduledTime time.Time, services []AppointmentDetail, total float32, note string) (int32, error) {
+	var appointmentID int32
+
+	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// Tạo lịch hẹn
-		if err := tx.Create(appointment).Error; err != nil {
+		appointment := Appointment{
+			CustomerID:      customerID,
+			CustomerAddress: customerAddress,
+			ScheduledTime:   scheduledTime,
+			Status:          StatusPending,
+			Total:           total,
+			Note:            note,
+		}
+
+		if err := tx.Create(&appointment).Error; err != nil {
 			return err
 		}
 
-		// Lấy giá dịch vụ từ bảng `services`
-		var services []Service
-		if err := tx.Where("id IN ?", serviceIDs).Find(&services).Error; err != nil {
-			return err
-		}
-
-		// Lưu chi tiết dịch vụ vào `appointment_details`
+		// Chuẩn bị danh sách chi tiết lịch hẹn
 		var details []AppointmentDetail
-		servicePriceMap := make(map[int32]float32)
 		for _, svc := range services {
-			servicePriceMap[svc.ID] = svc.Price
-		}
-
-		for _, serviceID := range serviceIDs {
-			price, exists := servicePriceMap[serviceID]
-			if !exists {
-				return errors.New("service ID not found")
-			}
-
-			details = append(details, AppointmentDetail{
+			detail := AppointmentDetail{
 				AppointmentID: appointment.ID,
-				ServiceID:     serviceID,
-				ServicePrice:  price,
-			})
+				ServiceID:     svc.ServiceID,
+				ServicePrice:  svc.ServicePrice, // Giá đã được lấy từ DB ở tầng AppService
+				Quantity:      svc.Quantity,
+			}
+			details = append(details, detail)
 		}
 
+		// Lưu chi tiết lịch hẹn
 		if len(details) > 0 {
 			if err := tx.Create(&details).Error; err != nil {
 				return err
 			}
 		}
 
+		appointmentID = appointment.ID
 		return nil
 	})
+
+	if err != nil {
+		return 0, err
+	}
+
+	return appointmentID, nil
+}
+func (s *Store) GetServicesByIDs(ctx context.Context, serviceIDs []int32) ([]Service, error) {
+	var services []Service
+	if err := s.db.WithContext(ctx).Where("id IN ?", serviceIDs).Find(&services).Error; err != nil {
+		return nil, err
+	}
+	return services, nil
 }
 
 // Lấy lịch hẹn theo khách hàng

@@ -75,7 +75,7 @@ func main() {
 	httpAddr := config.Envs.HTTP_ADDR
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:3000", "https://aa6d-2402-800-6375-845a-8417-eba3-c3d5-84b7.ngrok-free.app"},
+		AllowOrigins: []string{"http://localhost:3000", "https://aa6d-2402-800-6375-845a-8417-eba3-c3d5-84b7.ngrok-free.app", "http://26.30.229.237:8080"},
 		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE},
 		AllowHeaders: []string{
 			echo.HeaderOrigin,

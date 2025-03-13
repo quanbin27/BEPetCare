@@ -40,12 +40,16 @@ func (h *AppointmentHandler) RegisterRoutes(e *echo.Group) {
 
 // CreateAppointment xử lý yêu cầu tạo lịch hẹn
 func (h *AppointmentHandler) CreateAppointment(c echo.Context) error {
+	type ServiceItemReq struct {
+		ServiceId int32 `json:"service_id"`
+		Quantity  int32 `json:"quantity"`
+	}
 	var req struct {
-		CustomerID      int32   `json:"customer_id"`
-		EmployeeID      int32   `json:"employee_id"`
-		CustomerAddress string  `json:"customer_address"`
-		ScheduledTime   string  `json:"scheduled_time"` // RFC3339 format (e.g., "2025-03-07T10:00:00Z")
-		ServiceIDs      []int32 `json:"service_ids"`
+		CustomerID      int32            `json:"customer_id"`
+		CustomerAddress string           `json:"customer_address"`
+		ScheduledTime   string           `json:"scheduled_time"` // RFC3339 format (e.g., "2025-03-07T10:00:00Z")
+		Detail          []ServiceItemReq `json:"services"`
+		Note            string           `json:"note"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
@@ -59,13 +63,19 @@ func (h *AppointmentHandler) CreateAppointment(c echo.Context) error {
 
 	// Lấy context từ Echo request
 	ctx := c.Request().Context()
-
+	pbItems := make([]*pb.AppointmentDetail, len(req.Detail))
+	for i, item := range req.Detail {
+		pbItems[i] = &pb.AppointmentDetail{
+			Quantity:  item.Quantity,
+			ServiceId: item.ServiceId,
+		}
+	}
 	resp, err := h.client.CreateAppointment(ctx, &pb.CreateAppointmentRequest{
 		CustomerId:      req.CustomerID,
-		EmployeeId:      req.EmployeeID,
 		CustomerAddress: req.CustomerAddress,
 		ScheduledTime:   timestamppb.New(scheduledTime),
-		ServiceIds:      req.ServiceIDs,
+		Detail:          pbItems,
+		Note:            req.Note,
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
@@ -275,7 +285,19 @@ func (h *AppointmentHandler) GetServices(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, resp.Services)
+	// Chuyển đổi dữ liệu từ resp.Services sang ServiceResponse
+	var services []ServiceResponse
+	for _, svc := range resp.Services {
+		services = append(services, ServiceResponse{
+			ServiceID:   svc.Id,
+			Name:        svc.Name,
+			Description: svc.Description,
+			Price:       svc.Price,
+			ImgURL:      svc.Imgurl,
+		})
+	}
+
+	return c.JSON(http.StatusOK, services)
 }
 
 // UpdateService xử lý yêu cầu cập nhật dịch vụ

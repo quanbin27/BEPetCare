@@ -41,6 +41,7 @@ message Service {
   string name = 2;
   string description = 3;
   float price = 4;
+  string imgurl=5;
 }
 
 // Lịch hẹn
@@ -51,6 +52,8 @@ message Appointment {
   string customer_address = 4;
   google.protobuf.Timestamp scheduled_time = 5;
   AppointmentStatus status = 6;
+  float total=7;
+  string note=8;
 }
 
 // Chi tiết dịch vụ trong lịch hẹn (Bảng appointment_details)
@@ -58,6 +61,7 @@ message AppointmentDetail {
   int32 appointment_id = 1;
   int32 service_id = 2;
   float service_price = 3;  // Lưu giá dịch vụ tại thời điểm đặt lịch
+  int32 quantity =4;
 }
 
 // --- API Requests & Responses ---
@@ -65,10 +69,10 @@ message AppointmentDetail {
 // Đặt lịch hẹn
 message CreateAppointmentRequest {
   int32 customer_id = 1;
-  int32 employee_id = 2;
   string customer_address = 3;
   google.protobuf.Timestamp scheduled_time = 4;
-  repeated int32 service_ids = 5;
+  repeated AppointmentDetail detail = 5;
+  string note=2;
 }
 
 message CreateAppointmentResponse {

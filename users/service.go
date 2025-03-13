@@ -220,13 +220,11 @@ func (s *Service) savePendingUser(ctx context.Context, pu *PendingUser) error {
 		"token":    pu.Token,
 		"expires":  pu.Expires.Format(time.RFC3339),
 	}
-	println("toi day")
 	err := s.redis.HMSet(ctx, key, data).Err()
 	if err != nil {
 		return err
 	}
 	s.redis.Expire(ctx, key, 24*time.Hour)
-	println("toi day Done")
 	return nil
 }
 func (s *Service) getPendingUser(ctx context.Context, token string) (*PendingUser, error) {

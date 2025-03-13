@@ -15,20 +15,21 @@ func NewOrderService(store OrderStore) OrderService {
 }
 
 // CreateOrder tạo đơn hàng mới
-func (s *Service) CreateOrder(ctx context.Context, customerID, branchID int32, items []OrderItem) (int32, string, error) {
+func (s *Service) CreateOrder(ctx context.Context, customerID, branchID int32, items []OrderItem, appointmentID *int32) (int32, string, error) {
 	order := &Order{
-		CustomerID: customerID,
-		BranchID:   branchID,
-		Status:     OrderStatusPending,
-		CreatedAt:  time.Now(),
-		Items:      items,
+		CustomerID:    customerID,
+		BranchID:      branchID,
+		AppointmentID: appointmentID,
+		Status:        OrderStatusPending,
+		CreatedAt:     time.Now(),
+		Items:         items,
 	}
 	var total float32 = 0
 	for _, item := range items {
 		total += float32(item.Quantity) * item.UnitPrice
 	}
 	order.TotalPrice = total
-
+	println("total price:", total)
 	// Lưu vào database
 	if err := s.store.CreateOrder(ctx, order); err != nil {
 		return 0, "Failed", err

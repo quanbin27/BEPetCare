@@ -1,4 +1,4 @@
-.PHONY: all orders payments products records users appointments stop run_gateway
+.PHONY: all orders payments products records users appointments notifications run_gateway
 
 all:
 	@echo "Starting all services..."
@@ -27,7 +27,9 @@ users:
 appointments:
 	@echo "Starting Appointment Service..."
 	cd appointments && go run . &
-
+notifications:
+	@echo "Starting Notification Service..."
+	cd notifications && go run . &
 stop:
 	@echo "Stopping all services..."
 	@pkill -f "go run"

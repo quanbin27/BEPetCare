@@ -24,18 +24,21 @@ type Service struct {
 	Name        string    `gorm:"not null"`
 	Description string    `gorm:"type:text"`
 	Price       float32   `gorm:"not null"`
+	ImgUrl      string    `gorm:"type:text"`
 	CreatedAt   time.Time `gorm:"autoCreateTime"`
 	UpdatedAt   time.Time `gorm:"autoUpdateTime"`
 }
 
 // --- BẢNG LỊCH HẸN ---
 type Appointment struct {
-	ID              int32               `gorm:"primaryKey"`
-	CustomerID      int32               `gorm:"not null;index"`
-	EmployeeID      int32               `gorm:"not null;index"`
-	CustomerAddress string              `gorm:"type:text;not null"`
-	ScheduledTime   time.Time           `gorm:"not null"`
-	Status          AppointmentStatus   `gorm:"type:varchar(20);not null;default:'pending'"`
+	ID              int32             `gorm:"primaryKey"`
+	CustomerID      int32             `gorm:"not null;index"`
+	EmployeeID      int32             `gorm:"index"`
+	CustomerAddress string            `gorm:"type:text;not null"`
+	ScheduledTime   time.Time         `gorm:"not null"`
+	Status          AppointmentStatus `gorm:"type:varchar(20);not null;default:'pending'"`
+	Total           float32           `gorm:"not null"`
+	Note            string
 	CreatedAt       time.Time           `gorm:"autoCreateTime"`
 	UpdatedAt       time.Time           `gorm:"autoUpdateTime"`
 	Details         []AppointmentDetail `gorm:"foreignKey:AppointmentID"`
@@ -46,6 +49,7 @@ type AppointmentDetail struct {
 	AppointmentID int32       `gorm:"primaryKey"`
 	ServiceID     int32       `gorm:"primaryKey"`
 	ServicePrice  float32     `gorm:"not null"`
+	Quantity      int32       `gorm:"not null;default:0"`
 	Appointment   Appointment `gorm:"foreignKey:AppointmentID;constraint:OnDelete:CASCADE"`
 	Service       Service     `gorm:"foreignKey:ServiceID"`
 }
@@ -53,7 +57,7 @@ type AppointmentDetail struct {
 // --- INTERFACE CHO APPOINTMENT STORE ---
 type AppointmentStore interface {
 	// Lịch hẹn
-	CreateAppointment(ctx context.Context, appointment *Appointment, services []int32) error
+	CreateAppointment(ctx context.Context, customerID int32, customerAddress string, scheduledTime time.Time, services []AppointmentDetail, total float32, note string) (int32, error)
 	GetAppointmentsByCustomer(ctx context.Context, customerID int32) ([]Appointment, error)
 	GetAppointmentsByEmployee(ctx context.Context, employeeID int32) ([]Appointment, error)
 	UpdateAppointmentStatus(ctx context.Context, appointmentID int32, status AppointmentStatus) error
@@ -64,12 +68,13 @@ type AppointmentStore interface {
 	GetServices(ctx context.Context) ([]Service, error)
 	UpdateService(ctx context.Context, service *Service) error
 	DeleteService(ctx context.Context, serviceID int32) error
+	GetServicesByIDs(ctx context.Context, serviceIDs []int32) ([]Service, error)
 }
 
 // --- INTERFACE CHO APPOINTMENT SERVICE (SỬ DỤNG DỮ LIỆU NỘI BỘ) ---
 type AppointmentService interface {
 	// Lịch hẹn
-	CreateAppointment(ctx context.Context, customerID, employeeID int32, customerAddress string, scheduledTime time.Time, serviceIDs []int32) (int32, string, error) // Trả về appointmentID, status
+	CreateAppointment(ctx context.Context, customerID int32, customerAddress string, scheduledTime time.Time, services []AppointmentDetail, note string) (int32, string, error) // Trả về appointmentID, status
 	GetAppointmentsByCustomer(ctx context.Context, customerID int32) ([]Appointment, error)
 	GetAppointmentsByEmployee(ctx context.Context, employeeID int32) ([]Appointment, error)
 	UpdateAppointmentStatus(ctx context.Context, appointmentID int32, status AppointmentStatus) (string, error) // Trả về status
@@ -97,7 +102,6 @@ func toPbAppointmentStatus(status AppointmentStatus) pb.AppointmentStatus {
 		return pb.AppointmentStatus_UNSPECIFIED
 	}
 }
-
 func fromPbAppointmentStatus(pbStatus pb.AppointmentStatus) AppointmentStatus {
 	switch pbStatus {
 	case pb.AppointmentStatus_PENDING:
@@ -131,6 +135,7 @@ func toProtoService(s *Service) *pb.Service {
 		Name:        s.Name,
 		Description: s.Description,
 		Price:       s.Price,
+		Imgurl:      s.ImgUrl,
 	}
 }
 

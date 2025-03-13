@@ -27,8 +27,11 @@ func (h *UserHandler) RegisterRoutes(e *echo.Group) {
 	e.PUT("/users/change-password", h.ChangePassword)
 	e.GET("/users/info/:id", h.GetUserInfo)
 	e.GET("/users/info-by-email", h.GetUserInfoByEmail)
+	e.GET("/helloworld", helloWorld)
 }
-
+func helloWorld(c echo.Context) error {
+	return c.String(http.StatusOK, "Hello World")
+}
 func (h *UserHandler) Register(c echo.Context) error {
 	var req struct {
 		Email    string `json:"email"`

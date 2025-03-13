@@ -23,7 +23,14 @@ func NewAppointmentGrpcHandler(grpc *grpc.Server, appointmentService Appointment
 
 // --- LỊCH HẸN ---
 func (h *AppointmentGrpcHandler) CreateAppointment(ctx context.Context, req *pb.CreateAppointmentRequest) (*pb.CreateAppointmentResponse, error) {
-	appointmentID, statusMsg, err := h.appointmentService.CreateAppointment(ctx, req.CustomerId, req.EmployeeId, req.CustomerAddress, req.ScheduledTime.AsTime(), req.ServiceIds)
+	Items := make([]AppointmentDetail, len(req.Detail))
+	for i, item := range req.Detail {
+		Items[i] = AppointmentDetail{
+			Quantity:  item.Quantity,
+			ServiceID: item.ServiceId,
+		}
+	}
+	appointmentID, statusMsg, err := h.appointmentService.CreateAppointment(ctx, req.CustomerId, req.CustomerAddress, req.ScheduledTime.AsTime(), Items, req.Note)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}

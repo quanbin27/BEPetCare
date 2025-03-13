@@ -23,12 +23,6 @@ func (s *Store) CreateOrder(ctx context.Context, order *Order) error {
 		if err := tx.Create(order).Error; err != nil {
 			return err
 		}
-		for i := range order.Items {
-			order.Items[i].OrderID = order.ID
-			if err := tx.Create(&order.Items[i]).Error; err != nil {
-				return err
-			}
-		}
 		return nil
 	})
 }
