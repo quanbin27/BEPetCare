@@ -134,3 +134,56 @@ func (s *Store) UpdateBranchInventory(ctx context.Context, branchID int32, produ
 		Where("branch_id = ? AND product_id = ? AND product_type = ?", branchID, productID, productType).
 		Update("stock_quantity", stockQuantity).Error
 }
+func (s *Store) ListAttachableProducts(ctx context.Context) ([]GeneralProduct, error) {
+	var products []GeneralProduct
+
+	// Query Food
+	var foods []Food
+	if err := s.db.Where("is_attachable = ?", true).Find(&foods).Error; err != nil {
+		return nil, err
+	}
+	for _, food := range foods {
+		products = append(products, GeneralProduct{
+			Name:        food.Name,
+			Description: food.Description,
+			Price:       food.Price,
+			ImgUrl:      food.ImgUrl,
+			ProductID:   food.ID,
+			ProductType: "food",
+		})
+	}
+
+	// Query Accessory
+	var accessories []Accessory
+	if err := s.db.Where("is_attachable = ?", true).Find(&accessories).Error; err != nil {
+		return nil, err
+	}
+	for _, accessory := range accessories {
+		products = append(products, GeneralProduct{
+			Name:        accessory.Name,
+			Description: accessory.Description,
+			Price:       accessory.Price,
+			ImgUrl:      accessory.ImgUrl,
+			ProductID:   accessory.ID,
+			ProductType: "accessory",
+		})
+	}
+
+	// Query Medicine
+	var medicines []Medicine
+	if err := s.db.Where("is_attachable = ?", true).Find(&medicines).Error; err != nil {
+		return nil, err
+	}
+	for _, medicine := range medicines {
+		products = append(products, GeneralProduct{
+			Name:        medicine.Name,
+			Description: medicine.Description,
+			Price:       medicine.Price,
+			ImgUrl:      medicine.ImgUrl,
+			ProductID:   medicine.ID,
+			ProductType: "medicine",
+		})
+	}
+
+	return products, nil
+}

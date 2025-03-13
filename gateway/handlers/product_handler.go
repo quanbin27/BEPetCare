@@ -48,6 +48,8 @@ func (h *ProductHandler) RegisterRoutes(e *echo.Group) {
 	// Tồn kho
 	e.GET("/branches/:branch_id/inventory", h.GetBranchInventory)
 	e.PUT("/branches/inventory", h.UpdateBranchInventory)
+
+	e.GET("/products/is_attachable", h.ListAttachableProduct)
 }
 
 // --- Thực phẩm ---
@@ -599,4 +601,19 @@ func (h *ProductHandler) UpdateBranchInventory(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"status": resp.Status})
+}
+func (h *ProductHandler) ListAttachableProduct(c echo.Context) error {
+	ctx := c.Request().Context()
+	resp, err := h.client.ListAttachableProducts(ctx, &pb.ListAttachableProductsRequest{})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error"})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, resp.Products)
 }

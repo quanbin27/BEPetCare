@@ -19,25 +19,26 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ProductService_GetFoodByID_FullMethodName           = "/ProductService/GetFoodByID"
-	ProductService_GetAccessoryByID_FullMethodName      = "/ProductService/GetAccessoryByID"
-	ProductService_GetMedicineByID_FullMethodName       = "/ProductService/GetMedicineByID"
-	ProductService_ListFoods_FullMethodName             = "/ProductService/ListFoods"
-	ProductService_ListAccessories_FullMethodName       = "/ProductService/ListAccessories"
-	ProductService_ListMedicines_FullMethodName         = "/ProductService/ListMedicines"
-	ProductService_CreateFood_FullMethodName            = "/ProductService/CreateFood"
-	ProductService_CreateAccessory_FullMethodName       = "/ProductService/CreateAccessory"
-	ProductService_CreateMedicine_FullMethodName        = "/ProductService/CreateMedicine"
-	ProductService_UpdateFood_FullMethodName            = "/ProductService/UpdateFood"
-	ProductService_UpdateAccessory_FullMethodName       = "/ProductService/UpdateAccessory"
-	ProductService_UpdateMedicine_FullMethodName        = "/ProductService/UpdateMedicine"
-	ProductService_DeleteFood_FullMethodName            = "/ProductService/DeleteFood"
-	ProductService_DeleteAccessory_FullMethodName       = "/ProductService/DeleteAccessory"
-	ProductService_DeleteMedicine_FullMethodName        = "/ProductService/DeleteMedicine"
-	ProductService_GetBranchByID_FullMethodName         = "/ProductService/GetBranchByID"
-	ProductService_ListBranches_FullMethodName          = "/ProductService/ListBranches"
-	ProductService_GetBranchInventory_FullMethodName    = "/ProductService/GetBranchInventory"
-	ProductService_UpdateBranchInventory_FullMethodName = "/ProductService/UpdateBranchInventory"
+	ProductService_GetFoodByID_FullMethodName            = "/ProductService/GetFoodByID"
+	ProductService_GetAccessoryByID_FullMethodName       = "/ProductService/GetAccessoryByID"
+	ProductService_GetMedicineByID_FullMethodName        = "/ProductService/GetMedicineByID"
+	ProductService_ListFoods_FullMethodName              = "/ProductService/ListFoods"
+	ProductService_ListAccessories_FullMethodName        = "/ProductService/ListAccessories"
+	ProductService_ListMedicines_FullMethodName          = "/ProductService/ListMedicines"
+	ProductService_CreateFood_FullMethodName             = "/ProductService/CreateFood"
+	ProductService_CreateAccessory_FullMethodName        = "/ProductService/CreateAccessory"
+	ProductService_CreateMedicine_FullMethodName         = "/ProductService/CreateMedicine"
+	ProductService_UpdateFood_FullMethodName             = "/ProductService/UpdateFood"
+	ProductService_UpdateAccessory_FullMethodName        = "/ProductService/UpdateAccessory"
+	ProductService_UpdateMedicine_FullMethodName         = "/ProductService/UpdateMedicine"
+	ProductService_DeleteFood_FullMethodName             = "/ProductService/DeleteFood"
+	ProductService_DeleteAccessory_FullMethodName        = "/ProductService/DeleteAccessory"
+	ProductService_DeleteMedicine_FullMethodName         = "/ProductService/DeleteMedicine"
+	ProductService_GetBranchByID_FullMethodName          = "/ProductService/GetBranchByID"
+	ProductService_ListBranches_FullMethodName           = "/ProductService/ListBranches"
+	ProductService_GetBranchInventory_FullMethodName     = "/ProductService/GetBranchInventory"
+	ProductService_UpdateBranchInventory_FullMethodName  = "/ProductService/UpdateBranchInventory"
+	ProductService_ListAttachableProducts_FullMethodName = "/ProductService/ListAttachableProducts"
 )
 
 // ProductServiceClient is the client API for ProductService service.
@@ -63,6 +64,7 @@ type ProductServiceClient interface {
 	ListBranches(ctx context.Context, in *ListBranchRequest, opts ...grpc.CallOption) (*ListBranchResponse, error)
 	GetBranchInventory(ctx context.Context, in *GetBranchInventoryRequest, opts ...grpc.CallOption) (*GetBranchInventoryResponse, error)
 	UpdateBranchInventory(ctx context.Context, in *UpdateBranchInventoryRequest, opts ...grpc.CallOption) (*UpdateBranchInventoryResponse, error)
+	ListAttachableProducts(ctx context.Context, in *ListAttachableProductsRequest, opts ...grpc.CallOption) (*ListAttachableProductsResponse, error)
 }
 
 type productServiceClient struct {
@@ -263,6 +265,16 @@ func (c *productServiceClient) UpdateBranchInventory(ctx context.Context, in *Up
 	return out, nil
 }
 
+func (c *productServiceClient) ListAttachableProducts(ctx context.Context, in *ListAttachableProductsRequest, opts ...grpc.CallOption) (*ListAttachableProductsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAttachableProductsResponse)
+	err := c.cc.Invoke(ctx, ProductService_ListAttachableProducts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProductServiceServer is the server API for ProductService service.
 // All implementations must embed UnimplementedProductServiceServer
 // for forward compatibility.
@@ -286,6 +298,7 @@ type ProductServiceServer interface {
 	ListBranches(context.Context, *ListBranchRequest) (*ListBranchResponse, error)
 	GetBranchInventory(context.Context, *GetBranchInventoryRequest) (*GetBranchInventoryResponse, error)
 	UpdateBranchInventory(context.Context, *UpdateBranchInventoryRequest) (*UpdateBranchInventoryResponse, error)
+	ListAttachableProducts(context.Context, *ListAttachableProductsRequest) (*ListAttachableProductsResponse, error)
 	mustEmbedUnimplementedProductServiceServer()
 }
 
@@ -352,6 +365,9 @@ func (UnimplementedProductServiceServer) GetBranchInventory(context.Context, *Ge
 }
 func (UnimplementedProductServiceServer) UpdateBranchInventory(context.Context, *UpdateBranchInventoryRequest) (*UpdateBranchInventoryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateBranchInventory not implemented")
+}
+func (UnimplementedProductServiceServer) ListAttachableProducts(context.Context, *ListAttachableProductsRequest) (*ListAttachableProductsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAttachableProducts not implemented")
 }
 func (UnimplementedProductServiceServer) mustEmbedUnimplementedProductServiceServer() {}
 func (UnimplementedProductServiceServer) testEmbeddedByValue()                        {}
@@ -716,6 +732,24 @@ func _ProductService_UpdateBranchInventory_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProductService_ListAttachableProducts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAttachableProductsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).ListAttachableProducts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_ListAttachableProducts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).ListAttachableProducts(ctx, req.(*ListAttachableProductsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProductService_ServiceDesc is the grpc.ServiceDesc for ProductService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -798,6 +832,10 @@ var ProductService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateBranchInventory",
 			Handler:    _ProductService_UpdateBranchInventory_Handler,
+		},
+		{
+			MethodName: "ListAttachableProducts",
+			Handler:    _ProductService_ListAttachableProducts_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

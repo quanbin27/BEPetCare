@@ -26,12 +26,14 @@ type Food struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id          int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name        string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Description string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Price       float32                `protobuf:"fixed32,4,opt,name=price,proto3" json:"price,omitempty"`
-	CreatedAt   *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt   *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Id           int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name         string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description  string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Price        float32                `protobuf:"fixed32,4,opt,name=price,proto3" json:"price,omitempty"`
+	CreatedAt    *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt    *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Imgurl       string                 `protobuf:"bytes,7,opt,name=imgurl,proto3" json:"imgurl,omitempty"`
+	IsAttachable bool                   `protobuf:"varint,8,opt,name=is_attachable,json=isAttachable,proto3" json:"is_attachable,omitempty"`
 }
 
 func (x *Food) Reset() {
@@ -106,17 +108,33 @@ func (x *Food) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *Food) GetImgurl() string {
+	if x != nil {
+		return x.Imgurl
+	}
+	return ""
+}
+
+func (x *Food) GetIsAttachable() bool {
+	if x != nil {
+		return x.IsAttachable
+	}
+	return false
+}
+
 type Accessory struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id          int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name        string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Description string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Price       float32                `protobuf:"fixed32,4,opt,name=price,proto3" json:"price,omitempty"`
-	CreatedAt   *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt   *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Id           int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name         string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description  string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Price        float32                `protobuf:"fixed32,4,opt,name=price,proto3" json:"price,omitempty"`
+	CreatedAt    *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt    *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Imgurl       string                 `protobuf:"bytes,7,opt,name=imgurl,proto3" json:"imgurl,omitempty"`
+	IsAttachable bool                   `protobuf:"varint,8,opt,name=is_attachable,json=isAttachable,proto3" json:"is_attachable,omitempty"`
 }
 
 func (x *Accessory) Reset() {
@@ -191,17 +209,33 @@ func (x *Accessory) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *Accessory) GetImgurl() string {
+	if x != nil {
+		return x.Imgurl
+	}
+	return ""
+}
+
+func (x *Accessory) GetIsAttachable() bool {
+	if x != nil {
+		return x.IsAttachable
+	}
+	return false
+}
+
 type Medicine struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id          int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name        string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Description string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Price       float32                `protobuf:"fixed32,4,opt,name=price,proto3" json:"price,omitempty"`
-	CreatedAt   *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt   *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Id           int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name         string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description  string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Price        float32                `protobuf:"fixed32,4,opt,name=price,proto3" json:"price,omitempty"`
+	CreatedAt    *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt    *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Imgurl       string                 `protobuf:"bytes,7,opt,name=imgurl,proto3" json:"imgurl,omitempty"`
+	IsAttachable bool                   `protobuf:"varint,8,opt,name=is_attachable,json=isAttachable,proto3" json:"is_attachable,omitempty"`
 }
 
 func (x *Medicine) Reset() {
@@ -276,6 +310,105 @@ func (x *Medicine) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *Medicine) GetImgurl() string {
+	if x != nil {
+		return x.Imgurl
+	}
+	return ""
+}
+
+func (x *Medicine) GetIsAttachable() bool {
+	if x != nil {
+		return x.IsAttachable
+	}
+	return false
+}
+
+type GeneralProduct struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name        string  `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Description string  `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Price       float32 `protobuf:"fixed32,3,opt,name=price,proto3" json:"price,omitempty"`
+	Imgurl      string  `protobuf:"bytes,4,opt,name=imgurl,proto3" json:"imgurl,omitempty"`
+	ProductId   int32   `protobuf:"varint,5,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
+	ProductType string  `protobuf:"bytes,6,opt,name=product_type,json=productType,proto3" json:"product_type,omitempty"` // "food", "accessory", "medicine"
+}
+
+func (x *GeneralProduct) Reset() {
+	*x = GeneralProduct{}
+	mi := &file_products_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GeneralProduct) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GeneralProduct) ProtoMessage() {}
+
+func (x *GeneralProduct) ProtoReflect() protoreflect.Message {
+	mi := &file_products_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GeneralProduct.ProtoReflect.Descriptor instead.
+func (*GeneralProduct) Descriptor() ([]byte, []int) {
+	return file_products_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GeneralProduct) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *GeneralProduct) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *GeneralProduct) GetPrice() float32 {
+	if x != nil {
+		return x.Price
+	}
+	return 0
+}
+
+func (x *GeneralProduct) GetImgurl() string {
+	if x != nil {
+		return x.Imgurl
+	}
+	return ""
+}
+
+func (x *GeneralProduct) GetProductId() int32 {
+	if x != nil {
+		return x.ProductId
+	}
+	return 0
+}
+
+func (x *GeneralProduct) GetProductType() string {
+	if x != nil {
+		return x.ProductType
+	}
+	return ""
+}
+
 type Branch struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -288,7 +421,7 @@ type Branch struct {
 
 func (x *Branch) Reset() {
 	*x = Branch{}
-	mi := &file_products_proto_msgTypes[3]
+	mi := &file_products_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -300,7 +433,7 @@ func (x *Branch) String() string {
 func (*Branch) ProtoMessage() {}
 
 func (x *Branch) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[3]
+	mi := &file_products_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -313,7 +446,7 @@ func (x *Branch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Branch.ProtoReflect.Descriptor instead.
 func (*Branch) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{3}
+	return file_products_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Branch) GetId() int32 {
@@ -350,7 +483,7 @@ type BranchProduct struct {
 
 func (x *BranchProduct) Reset() {
 	*x = BranchProduct{}
-	mi := &file_products_proto_msgTypes[4]
+	mi := &file_products_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -362,7 +495,7 @@ func (x *BranchProduct) String() string {
 func (*BranchProduct) ProtoMessage() {}
 
 func (x *BranchProduct) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[4]
+	mi := &file_products_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -375,7 +508,7 @@ func (x *BranchProduct) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BranchProduct.ProtoReflect.Descriptor instead.
 func (*BranchProduct) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{4}
+	return file_products_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *BranchProduct) GetBranchId() int32 {
@@ -416,7 +549,7 @@ type GetFoodRequest struct {
 
 func (x *GetFoodRequest) Reset() {
 	*x = GetFoodRequest{}
-	mi := &file_products_proto_msgTypes[5]
+	mi := &file_products_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -428,7 +561,7 @@ func (x *GetFoodRequest) String() string {
 func (*GetFoodRequest) ProtoMessage() {}
 
 func (x *GetFoodRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[5]
+	mi := &file_products_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -441,7 +574,7 @@ func (x *GetFoodRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFoodRequest.ProtoReflect.Descriptor instead.
 func (*GetFoodRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{5}
+	return file_products_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetFoodRequest) GetId() int32 {
@@ -461,7 +594,7 @@ type GetAccessoryRequest struct {
 
 func (x *GetAccessoryRequest) Reset() {
 	*x = GetAccessoryRequest{}
-	mi := &file_products_proto_msgTypes[6]
+	mi := &file_products_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -473,7 +606,7 @@ func (x *GetAccessoryRequest) String() string {
 func (*GetAccessoryRequest) ProtoMessage() {}
 
 func (x *GetAccessoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[6]
+	mi := &file_products_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -486,7 +619,7 @@ func (x *GetAccessoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAccessoryRequest.ProtoReflect.Descriptor instead.
 func (*GetAccessoryRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{6}
+	return file_products_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *GetAccessoryRequest) GetId() int32 {
@@ -506,7 +639,7 @@ type GetMedicineRequest struct {
 
 func (x *GetMedicineRequest) Reset() {
 	*x = GetMedicineRequest{}
-	mi := &file_products_proto_msgTypes[7]
+	mi := &file_products_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -518,7 +651,7 @@ func (x *GetMedicineRequest) String() string {
 func (*GetMedicineRequest) ProtoMessage() {}
 
 func (x *GetMedicineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[7]
+	mi := &file_products_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -531,7 +664,7 @@ func (x *GetMedicineRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMedicineRequest.ProtoReflect.Descriptor instead.
 func (*GetMedicineRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{7}
+	return file_products_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetMedicineRequest) GetId() int32 {
@@ -551,7 +684,7 @@ type GetBranchRequest struct {
 
 func (x *GetBranchRequest) Reset() {
 	*x = GetBranchRequest{}
-	mi := &file_products_proto_msgTypes[8]
+	mi := &file_products_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -563,7 +696,7 @@ func (x *GetBranchRequest) String() string {
 func (*GetBranchRequest) ProtoMessage() {}
 
 func (x *GetBranchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[8]
+	mi := &file_products_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -576,7 +709,7 @@ func (x *GetBranchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBranchRequest.ProtoReflect.Descriptor instead.
 func (*GetBranchRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{8}
+	return file_products_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GetBranchRequest) GetId() int32 {
@@ -594,7 +727,7 @@ type ListFoodRequest struct {
 
 func (x *ListFoodRequest) Reset() {
 	*x = ListFoodRequest{}
-	mi := &file_products_proto_msgTypes[9]
+	mi := &file_products_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -606,7 +739,7 @@ func (x *ListFoodRequest) String() string {
 func (*ListFoodRequest) ProtoMessage() {}
 
 func (x *ListFoodRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[9]
+	mi := &file_products_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -619,7 +752,7 @@ func (x *ListFoodRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFoodRequest.ProtoReflect.Descriptor instead.
 func (*ListFoodRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{9}
+	return file_products_proto_rawDescGZIP(), []int{10}
 }
 
 type ListAccessoryRequest struct {
@@ -630,7 +763,7 @@ type ListAccessoryRequest struct {
 
 func (x *ListAccessoryRequest) Reset() {
 	*x = ListAccessoryRequest{}
-	mi := &file_products_proto_msgTypes[10]
+	mi := &file_products_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -642,7 +775,7 @@ func (x *ListAccessoryRequest) String() string {
 func (*ListAccessoryRequest) ProtoMessage() {}
 
 func (x *ListAccessoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[10]
+	mi := &file_products_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -655,7 +788,7 @@ func (x *ListAccessoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAccessoryRequest.ProtoReflect.Descriptor instead.
 func (*ListAccessoryRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{10}
+	return file_products_proto_rawDescGZIP(), []int{11}
 }
 
 type ListMedicineRequest struct {
@@ -666,7 +799,7 @@ type ListMedicineRequest struct {
 
 func (x *ListMedicineRequest) Reset() {
 	*x = ListMedicineRequest{}
-	mi := &file_products_proto_msgTypes[11]
+	mi := &file_products_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -678,7 +811,7 @@ func (x *ListMedicineRequest) String() string {
 func (*ListMedicineRequest) ProtoMessage() {}
 
 func (x *ListMedicineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[11]
+	mi := &file_products_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -691,7 +824,7 @@ func (x *ListMedicineRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMedicineRequest.ProtoReflect.Descriptor instead.
 func (*ListMedicineRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{11}
+	return file_products_proto_rawDescGZIP(), []int{12}
 }
 
 type ListBranchRequest struct {
@@ -702,7 +835,7 @@ type ListBranchRequest struct {
 
 func (x *ListBranchRequest) Reset() {
 	*x = ListBranchRequest{}
-	mi := &file_products_proto_msgTypes[12]
+	mi := &file_products_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -714,7 +847,7 @@ func (x *ListBranchRequest) String() string {
 func (*ListBranchRequest) ProtoMessage() {}
 
 func (x *ListBranchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[12]
+	mi := &file_products_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -727,7 +860,88 @@ func (x *ListBranchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBranchRequest.ProtoReflect.Descriptor instead.
 func (*ListBranchRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{12}
+	return file_products_proto_rawDescGZIP(), []int{13}
+}
+
+type ListAttachableProductsRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *ListAttachableProductsRequest) Reset() {
+	*x = ListAttachableProductsRequest{}
+	mi := &file_products_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAttachableProductsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAttachableProductsRequest) ProtoMessage() {}
+
+func (x *ListAttachableProductsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_products_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAttachableProductsRequest.ProtoReflect.Descriptor instead.
+func (*ListAttachableProductsRequest) Descriptor() ([]byte, []int) {
+	return file_products_proto_rawDescGZIP(), []int{14}
+}
+
+type ListAttachableProductsResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Products []*GeneralProduct `protobuf:"bytes,1,rep,name=products,proto3" json:"products,omitempty"`
+}
+
+func (x *ListAttachableProductsResponse) Reset() {
+	*x = ListAttachableProductsResponse{}
+	mi := &file_products_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAttachableProductsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAttachableProductsResponse) ProtoMessage() {}
+
+func (x *ListAttachableProductsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_products_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAttachableProductsResponse.ProtoReflect.Descriptor instead.
+func (*ListAttachableProductsResponse) Descriptor() ([]byte, []int) {
+	return file_products_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *ListAttachableProductsResponse) GetProducts() []*GeneralProduct {
+	if x != nil {
+		return x.Products
+	}
+	return nil
 }
 
 type ListFoodResponse struct {
@@ -740,7 +954,7 @@ type ListFoodResponse struct {
 
 func (x *ListFoodResponse) Reset() {
 	*x = ListFoodResponse{}
-	mi := &file_products_proto_msgTypes[13]
+	mi := &file_products_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -752,7 +966,7 @@ func (x *ListFoodResponse) String() string {
 func (*ListFoodResponse) ProtoMessage() {}
 
 func (x *ListFoodResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[13]
+	mi := &file_products_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -765,7 +979,7 @@ func (x *ListFoodResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFoodResponse.ProtoReflect.Descriptor instead.
 func (*ListFoodResponse) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{13}
+	return file_products_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *ListFoodResponse) GetFoods() []*Food {
@@ -785,7 +999,7 @@ type ListAccessoryResponse struct {
 
 func (x *ListAccessoryResponse) Reset() {
 	*x = ListAccessoryResponse{}
-	mi := &file_products_proto_msgTypes[14]
+	mi := &file_products_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -797,7 +1011,7 @@ func (x *ListAccessoryResponse) String() string {
 func (*ListAccessoryResponse) ProtoMessage() {}
 
 func (x *ListAccessoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[14]
+	mi := &file_products_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -810,7 +1024,7 @@ func (x *ListAccessoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAccessoryResponse.ProtoReflect.Descriptor instead.
 func (*ListAccessoryResponse) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{14}
+	return file_products_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *ListAccessoryResponse) GetAccessories() []*Accessory {
@@ -830,7 +1044,7 @@ type ListMedicineResponse struct {
 
 func (x *ListMedicineResponse) Reset() {
 	*x = ListMedicineResponse{}
-	mi := &file_products_proto_msgTypes[15]
+	mi := &file_products_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -842,7 +1056,7 @@ func (x *ListMedicineResponse) String() string {
 func (*ListMedicineResponse) ProtoMessage() {}
 
 func (x *ListMedicineResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[15]
+	mi := &file_products_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -855,7 +1069,7 @@ func (x *ListMedicineResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMedicineResponse.ProtoReflect.Descriptor instead.
 func (*ListMedicineResponse) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{15}
+	return file_products_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *ListMedicineResponse) GetMedicines() []*Medicine {
@@ -875,7 +1089,7 @@ type ListBranchResponse struct {
 
 func (x *ListBranchResponse) Reset() {
 	*x = ListBranchResponse{}
-	mi := &file_products_proto_msgTypes[16]
+	mi := &file_products_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -887,7 +1101,7 @@ func (x *ListBranchResponse) String() string {
 func (*ListBranchResponse) ProtoMessage() {}
 
 func (x *ListBranchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[16]
+	mi := &file_products_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -900,7 +1114,7 @@ func (x *ListBranchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBranchResponse.ProtoReflect.Descriptor instead.
 func (*ListBranchResponse) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{16}
+	return file_products_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *ListBranchResponse) GetBranches() []*Branch {
@@ -922,7 +1136,7 @@ type CreateFoodRequest struct {
 
 func (x *CreateFoodRequest) Reset() {
 	*x = CreateFoodRequest{}
-	mi := &file_products_proto_msgTypes[17]
+	mi := &file_products_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -934,7 +1148,7 @@ func (x *CreateFoodRequest) String() string {
 func (*CreateFoodRequest) ProtoMessage() {}
 
 func (x *CreateFoodRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[17]
+	mi := &file_products_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -947,7 +1161,7 @@ func (x *CreateFoodRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateFoodRequest.ProtoReflect.Descriptor instead.
 func (*CreateFoodRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{17}
+	return file_products_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *CreateFoodRequest) GetName() string {
@@ -983,7 +1197,7 @@ type CreateAccessoryRequest struct {
 
 func (x *CreateAccessoryRequest) Reset() {
 	*x = CreateAccessoryRequest{}
-	mi := &file_products_proto_msgTypes[18]
+	mi := &file_products_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -995,7 +1209,7 @@ func (x *CreateAccessoryRequest) String() string {
 func (*CreateAccessoryRequest) ProtoMessage() {}
 
 func (x *CreateAccessoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[18]
+	mi := &file_products_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1008,7 +1222,7 @@ func (x *CreateAccessoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAccessoryRequest.ProtoReflect.Descriptor instead.
 func (*CreateAccessoryRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{18}
+	return file_products_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *CreateAccessoryRequest) GetName() string {
@@ -1044,7 +1258,7 @@ type CreateMedicineRequest struct {
 
 func (x *CreateMedicineRequest) Reset() {
 	*x = CreateMedicineRequest{}
-	mi := &file_products_proto_msgTypes[19]
+	mi := &file_products_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1056,7 +1270,7 @@ func (x *CreateMedicineRequest) String() string {
 func (*CreateMedicineRequest) ProtoMessage() {}
 
 func (x *CreateMedicineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[19]
+	mi := &file_products_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1069,7 +1283,7 @@ func (x *CreateMedicineRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateMedicineRequest.ProtoReflect.Descriptor instead.
 func (*CreateMedicineRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{19}
+	return file_products_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *CreateMedicineRequest) GetName() string {
@@ -1103,7 +1317,7 @@ type CreateFoodResponse struct {
 
 func (x *CreateFoodResponse) Reset() {
 	*x = CreateFoodResponse{}
-	mi := &file_products_proto_msgTypes[20]
+	mi := &file_products_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1115,7 +1329,7 @@ func (x *CreateFoodResponse) String() string {
 func (*CreateFoodResponse) ProtoMessage() {}
 
 func (x *CreateFoodResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[20]
+	mi := &file_products_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1128,7 +1342,7 @@ func (x *CreateFoodResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateFoodResponse.ProtoReflect.Descriptor instead.
 func (*CreateFoodResponse) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{20}
+	return file_products_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *CreateFoodResponse) GetStatus() string {
@@ -1148,7 +1362,7 @@ type CreateAccessoryResponse struct {
 
 func (x *CreateAccessoryResponse) Reset() {
 	*x = CreateAccessoryResponse{}
-	mi := &file_products_proto_msgTypes[21]
+	mi := &file_products_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1160,7 +1374,7 @@ func (x *CreateAccessoryResponse) String() string {
 func (*CreateAccessoryResponse) ProtoMessage() {}
 
 func (x *CreateAccessoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[21]
+	mi := &file_products_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1173,7 +1387,7 @@ func (x *CreateAccessoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAccessoryResponse.ProtoReflect.Descriptor instead.
 func (*CreateAccessoryResponse) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{21}
+	return file_products_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *CreateAccessoryResponse) GetStatus() string {
@@ -1193,7 +1407,7 @@ type CreateMedicineResponse struct {
 
 func (x *CreateMedicineResponse) Reset() {
 	*x = CreateMedicineResponse{}
-	mi := &file_products_proto_msgTypes[22]
+	mi := &file_products_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1205,7 +1419,7 @@ func (x *CreateMedicineResponse) String() string {
 func (*CreateMedicineResponse) ProtoMessage() {}
 
 func (x *CreateMedicineResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[22]
+	mi := &file_products_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1218,7 +1432,7 @@ func (x *CreateMedicineResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateMedicineResponse.ProtoReflect.Descriptor instead.
 func (*CreateMedicineResponse) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{22}
+	return file_products_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *CreateMedicineResponse) GetStatus() string {
@@ -1241,7 +1455,7 @@ type UpdateFoodRequest struct {
 
 func (x *UpdateFoodRequest) Reset() {
 	*x = UpdateFoodRequest{}
-	mi := &file_products_proto_msgTypes[23]
+	mi := &file_products_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1253,7 +1467,7 @@ func (x *UpdateFoodRequest) String() string {
 func (*UpdateFoodRequest) ProtoMessage() {}
 
 func (x *UpdateFoodRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[23]
+	mi := &file_products_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1266,7 +1480,7 @@ func (x *UpdateFoodRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateFoodRequest.ProtoReflect.Descriptor instead.
 func (*UpdateFoodRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{23}
+	return file_products_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *UpdateFoodRequest) GetId() int32 {
@@ -1310,7 +1524,7 @@ type UpdateAccessoryRequest struct {
 
 func (x *UpdateAccessoryRequest) Reset() {
 	*x = UpdateAccessoryRequest{}
-	mi := &file_products_proto_msgTypes[24]
+	mi := &file_products_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1322,7 +1536,7 @@ func (x *UpdateAccessoryRequest) String() string {
 func (*UpdateAccessoryRequest) ProtoMessage() {}
 
 func (x *UpdateAccessoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[24]
+	mi := &file_products_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1335,7 +1549,7 @@ func (x *UpdateAccessoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAccessoryRequest.ProtoReflect.Descriptor instead.
 func (*UpdateAccessoryRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{24}
+	return file_products_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *UpdateAccessoryRequest) GetId() int32 {
@@ -1379,7 +1593,7 @@ type UpdateMedicineRequest struct {
 
 func (x *UpdateMedicineRequest) Reset() {
 	*x = UpdateMedicineRequest{}
-	mi := &file_products_proto_msgTypes[25]
+	mi := &file_products_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1391,7 +1605,7 @@ func (x *UpdateMedicineRequest) String() string {
 func (*UpdateMedicineRequest) ProtoMessage() {}
 
 func (x *UpdateMedicineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[25]
+	mi := &file_products_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1404,7 +1618,7 @@ func (x *UpdateMedicineRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateMedicineRequest.ProtoReflect.Descriptor instead.
 func (*UpdateMedicineRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{25}
+	return file_products_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *UpdateMedicineRequest) GetId() int32 {
@@ -1445,7 +1659,7 @@ type UpdateFoodResponse struct {
 
 func (x *UpdateFoodResponse) Reset() {
 	*x = UpdateFoodResponse{}
-	mi := &file_products_proto_msgTypes[26]
+	mi := &file_products_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1457,7 +1671,7 @@ func (x *UpdateFoodResponse) String() string {
 func (*UpdateFoodResponse) ProtoMessage() {}
 
 func (x *UpdateFoodResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[26]
+	mi := &file_products_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1470,7 +1684,7 @@ func (x *UpdateFoodResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateFoodResponse.ProtoReflect.Descriptor instead.
 func (*UpdateFoodResponse) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{26}
+	return file_products_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *UpdateFoodResponse) GetStatus() string {
@@ -1490,7 +1704,7 @@ type UpdateAccessoryResponse struct {
 
 func (x *UpdateAccessoryResponse) Reset() {
 	*x = UpdateAccessoryResponse{}
-	mi := &file_products_proto_msgTypes[27]
+	mi := &file_products_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1502,7 +1716,7 @@ func (x *UpdateAccessoryResponse) String() string {
 func (*UpdateAccessoryResponse) ProtoMessage() {}
 
 func (x *UpdateAccessoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[27]
+	mi := &file_products_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1515,7 +1729,7 @@ func (x *UpdateAccessoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAccessoryResponse.ProtoReflect.Descriptor instead.
 func (*UpdateAccessoryResponse) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{27}
+	return file_products_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *UpdateAccessoryResponse) GetStatus() string {
@@ -1535,7 +1749,7 @@ type UpdateMedicineResponse struct {
 
 func (x *UpdateMedicineResponse) Reset() {
 	*x = UpdateMedicineResponse{}
-	mi := &file_products_proto_msgTypes[28]
+	mi := &file_products_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1547,7 +1761,7 @@ func (x *UpdateMedicineResponse) String() string {
 func (*UpdateMedicineResponse) ProtoMessage() {}
 
 func (x *UpdateMedicineResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[28]
+	mi := &file_products_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1560,7 +1774,7 @@ func (x *UpdateMedicineResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateMedicineResponse.ProtoReflect.Descriptor instead.
 func (*UpdateMedicineResponse) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{28}
+	return file_products_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *UpdateMedicineResponse) GetStatus() string {
@@ -1580,7 +1794,7 @@ type DeleteFoodRequest struct {
 
 func (x *DeleteFoodRequest) Reset() {
 	*x = DeleteFoodRequest{}
-	mi := &file_products_proto_msgTypes[29]
+	mi := &file_products_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1592,7 +1806,7 @@ func (x *DeleteFoodRequest) String() string {
 func (*DeleteFoodRequest) ProtoMessage() {}
 
 func (x *DeleteFoodRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[29]
+	mi := &file_products_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1605,7 +1819,7 @@ func (x *DeleteFoodRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFoodRequest.ProtoReflect.Descriptor instead.
 func (*DeleteFoodRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{29}
+	return file_products_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *DeleteFoodRequest) GetId() int32 {
@@ -1625,7 +1839,7 @@ type DeleteAccessoryRequest struct {
 
 func (x *DeleteAccessoryRequest) Reset() {
 	*x = DeleteAccessoryRequest{}
-	mi := &file_products_proto_msgTypes[30]
+	mi := &file_products_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1637,7 +1851,7 @@ func (x *DeleteAccessoryRequest) String() string {
 func (*DeleteAccessoryRequest) ProtoMessage() {}
 
 func (x *DeleteAccessoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[30]
+	mi := &file_products_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1650,7 +1864,7 @@ func (x *DeleteAccessoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAccessoryRequest.ProtoReflect.Descriptor instead.
 func (*DeleteAccessoryRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{30}
+	return file_products_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *DeleteAccessoryRequest) GetId() int32 {
@@ -1670,7 +1884,7 @@ type DeleteMedicineRequest struct {
 
 func (x *DeleteMedicineRequest) Reset() {
 	*x = DeleteMedicineRequest{}
-	mi := &file_products_proto_msgTypes[31]
+	mi := &file_products_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1682,7 +1896,7 @@ func (x *DeleteMedicineRequest) String() string {
 func (*DeleteMedicineRequest) ProtoMessage() {}
 
 func (x *DeleteMedicineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[31]
+	mi := &file_products_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1695,7 +1909,7 @@ func (x *DeleteMedicineRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteMedicineRequest.ProtoReflect.Descriptor instead.
 func (*DeleteMedicineRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{31}
+	return file_products_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *DeleteMedicineRequest) GetId() int32 {
@@ -1715,7 +1929,7 @@ type DeleteFoodResponse struct {
 
 func (x *DeleteFoodResponse) Reset() {
 	*x = DeleteFoodResponse{}
-	mi := &file_products_proto_msgTypes[32]
+	mi := &file_products_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1727,7 +1941,7 @@ func (x *DeleteFoodResponse) String() string {
 func (*DeleteFoodResponse) ProtoMessage() {}
 
 func (x *DeleteFoodResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[32]
+	mi := &file_products_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1740,7 +1954,7 @@ func (x *DeleteFoodResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFoodResponse.ProtoReflect.Descriptor instead.
 func (*DeleteFoodResponse) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{32}
+	return file_products_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *DeleteFoodResponse) GetStatus() string {
@@ -1760,7 +1974,7 @@ type DeleteAccessoryResponse struct {
 
 func (x *DeleteAccessoryResponse) Reset() {
 	*x = DeleteAccessoryResponse{}
-	mi := &file_products_proto_msgTypes[33]
+	mi := &file_products_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1772,7 +1986,7 @@ func (x *DeleteAccessoryResponse) String() string {
 func (*DeleteAccessoryResponse) ProtoMessage() {}
 
 func (x *DeleteAccessoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[33]
+	mi := &file_products_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1785,7 +1999,7 @@ func (x *DeleteAccessoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAccessoryResponse.ProtoReflect.Descriptor instead.
 func (*DeleteAccessoryResponse) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{33}
+	return file_products_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *DeleteAccessoryResponse) GetStatus() string {
@@ -1805,7 +2019,7 @@ type DeleteMedicineResponse struct {
 
 func (x *DeleteMedicineResponse) Reset() {
 	*x = DeleteMedicineResponse{}
-	mi := &file_products_proto_msgTypes[34]
+	mi := &file_products_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1817,7 +2031,7 @@ func (x *DeleteMedicineResponse) String() string {
 func (*DeleteMedicineResponse) ProtoMessage() {}
 
 func (x *DeleteMedicineResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[34]
+	mi := &file_products_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1830,7 +2044,7 @@ func (x *DeleteMedicineResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteMedicineResponse.ProtoReflect.Descriptor instead.
 func (*DeleteMedicineResponse) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{34}
+	return file_products_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *DeleteMedicineResponse) GetStatus() string {
@@ -1850,7 +2064,7 @@ type GetBranchInventoryRequest struct {
 
 func (x *GetBranchInventoryRequest) Reset() {
 	*x = GetBranchInventoryRequest{}
-	mi := &file_products_proto_msgTypes[35]
+	mi := &file_products_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1862,7 +2076,7 @@ func (x *GetBranchInventoryRequest) String() string {
 func (*GetBranchInventoryRequest) ProtoMessage() {}
 
 func (x *GetBranchInventoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[35]
+	mi := &file_products_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1875,7 +2089,7 @@ func (x *GetBranchInventoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBranchInventoryRequest.ProtoReflect.Descriptor instead.
 func (*GetBranchInventoryRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{35}
+	return file_products_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *GetBranchInventoryRequest) GetBranchId() int32 {
@@ -1895,7 +2109,7 @@ type GetBranchInventoryResponse struct {
 
 func (x *GetBranchInventoryResponse) Reset() {
 	*x = GetBranchInventoryResponse{}
-	mi := &file_products_proto_msgTypes[36]
+	mi := &file_products_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1907,7 +2121,7 @@ func (x *GetBranchInventoryResponse) String() string {
 func (*GetBranchInventoryResponse) ProtoMessage() {}
 
 func (x *GetBranchInventoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[36]
+	mi := &file_products_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1920,7 +2134,7 @@ func (x *GetBranchInventoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBranchInventoryResponse.ProtoReflect.Descriptor instead.
 func (*GetBranchInventoryResponse) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{36}
+	return file_products_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *GetBranchInventoryResponse) GetInventory() []*BranchProduct {
@@ -1943,7 +2157,7 @@ type UpdateBranchInventoryRequest struct {
 
 func (x *UpdateBranchInventoryRequest) Reset() {
 	*x = UpdateBranchInventoryRequest{}
-	mi := &file_products_proto_msgTypes[37]
+	mi := &file_products_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1955,7 +2169,7 @@ func (x *UpdateBranchInventoryRequest) String() string {
 func (*UpdateBranchInventoryRequest) ProtoMessage() {}
 
 func (x *UpdateBranchInventoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[37]
+	mi := &file_products_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1968,7 +2182,7 @@ func (x *UpdateBranchInventoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateBranchInventoryRequest.ProtoReflect.Descriptor instead.
 func (*UpdateBranchInventoryRequest) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{37}
+	return file_products_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *UpdateBranchInventoryRequest) GetBranchId() int32 {
@@ -2009,7 +2223,7 @@ type UpdateBranchInventoryResponse struct {
 
 func (x *UpdateBranchInventoryResponse) Reset() {
 	*x = UpdateBranchInventoryResponse{}
-	mi := &file_products_proto_msgTypes[38]
+	mi := &file_products_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2021,7 +2235,7 @@ func (x *UpdateBranchInventoryResponse) String() string {
 func (*UpdateBranchInventoryResponse) ProtoMessage() {}
 
 func (x *UpdateBranchInventoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_products_proto_msgTypes[38]
+	mi := &file_products_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2034,7 +2248,7 @@ func (x *UpdateBranchInventoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateBranchInventoryResponse.ProtoReflect.Descriptor instead.
 func (*UpdateBranchInventoryResponse) Descriptor() ([]byte, []int) {
-	return file_products_proto_rawDescGZIP(), []int{38}
+	return file_products_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *UpdateBranchInventoryResponse) GetStatus() string {
@@ -2050,7 +2264,7 @@ var file_products_proto_rawDesc = []byte{
 	0x0a, 0x0e, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 	0x1a, 0x1f, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
 	0x66, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x22, 0xd8, 0x01, 0x0a, 0x04, 0x46, 0x6f, 0x6f, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
+	0x6f, 0x22, 0x95, 0x02, 0x0a, 0x04, 0x46, 0x6f, 0x6f, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61,
 	0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x20,
 	0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20,
@@ -2063,35 +2277,58 @@ var file_products_proto_rawDesc = []byte{
 	0x74, 0x12, 0x39, 0x0a, 0x0a, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18,
 	0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
 	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d,
-	0x70, 0x52, 0x09, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x22, 0xdd, 0x01, 0x0a,
-	0x09, 0x41, 0x63, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x72, 0x79, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61,
-	0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x20,
-	0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e,
-	0x12, 0x14, 0x0a, 0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x02, 0x52,
-	0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x12, 0x39, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65,
-	0x64, 0x5f, 0x61, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f,
-	0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d,
-	0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41,
-	0x74, 0x12, 0x39, 0x0a, 0x0a, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18,
-	0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d,
-	0x70, 0x52, 0x09, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x22, 0xdc, 0x01, 0x0a,
-	0x08, 0x4d, 0x65, 0x64, 0x69, 0x63, 0x69, 0x6e, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d,
-	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x20, 0x0a,
-	0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12,
-	0x14, 0x0a, 0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x02, 0x52, 0x05,
-	0x70, 0x72, 0x69, 0x63, 0x65, 0x12, 0x39, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64,
-	0x5f, 0x61, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67,
-	0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65,
-	0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74,
-	0x12, 0x39, 0x0a, 0x0a, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x06,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70,
-	0x52, 0x09, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x22, 0x48, 0x0a, 0x06, 0x42,
+	0x70, 0x52, 0x09, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x12, 0x16, 0x0a, 0x06,
+	0x69, 0x6d, 0x67, 0x75, 0x72, 0x6c, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x69, 0x6d,
+	0x67, 0x75, 0x72, 0x6c, 0x12, 0x23, 0x0a, 0x0d, 0x69, 0x73, 0x5f, 0x61, 0x74, 0x74, 0x61, 0x63,
+	0x68, 0x61, 0x62, 0x6c, 0x65, 0x18, 0x08, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0c, 0x69, 0x73, 0x41,
+	0x74, 0x74, 0x61, 0x63, 0x68, 0x61, 0x62, 0x6c, 0x65, 0x22, 0x9a, 0x02, 0x0a, 0x09, 0x41, 0x63,
+	0x63, 0x65, 0x73, 0x73, 0x6f, 0x72, 0x79, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x05, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x20, 0x0a, 0x0b, 0x64,
+	0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x14, 0x0a,
+	0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x02, 0x52, 0x05, 0x70, 0x72,
+	0x69, 0x63, 0x65, 0x12, 0x39, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61,
+	0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74,
+	0x61, 0x6d, 0x70, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x12, 0x39,
+	0x0a, 0x0a, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x06, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09,
+	0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x69, 0x6d, 0x67,
+	0x75, 0x72, 0x6c, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x69, 0x6d, 0x67, 0x75, 0x72,
+	0x6c, 0x12, 0x23, 0x0a, 0x0d, 0x69, 0x73, 0x5f, 0x61, 0x74, 0x74, 0x61, 0x63, 0x68, 0x61, 0x62,
+	0x6c, 0x65, 0x18, 0x08, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0c, 0x69, 0x73, 0x41, 0x74, 0x74, 0x61,
+	0x63, 0x68, 0x61, 0x62, 0x6c, 0x65, 0x22, 0x99, 0x02, 0x0a, 0x08, 0x4d, 0x65, 0x64, 0x69, 0x63,
+	0x69, 0x6e, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52,
+	0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72,
+	0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65,
+	0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x14, 0x0a, 0x05, 0x70, 0x72, 0x69,
+	0x63, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x02, 0x52, 0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x12,
+	0x39, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x05, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52,
+	0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x12, 0x39, 0x0a, 0x0a, 0x75, 0x70,
+	0x64, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a,
+	0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66,
+	0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x75, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x64, 0x41, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x69, 0x6d, 0x67, 0x75, 0x72, 0x6c, 0x18,
+	0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x69, 0x6d, 0x67, 0x75, 0x72, 0x6c, 0x12, 0x23, 0x0a,
+	0x0d, 0x69, 0x73, 0x5f, 0x61, 0x74, 0x74, 0x61, 0x63, 0x68, 0x61, 0x62, 0x6c, 0x65, 0x18, 0x08,
+	0x20, 0x01, 0x28, 0x08, 0x52, 0x0c, 0x69, 0x73, 0x41, 0x74, 0x74, 0x61, 0x63, 0x68, 0x61, 0x62,
+	0x6c, 0x65, 0x22, 0xb6, 0x01, 0x0a, 0x0e, 0x47, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x6c, 0x50, 0x72,
+	0x6f, 0x64, 0x75, 0x63, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73,
+	0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b,
+	0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x14, 0x0a, 0x05, 0x70,
+	0x72, 0x69, 0x63, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x02, 0x52, 0x05, 0x70, 0x72, 0x69, 0x63,
+	0x65, 0x12, 0x16, 0x0a, 0x06, 0x69, 0x6d, 0x67, 0x75, 0x72, 0x6c, 0x18, 0x04, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x06, 0x69, 0x6d, 0x67, 0x75, 0x72, 0x6c, 0x12, 0x1d, 0x0a, 0x0a, 0x70, 0x72, 0x6f,
+	0x64, 0x75, 0x63, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x05, 0x52, 0x09, 0x70,
+	0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x49, 0x64, 0x12, 0x21, 0x0a, 0x0c, 0x70, 0x72, 0x6f, 0x64,
+	0x75, 0x63, 0x74, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b,
+	0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x54, 0x79, 0x70, 0x65, 0x22, 0x48, 0x0a, 0x06, 0x42,
 	0x72, 0x61, 0x6e, 0x63, 0x68, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x05, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20,
 	0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x6c, 0x6f, 0x63,
@@ -2120,7 +2357,14 @@ var file_products_proto_rawDesc = []byte{
 	0x73, 0x6f, 0x72, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x15, 0x0a, 0x13, 0x4c,
 	0x69, 0x73, 0x74, 0x4d, 0x65, 0x64, 0x69, 0x63, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65,
 	0x73, 0x74, 0x22, 0x13, 0x0a, 0x11, 0x4c, 0x69, 0x73, 0x74, 0x42, 0x72, 0x61, 0x6e, 0x63, 0x68,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x2f, 0x0a, 0x10, 0x4c, 0x69, 0x73, 0x74, 0x46,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x1f, 0x0a, 0x1d, 0x4c, 0x69, 0x73, 0x74, 0x41,
+	0x74, 0x74, 0x61, 0x63, 0x68, 0x61, 0x62, 0x6c, 0x65, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74,
+	0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x4d, 0x0a, 0x1e, 0x4c, 0x69, 0x73, 0x74,
+	0x41, 0x74, 0x74, 0x61, 0x63, 0x68, 0x61, 0x62, 0x6c, 0x65, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63,
+	0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2b, 0x0a, 0x08, 0x70, 0x72,
+	0x6f, 0x64, 0x75, 0x63, 0x74, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x47,
+	0x65, 0x6e, 0x65, 0x72, 0x61, 0x6c, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x52, 0x08, 0x70,
+	0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x73, 0x22, 0x2f, 0x0a, 0x10, 0x4c, 0x69, 0x73, 0x74, 0x46,
 	0x6f, 0x6f, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1b, 0x0a, 0x05, 0x66,
 	0x6f, 0x6f, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x05, 0x2e, 0x46, 0x6f, 0x6f,
 	0x64, 0x52, 0x05, 0x66, 0x6f, 0x6f, 0x64, 0x73, 0x22, 0x45, 0x0a, 0x15, 0x4c, 0x69, 0x73, 0x74,
@@ -2233,7 +2477,7 @@ var file_products_proto_rawDesc = []byte{
 	0x79, 0x22, 0x37, 0x0a, 0x1d, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x42, 0x72, 0x61, 0x6e, 0x63,
 	0x68, 0x49, 0x6e, 0x76, 0x65, 0x6e, 0x74, 0x6f, 0x72, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
 	0x73, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x32, 0xc5, 0x09, 0x0a, 0x0e, 0x50,
+	0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x32, 0xa2, 0x0a, 0x0a, 0x0e, 0x50,
 	0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x27, 0x0a,
 	0x0b, 0x47, 0x65, 0x74, 0x46, 0x6f, 0x6f, 0x64, 0x42, 0x79, 0x49, 0x44, 0x12, 0x0f, 0x2e, 0x47,
 	0x65, 0x74, 0x46, 0x6f, 0x6f, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x05, 0x2e,
@@ -2310,10 +2554,16 @@ var file_products_proto_rawDesc = []byte{
 	0x49, 0x6e, 0x76, 0x65, 0x6e, 0x74, 0x6f, 0x72, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
 	0x1a, 0x1e, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x42, 0x72, 0x61, 0x6e, 0x63, 0x68, 0x49,
 	0x6e, 0x76, 0x65, 0x6e, 0x74, 0x6f, 0x72, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x22, 0x00, 0x42, 0x27, 0x5a, 0x25, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
-	0x2f, 0x71, 0x75, 0x61, 0x6e, 0x62, 0x69, 0x6e, 0x32, 0x37, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x6f,
-	0x6e, 0x73, 0x2f, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x22, 0x00, 0x12, 0x5b, 0x0a, 0x16, 0x4c, 0x69, 0x73, 0x74, 0x41, 0x74, 0x74, 0x61, 0x63, 0x68,
+	0x61, 0x62, 0x6c, 0x65, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x73, 0x12, 0x1e, 0x2e, 0x4c,
+	0x69, 0x73, 0x74, 0x41, 0x74, 0x74, 0x61, 0x63, 0x68, 0x61, 0x62, 0x6c, 0x65, 0x50, 0x72, 0x6f,
+	0x64, 0x75, 0x63, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1f, 0x2e, 0x4c,
+	0x69, 0x73, 0x74, 0x41, 0x74, 0x74, 0x61, 0x63, 0x68, 0x61, 0x62, 0x6c, 0x65, 0x50, 0x72, 0x6f,
+	0x64, 0x75, 0x63, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42,
+	0x30, 0x5a, 0x2e, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x71, 0x75,
+	0x61, 0x6e, 0x62, 0x69, 0x6e, 0x32, 0x37, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x73, 0x2f,
+	0x67, 0x65, 0x6e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74,
+	0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2328,104 +2578,110 @@ func file_products_proto_rawDescGZIP() []byte {
 	return file_products_proto_rawDescData
 }
 
-var file_products_proto_msgTypes = make([]protoimpl.MessageInfo, 39)
+var file_products_proto_msgTypes = make([]protoimpl.MessageInfo, 42)
 var file_products_proto_goTypes = []any{
-	(*Food)(nil),                          // 0: Food
-	(*Accessory)(nil),                     // 1: Accessory
-	(*Medicine)(nil),                      // 2: Medicine
-	(*Branch)(nil),                        // 3: Branch
-	(*BranchProduct)(nil),                 // 4: BranchProduct
-	(*GetFoodRequest)(nil),                // 5: GetFoodRequest
-	(*GetAccessoryRequest)(nil),           // 6: GetAccessoryRequest
-	(*GetMedicineRequest)(nil),            // 7: GetMedicineRequest
-	(*GetBranchRequest)(nil),              // 8: GetBranchRequest
-	(*ListFoodRequest)(nil),               // 9: ListFoodRequest
-	(*ListAccessoryRequest)(nil),          // 10: ListAccessoryRequest
-	(*ListMedicineRequest)(nil),           // 11: ListMedicineRequest
-	(*ListBranchRequest)(nil),             // 12: ListBranchRequest
-	(*ListFoodResponse)(nil),              // 13: ListFoodResponse
-	(*ListAccessoryResponse)(nil),         // 14: ListAccessoryResponse
-	(*ListMedicineResponse)(nil),          // 15: ListMedicineResponse
-	(*ListBranchResponse)(nil),            // 16: ListBranchResponse
-	(*CreateFoodRequest)(nil),             // 17: CreateFoodRequest
-	(*CreateAccessoryRequest)(nil),        // 18: CreateAccessoryRequest
-	(*CreateMedicineRequest)(nil),         // 19: CreateMedicineRequest
-	(*CreateFoodResponse)(nil),            // 20: CreateFoodResponse
-	(*CreateAccessoryResponse)(nil),       // 21: CreateAccessoryResponse
-	(*CreateMedicineResponse)(nil),        // 22: CreateMedicineResponse
-	(*UpdateFoodRequest)(nil),             // 23: UpdateFoodRequest
-	(*UpdateAccessoryRequest)(nil),        // 24: UpdateAccessoryRequest
-	(*UpdateMedicineRequest)(nil),         // 25: UpdateMedicineRequest
-	(*UpdateFoodResponse)(nil),            // 26: UpdateFoodResponse
-	(*UpdateAccessoryResponse)(nil),       // 27: UpdateAccessoryResponse
-	(*UpdateMedicineResponse)(nil),        // 28: UpdateMedicineResponse
-	(*DeleteFoodRequest)(nil),             // 29: DeleteFoodRequest
-	(*DeleteAccessoryRequest)(nil),        // 30: DeleteAccessoryRequest
-	(*DeleteMedicineRequest)(nil),         // 31: DeleteMedicineRequest
-	(*DeleteFoodResponse)(nil),            // 32: DeleteFoodResponse
-	(*DeleteAccessoryResponse)(nil),       // 33: DeleteAccessoryResponse
-	(*DeleteMedicineResponse)(nil),        // 34: DeleteMedicineResponse
-	(*GetBranchInventoryRequest)(nil),     // 35: GetBranchInventoryRequest
-	(*GetBranchInventoryResponse)(nil),    // 36: GetBranchInventoryResponse
-	(*UpdateBranchInventoryRequest)(nil),  // 37: UpdateBranchInventoryRequest
-	(*UpdateBranchInventoryResponse)(nil), // 38: UpdateBranchInventoryResponse
-	(*timestamppb.Timestamp)(nil),         // 39: google.protobuf.Timestamp
+	(*Food)(nil),                           // 0: Food
+	(*Accessory)(nil),                      // 1: Accessory
+	(*Medicine)(nil),                       // 2: Medicine
+	(*GeneralProduct)(nil),                 // 3: GeneralProduct
+	(*Branch)(nil),                         // 4: Branch
+	(*BranchProduct)(nil),                  // 5: BranchProduct
+	(*GetFoodRequest)(nil),                 // 6: GetFoodRequest
+	(*GetAccessoryRequest)(nil),            // 7: GetAccessoryRequest
+	(*GetMedicineRequest)(nil),             // 8: GetMedicineRequest
+	(*GetBranchRequest)(nil),               // 9: GetBranchRequest
+	(*ListFoodRequest)(nil),                // 10: ListFoodRequest
+	(*ListAccessoryRequest)(nil),           // 11: ListAccessoryRequest
+	(*ListMedicineRequest)(nil),            // 12: ListMedicineRequest
+	(*ListBranchRequest)(nil),              // 13: ListBranchRequest
+	(*ListAttachableProductsRequest)(nil),  // 14: ListAttachableProductsRequest
+	(*ListAttachableProductsResponse)(nil), // 15: ListAttachableProductsResponse
+	(*ListFoodResponse)(nil),               // 16: ListFoodResponse
+	(*ListAccessoryResponse)(nil),          // 17: ListAccessoryResponse
+	(*ListMedicineResponse)(nil),           // 18: ListMedicineResponse
+	(*ListBranchResponse)(nil),             // 19: ListBranchResponse
+	(*CreateFoodRequest)(nil),              // 20: CreateFoodRequest
+	(*CreateAccessoryRequest)(nil),         // 21: CreateAccessoryRequest
+	(*CreateMedicineRequest)(nil),          // 22: CreateMedicineRequest
+	(*CreateFoodResponse)(nil),             // 23: CreateFoodResponse
+	(*CreateAccessoryResponse)(nil),        // 24: CreateAccessoryResponse
+	(*CreateMedicineResponse)(nil),         // 25: CreateMedicineResponse
+	(*UpdateFoodRequest)(nil),              // 26: UpdateFoodRequest
+	(*UpdateAccessoryRequest)(nil),         // 27: UpdateAccessoryRequest
+	(*UpdateMedicineRequest)(nil),          // 28: UpdateMedicineRequest
+	(*UpdateFoodResponse)(nil),             // 29: UpdateFoodResponse
+	(*UpdateAccessoryResponse)(nil),        // 30: UpdateAccessoryResponse
+	(*UpdateMedicineResponse)(nil),         // 31: UpdateMedicineResponse
+	(*DeleteFoodRequest)(nil),              // 32: DeleteFoodRequest
+	(*DeleteAccessoryRequest)(nil),         // 33: DeleteAccessoryRequest
+	(*DeleteMedicineRequest)(nil),          // 34: DeleteMedicineRequest
+	(*DeleteFoodResponse)(nil),             // 35: DeleteFoodResponse
+	(*DeleteAccessoryResponse)(nil),        // 36: DeleteAccessoryResponse
+	(*DeleteMedicineResponse)(nil),         // 37: DeleteMedicineResponse
+	(*GetBranchInventoryRequest)(nil),      // 38: GetBranchInventoryRequest
+	(*GetBranchInventoryResponse)(nil),     // 39: GetBranchInventoryResponse
+	(*UpdateBranchInventoryRequest)(nil),   // 40: UpdateBranchInventoryRequest
+	(*UpdateBranchInventoryResponse)(nil),  // 41: UpdateBranchInventoryResponse
+	(*timestamppb.Timestamp)(nil),          // 42: google.protobuf.Timestamp
 }
 var file_products_proto_depIdxs = []int32{
-	39, // 0: Food.created_at:type_name -> google.protobuf.Timestamp
-	39, // 1: Food.updated_at:type_name -> google.protobuf.Timestamp
-	39, // 2: Accessory.created_at:type_name -> google.protobuf.Timestamp
-	39, // 3: Accessory.updated_at:type_name -> google.protobuf.Timestamp
-	39, // 4: Medicine.created_at:type_name -> google.protobuf.Timestamp
-	39, // 5: Medicine.updated_at:type_name -> google.protobuf.Timestamp
-	0,  // 6: ListFoodResponse.foods:type_name -> Food
-	1,  // 7: ListAccessoryResponse.accessories:type_name -> Accessory
-	2,  // 8: ListMedicineResponse.medicines:type_name -> Medicine
-	3,  // 9: ListBranchResponse.branches:type_name -> Branch
-	4,  // 10: GetBranchInventoryResponse.inventory:type_name -> BranchProduct
-	5,  // 11: ProductService.GetFoodByID:input_type -> GetFoodRequest
-	6,  // 12: ProductService.GetAccessoryByID:input_type -> GetAccessoryRequest
-	7,  // 13: ProductService.GetMedicineByID:input_type -> GetMedicineRequest
-	9,  // 14: ProductService.ListFoods:input_type -> ListFoodRequest
-	10, // 15: ProductService.ListAccessories:input_type -> ListAccessoryRequest
-	11, // 16: ProductService.ListMedicines:input_type -> ListMedicineRequest
-	17, // 17: ProductService.CreateFood:input_type -> CreateFoodRequest
-	18, // 18: ProductService.CreateAccessory:input_type -> CreateAccessoryRequest
-	19, // 19: ProductService.CreateMedicine:input_type -> CreateMedicineRequest
-	23, // 20: ProductService.UpdateFood:input_type -> UpdateFoodRequest
-	24, // 21: ProductService.UpdateAccessory:input_type -> UpdateAccessoryRequest
-	25, // 22: ProductService.UpdateMedicine:input_type -> UpdateMedicineRequest
-	29, // 23: ProductService.DeleteFood:input_type -> DeleteFoodRequest
-	30, // 24: ProductService.DeleteAccessory:input_type -> DeleteAccessoryRequest
-	31, // 25: ProductService.DeleteMedicine:input_type -> DeleteMedicineRequest
-	8,  // 26: ProductService.GetBranchByID:input_type -> GetBranchRequest
-	12, // 27: ProductService.ListBranches:input_type -> ListBranchRequest
-	35, // 28: ProductService.GetBranchInventory:input_type -> GetBranchInventoryRequest
-	37, // 29: ProductService.UpdateBranchInventory:input_type -> UpdateBranchInventoryRequest
-	0,  // 30: ProductService.GetFoodByID:output_type -> Food
-	1,  // 31: ProductService.GetAccessoryByID:output_type -> Accessory
-	2,  // 32: ProductService.GetMedicineByID:output_type -> Medicine
-	13, // 33: ProductService.ListFoods:output_type -> ListFoodResponse
-	14, // 34: ProductService.ListAccessories:output_type -> ListAccessoryResponse
-	15, // 35: ProductService.ListMedicines:output_type -> ListMedicineResponse
-	20, // 36: ProductService.CreateFood:output_type -> CreateFoodResponse
-	21, // 37: ProductService.CreateAccessory:output_type -> CreateAccessoryResponse
-	22, // 38: ProductService.CreateMedicine:output_type -> CreateMedicineResponse
-	26, // 39: ProductService.UpdateFood:output_type -> UpdateFoodResponse
-	27, // 40: ProductService.UpdateAccessory:output_type -> UpdateAccessoryResponse
-	28, // 41: ProductService.UpdateMedicine:output_type -> UpdateMedicineResponse
-	32, // 42: ProductService.DeleteFood:output_type -> DeleteFoodResponse
-	33, // 43: ProductService.DeleteAccessory:output_type -> DeleteAccessoryResponse
-	34, // 44: ProductService.DeleteMedicine:output_type -> DeleteMedicineResponse
-	3,  // 45: ProductService.GetBranchByID:output_type -> Branch
-	16, // 46: ProductService.ListBranches:output_type -> ListBranchResponse
-	36, // 47: ProductService.GetBranchInventory:output_type -> GetBranchInventoryResponse
-	38, // 48: ProductService.UpdateBranchInventory:output_type -> UpdateBranchInventoryResponse
-	30, // [30:49] is the sub-list for method output_type
-	11, // [11:30] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	42, // 0: Food.created_at:type_name -> google.protobuf.Timestamp
+	42, // 1: Food.updated_at:type_name -> google.protobuf.Timestamp
+	42, // 2: Accessory.created_at:type_name -> google.protobuf.Timestamp
+	42, // 3: Accessory.updated_at:type_name -> google.protobuf.Timestamp
+	42, // 4: Medicine.created_at:type_name -> google.protobuf.Timestamp
+	42, // 5: Medicine.updated_at:type_name -> google.protobuf.Timestamp
+	3,  // 6: ListAttachableProductsResponse.products:type_name -> GeneralProduct
+	0,  // 7: ListFoodResponse.foods:type_name -> Food
+	1,  // 8: ListAccessoryResponse.accessories:type_name -> Accessory
+	2,  // 9: ListMedicineResponse.medicines:type_name -> Medicine
+	4,  // 10: ListBranchResponse.branches:type_name -> Branch
+	5,  // 11: GetBranchInventoryResponse.inventory:type_name -> BranchProduct
+	6,  // 12: ProductService.GetFoodByID:input_type -> GetFoodRequest
+	7,  // 13: ProductService.GetAccessoryByID:input_type -> GetAccessoryRequest
+	8,  // 14: ProductService.GetMedicineByID:input_type -> GetMedicineRequest
+	10, // 15: ProductService.ListFoods:input_type -> ListFoodRequest
+	11, // 16: ProductService.ListAccessories:input_type -> ListAccessoryRequest
+	12, // 17: ProductService.ListMedicines:input_type -> ListMedicineRequest
+	20, // 18: ProductService.CreateFood:input_type -> CreateFoodRequest
+	21, // 19: ProductService.CreateAccessory:input_type -> CreateAccessoryRequest
+	22, // 20: ProductService.CreateMedicine:input_type -> CreateMedicineRequest
+	26, // 21: ProductService.UpdateFood:input_type -> UpdateFoodRequest
+	27, // 22: ProductService.UpdateAccessory:input_type -> UpdateAccessoryRequest
+	28, // 23: ProductService.UpdateMedicine:input_type -> UpdateMedicineRequest
+	32, // 24: ProductService.DeleteFood:input_type -> DeleteFoodRequest
+	33, // 25: ProductService.DeleteAccessory:input_type -> DeleteAccessoryRequest
+	34, // 26: ProductService.DeleteMedicine:input_type -> DeleteMedicineRequest
+	9,  // 27: ProductService.GetBranchByID:input_type -> GetBranchRequest
+	13, // 28: ProductService.ListBranches:input_type -> ListBranchRequest
+	38, // 29: ProductService.GetBranchInventory:input_type -> GetBranchInventoryRequest
+	40, // 30: ProductService.UpdateBranchInventory:input_type -> UpdateBranchInventoryRequest
+	14, // 31: ProductService.ListAttachableProducts:input_type -> ListAttachableProductsRequest
+	0,  // 32: ProductService.GetFoodByID:output_type -> Food
+	1,  // 33: ProductService.GetAccessoryByID:output_type -> Accessory
+	2,  // 34: ProductService.GetMedicineByID:output_type -> Medicine
+	16, // 35: ProductService.ListFoods:output_type -> ListFoodResponse
+	17, // 36: ProductService.ListAccessories:output_type -> ListAccessoryResponse
+	18, // 37: ProductService.ListMedicines:output_type -> ListMedicineResponse
+	23, // 38: ProductService.CreateFood:output_type -> CreateFoodResponse
+	24, // 39: ProductService.CreateAccessory:output_type -> CreateAccessoryResponse
+	25, // 40: ProductService.CreateMedicine:output_type -> CreateMedicineResponse
+	29, // 41: ProductService.UpdateFood:output_type -> UpdateFoodResponse
+	30, // 42: ProductService.UpdateAccessory:output_type -> UpdateAccessoryResponse
+	31, // 43: ProductService.UpdateMedicine:output_type -> UpdateMedicineResponse
+	35, // 44: ProductService.DeleteFood:output_type -> DeleteFoodResponse
+	36, // 45: ProductService.DeleteAccessory:output_type -> DeleteAccessoryResponse
+	37, // 46: ProductService.DeleteMedicine:output_type -> DeleteMedicineResponse
+	4,  // 47: ProductService.GetBranchByID:output_type -> Branch
+	19, // 48: ProductService.ListBranches:output_type -> ListBranchResponse
+	39, // 49: ProductService.GetBranchInventory:output_type -> GetBranchInventoryResponse
+	41, // 50: ProductService.UpdateBranchInventory:output_type -> UpdateBranchInventoryResponse
+	15, // 51: ProductService.ListAttachableProducts:output_type -> ListAttachableProductsResponse
+	32, // [32:52] is the sub-list for method output_type
+	12, // [12:32] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_products_proto_init() }
@@ -2439,7 +2695,7 @@ func file_products_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_products_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   39,
+			NumMessages:   42,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

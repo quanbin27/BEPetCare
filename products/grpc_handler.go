@@ -197,3 +197,14 @@ func (h *ProductGrpcHandler) UpdateBranchInventory(ctx context.Context, req *pb.
 	}
 	return &pb.UpdateBranchInventoryResponse{Status: stt}, nil
 }
+func (h *ProductGrpcHandler) ListAttachableProducts(ctx context.Context, req *pb.ListAttachableProductsRequest) (*pb.ListAttachableProductsResponse, error) {
+	products, err := h.productService.ListAttachableProducts(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	resp := &pb.ListAttachableProductsResponse{}
+	for _, p := range products {
+		resp.Products = append(resp.Products, toProtoGeneralProduct(&p))
+	}
+	return resp, nil
+}
