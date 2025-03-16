@@ -32,10 +32,11 @@ type Order struct {
 
 // OrderItem đại diện cho sản phẩm trong đơn hàng
 type OrderItem struct {
-	OrderID   int32   `gorm:"primaryKey"`
-	ProductID int32   `gorm:"primaryKey"`
-	Quantity  int32   `gorm:"not null"`
-	UnitPrice float32 `gorm:"not null"`
+	OrderID     int32   `gorm:"primaryKey"`
+	ProductID   int32   `gorm:"primaryKey"`
+	ProductType string  `gorm:"primaryKey"`
+	Quantity    int32   `gorm:"not null"`
+	UnitPrice   float32 `gorm:"not null"`
 }
 
 // OrderStore interface làm việc với database
@@ -89,10 +90,11 @@ func toPbOrder(o *Order) *pb.Order {
 	pbItems := make([]*pb.OrderItem, len(o.Items))
 	for i, item := range o.Items {
 		pbItems[i] = &pb.OrderItem{
-			OrderId:   item.OrderID,
-			ProductId: item.ProductID,
-			Quantity:  item.Quantity,
-			UnitPrice: item.UnitPrice,
+			OrderId:     item.OrderID,
+			ProductId:   item.ProductID,
+			Quantity:    item.Quantity,
+			UnitPrice:   item.UnitPrice,
+			ProductType: item.ProductType,
 		}
 	}
 	return &pb.Order{
@@ -109,9 +111,10 @@ func toPbOrder(o *Order) *pb.Order {
 
 func toPbOrderItem(item OrderItem) *pb.OrderItem {
 	return &pb.OrderItem{
-		OrderId:   item.OrderID,
-		ProductId: item.ProductID,
-		Quantity:  item.Quantity,
-		UnitPrice: item.UnitPrice,
+		OrderId:     item.OrderID,
+		ProductId:   item.ProductID,
+		Quantity:    item.Quantity,
+		UnitPrice:   item.UnitPrice,
+		ProductType: item.ProductType,
 	}
 }

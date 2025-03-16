@@ -25,6 +25,7 @@ message OrderItem {
   int32 product_id = 3;
   int32 quantity = 4;
   float unit_price = 5;
+  string product_type=6;
 }
 enum OrderStatus {
   ORDER_STATUS_UNSPECIFIED = 0; // Giá trị mặc định (bắt buộc trong Protobuf)

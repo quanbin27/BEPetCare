@@ -16,7 +16,7 @@ func NewAppointmentService(store AppointmentStore) AppointmentService {
 
 // --- LỊCH HẸN ---
 // Tạo lịch hẹn
-func (s *AppService) CreateAppointment(ctx context.Context, customerID int32, customerAddress string, scheduledTime time.Time, services []AppointmentDetail, note string) (int32, string, error) {
+func (s *AppService) CreateAppointment(ctx context.Context, customerID int32, customerAddress string, scheduledTime time.Time, services []AppointmentDetail, note string, branchID int32) (int32, string, error) {
 	// Lấy danh sách service IDs từ request
 	var serviceIDs []int32
 	for _, item := range services {
@@ -47,7 +47,7 @@ func (s *AppService) CreateAppointment(ctx context.Context, customerID int32, cu
 	}
 
 	// Gọi Store để tạo lịch hẹn
-	id, err := s.store.CreateAppointment(ctx, customerID, customerAddress, scheduledTime, services, total, note)
+	id, err := s.store.CreateAppointment(ctx, customerID, customerAddress, scheduledTime, services, total, note, branchID)
 	if err != nil {
 		return 0, "Failed", err
 	}

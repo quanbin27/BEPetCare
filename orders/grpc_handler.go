@@ -26,9 +26,10 @@ func (h *OrderGrpcHandler) CreateOrder(ctx context.Context, req *pb.CreateOrderR
 	items := make([]OrderItem, len(req.Items))
 	for i, item := range req.Items {
 		items[i] = OrderItem{
-			ProductID: item.ProductId,
-			Quantity:  item.Quantity,
-			UnitPrice: item.UnitPrice,
+			ProductID:   item.ProductId,
+			Quantity:    item.Quantity,
+			UnitPrice:   item.UnitPrice,
+			ProductType: item.ProductType,
 		}
 	}
 

@@ -18,7 +18,7 @@ func NewStore(db *gorm.DB) *Store {
 }
 
 // Tạo lịch hẹn + chi tiết dịch vụ
-func (s *Store) CreateAppointment(ctx context.Context, customerID int32, customerAddress string, scheduledTime time.Time, services []AppointmentDetail, total float32, note string) (int32, error) {
+func (s *Store) CreateAppointment(ctx context.Context, customerID int32, customerAddress string, scheduledTime time.Time, services []AppointmentDetail, total float32, note string, branchID int32) (int32, error) {
 	var appointmentID int32
 
 	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
@@ -30,6 +30,7 @@ func (s *Store) CreateAppointment(ctx context.Context, customerID int32, custome
 			Status:          StatusPending,
 			Total:           total,
 			Note:            note,
+			BranchID:        branchID,
 		}
 
 		if err := tx.Create(&appointment).Error; err != nil {

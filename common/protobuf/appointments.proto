@@ -54,6 +54,8 @@ message Appointment {
   AppointmentStatus status = 6;
   float total=7;
   string note=8;
+  int32 branch_id=9;
+
 }
 
 // Chi tiết dịch vụ trong lịch hẹn (Bảng appointment_details)
@@ -73,6 +75,7 @@ message CreateAppointmentRequest {
   google.protobuf.Timestamp scheduled_time = 4;
   repeated AppointmentDetail detail = 5;
   string note=2;
+  int32 branch_id=6;
 }
 
 message CreateAppointmentResponse {

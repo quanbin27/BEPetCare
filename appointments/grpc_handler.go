@@ -30,7 +30,7 @@ func (h *AppointmentGrpcHandler) CreateAppointment(ctx context.Context, req *pb.
 			ServiceID: item.ServiceId,
 		}
 	}
-	appointmentID, statusMsg, err := h.appointmentService.CreateAppointment(ctx, req.CustomerId, req.CustomerAddress, req.ScheduledTime.AsTime(), Items, req.Note)
+	appointmentID, statusMsg, err := h.appointmentService.CreateAppointment(ctx, req.CustomerId, req.CustomerAddress, req.ScheduledTime.AsTime(), Items, req.Note, req.BranchId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}

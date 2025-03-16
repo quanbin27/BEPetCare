@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/quanbin27/commons/auth"
 	"net/http"
 	"strconv"
 	"time"
@@ -23,7 +24,7 @@ func NewAppointmentHandler(client pb.AppointmentServiceClient) *AppointmentHandl
 // RegisterRoutes đăng ký các route cho Appointments service
 func (h *AppointmentHandler) RegisterRoutes(e *echo.Group) {
 	// Routes cho lịch hẹn
-	e.POST("/appointments", h.CreateAppointment)
+	e.POST("/appointments", h.CreateAppointment, auth.WithJWTAuth())
 	e.GET("/appointments/customer/:customer_id", h.GetAppointmentsByCustomer)
 	e.GET("/appointments/employee/:employee_id", h.GetAppointmentsByEmployee)
 	e.PUT("/appointments/update-status", h.UpdateAppointmentStatus)
@@ -50,6 +51,7 @@ func (h *AppointmentHandler) CreateAppointment(c echo.Context) error {
 		ScheduledTime   string           `json:"scheduled_time"` // RFC3339 format (e.g., "2025-03-07T10:00:00Z")
 		Detail          []ServiceItemReq `json:"services"`
 		Note            string           `json:"note"`
+		BranchID        int32            `json:"branch_id"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
@@ -76,6 +78,7 @@ func (h *AppointmentHandler) CreateAppointment(c echo.Context) error {
 		ScheduledTime:   timestamppb.New(scheduledTime),
 		Detail:          pbItems,
 		Note:            req.Note,
+		BranchId:        req.BranchID,
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {

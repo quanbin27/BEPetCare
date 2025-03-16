@@ -29,9 +29,10 @@ func (h *OrderHandler) RegisterRoutes(e *echo.Group) {
 // CreateOrder xử lý yêu cầu tạo đơn hàng
 func (h *OrderHandler) CreateOrder(c echo.Context) error {
 	type OrderItemReq struct {
-		ProductID int32   `json:"product_id"`
-		Quantity  int32   `json:"quantity"`
-		UnitPrice float32 `json:"unit_price"`
+		ProductID   int32   `json:"product_id"`
+		ProductType string  `json:"product_type"`
+		Quantity    int32   `json:"quantity"`
+		UnitPrice   float32 `json:"unit_price"`
 	}
 	var req struct {
 		CustomerID    int32          `json:"customer_id"`
@@ -48,9 +49,10 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 	pbItems := make([]*pb.OrderItem, len(req.Items))
 	for i, item := range req.Items {
 		pbItems[i] = &pb.OrderItem{
-			ProductId: item.ProductID,
-			Quantity:  item.Quantity,
-			UnitPrice: item.UnitPrice,
+			ProductId:   item.ProductID,
+			Quantity:    item.Quantity,
+			UnitPrice:   item.UnitPrice,
+			ProductType: item.ProductType,
 		}
 	}
 
