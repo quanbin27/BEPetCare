@@ -25,9 +25,9 @@ type UserStore interface {
 // UserService defines the interface for business logic operations with internal types
 type UserService interface {
 	Register(ctx context.Context, email, password, name string) (string, error)
-	Login(ctx context.Context, email, password string, rememberMe bool) (string, string, error)        // Trả về status và token
-	ChangeInfo(ctx context.Context, userID int32, email, name string) (string, string, string, error)  // Trả về status, email, name
-	ChangePassword(ctx context.Context, userID int32, oldPassword, newPassword string) (string, error) // Trả về status
+	Login(ctx context.Context, email, password string, rememberMe bool) (string, string, error)                                             // Trả về status và token
+	ChangeInfo(ctx context.Context, userID int32, email, name, address, phoneNumber string) (string, string, string, string, string, error) // Trả về status, email, name
+	ChangePassword(ctx context.Context, userID int32, oldPassword, newPassword string) (string, error)                                      // Trả về status
 	GetUserInfo(ctx context.Context, id int32) (*User, error)
 	GetUserInfoByEmail(ctx context.Context, email string) (*User, error)
 	VerifyEmail(ctx context.Context, token string) (int32, error)
@@ -35,13 +35,15 @@ type UserService interface {
 
 // User represents a user in the internal system
 type User struct {
-	ID        int32     `gorm:"primaryKey"`
-	Email     string    `gorm:"unique;not null"`
-	Password  string    `gorm:"not null"`
-	Name      string    `gorm:"not null"`
-	Roles     []Role    `gorm:"many2many:user_roles;"` // Quan hệ nhiều-nhiều với Role
-	BranchID  *int32    `gorm:"index"`                 // ID của chi nhánh hiện tại
-	CreatedAt time.Time `gorm:"autoCreateTime"`
+	ID          int32  `gorm:"primaryKey"`
+	Email       string `gorm:"unique;not null"`
+	Password    string `gorm:"not null"`
+	Name        string `gorm:"not null"`
+	PhoneNumber string `gorm:"size:11"`
+	Address     string
+	Roles       []Role    `gorm:"many2many:user_roles;"` // Quan hệ nhiều-nhiều với Role
+	BranchID    *int32    `gorm:"index"`                 // ID của chi nhánh hiện tại
+	CreatedAt   time.Time `gorm:"autoCreateTime"`
 }
 type PendingUser struct {
 	Email    string
@@ -73,11 +75,13 @@ type EmployeeBranch struct {
 // Helper functions to convert between internal User and protobuf User
 func toProtoUser(u *User) *users.User {
 	return &users.User{
-		ID:        u.ID,
-		Email:     u.Email,
-		Name:      u.Name,
-		Password:  u.Password,
-		CreatedAt: timestamppb.New(u.CreatedAt),
+		ID:          u.ID,
+		Email:       u.Email,
+		Name:        u.Name,
+		Password:    u.Password,
+		PhoneNumber: u.PhoneNumber,
+		Address:     u.Address,
+		CreatedAt:   timestamppb.New(u.CreatedAt),
 	}
 }
 

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/quanbin27/commons/auth"
 	"net/http"
 	"strconv"
 
@@ -23,9 +24,10 @@ func (h *UserHandler) RegisterRoutes(e *echo.Group) {
 	e.POST("/users/register", h.Register)
 	e.GET("/users/verify", h.VerifyEmail)
 	e.POST("/users/login", h.LoginUser)
-	e.PUT("/users/change-info", h.ChangeInfo)
+	e.PUT("/users/change-info", h.ChangeInfo, auth.WithJWTAuth())
 	e.PUT("/users/change-password", h.ChangePassword)
 	e.GET("/users/info/:id", h.GetUserInfo)
+	e.GET("/users/info/me", h.GetMyInfo, auth.WithJWTAuth())
 	e.GET("/users/info-by-email", h.GetUserInfoByEmail)
 	e.GET("/helloworld", helloWorld)
 }
@@ -133,28 +135,29 @@ func (h *UserHandler) LoginUser(c echo.Context) error {
 
 // ChangeInfo xử lý yêu cầu thay đổi thông tin người dùng
 func (h *UserHandler) ChangeInfo(c echo.Context) error {
+	id, err := auth.GetUserIDFromContext(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
 	var req struct {
-		ID    string `json:"id"`
-		Email string `json:"email"`
-		Name  string `json:"name"`
+		Email       string `json:"email"`
+		Name        string `json:"name"`
+		PhoneNumber string `json:"phoneNumber"`
+		Address     string `json:"address"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
-	}
-
-	// Chuyển đổi ID từ string sang int32
-	id, err := strconv.ParseInt(req.ID, 10, 32)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid ID format, must be an integer"})
 	}
 
 	// Lấy context từ Echo request
 	ctx := c.Request().Context()
 
 	resp, err := h.client.ChangeInfo(ctx, &pb.ChangeInfoRequest{
-		Id:    int32(id),
-		Email: req.Email,
-		Name:  req.Name,
+		Id:          id,
+		Email:       req.Email,
+		Name:        req.Name,
+		PhoneNumber: req.PhoneNumber,
+		Address:     req.Address,
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
@@ -169,9 +172,11 @@ func (h *UserHandler) ChangeInfo(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"status": resp.Status,
-		"email":  resp.Email,
-		"name":   resp.Name,
+		"status":      resp.Status,
+		"email":       resp.Email,
+		"name":        resp.Name,
+		"address":     resp.Address,
+		"phoneNumber": resp.PhoneNumber,
 	})
 }
 
@@ -247,6 +252,38 @@ func (h *UserHandler) GetUserInfo(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, resp)
+}
+func (h *UserHandler) GetMyInfo(c echo.Context) error {
+
+	id, err := auth.GetUserIDFromContext(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	// Lấy context từ Echo request
+	ctx := c.Request().Context()
+
+	resp, err := h.client.GetUserInfo(ctx, &pb.GetUserInfoRequest{ID: id})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.NotFound:
+				return c.JSON(http.StatusNotFound, map[string]string{"error": grpcErr.Message()})
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	response := UserResponse{
+		UserID:      resp.ID,
+		Name:        resp.Name,
+		Email:       resp.Email,
+		PhoneNumber: resp.PhoneNumber,
+		Address:     resp.Address,
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
 // GetUserInfoByEmail xử lý yêu cầu lấy thông tin người dùng theo email

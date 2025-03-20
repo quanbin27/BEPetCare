@@ -15,6 +15,8 @@ message User{
   string Email = 2;
   string Name = 3;
   string Password = 4;
+  string Address = 5;
+  string PhoneNumber =6;
   google.protobuf.Timestamp CreatedAt=7;
 }
 message RegisterRequest{
@@ -38,11 +40,15 @@ message ChangeInfoRequest{
   int32 Id=1;
   string Email=2;
   string Name=3;
+  string PhoneNumber=4;
+  string Address=5;
 }
 message ChangeInfoResponse{
   string Status=1;
   string Email=2;
   string Name=3;
+  string PhoneNumber=4;
+  string Address=5;
 }
 message ChangePasswordRequest{
   int32 Id=1;

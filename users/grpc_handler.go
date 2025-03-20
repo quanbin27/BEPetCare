@@ -55,7 +55,7 @@ func (h *UsersGrpcHandler) Login(ctx context.Context, req *pb.LoginRequest) (*pb
 }
 
 func (h *UsersGrpcHandler) ChangeInfo(ctx context.Context, req *pb.ChangeInfoRequest) (*pb.ChangeInfoResponse, error) {
-	stt, email, name, err := h.userService.ChangeInfo(ctx, req.Id, req.Email, req.Name)
+	stt, email, name, address, phoneNumber, err := h.userService.ChangeInfo(ctx, req.Id, req.Email, req.Name, req.Address, req.PhoneNumber)
 	if err != nil {
 		// Ánh xạ lỗi từ Service sang mã gRPC
 		if stt == "Failed" {
@@ -63,7 +63,7 @@ func (h *UsersGrpcHandler) ChangeInfo(ctx context.Context, req *pb.ChangeInfoReq
 		}
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
-	return &pb.ChangeInfoResponse{Status: stt, Email: email, Name: name}, nil
+	return &pb.ChangeInfoResponse{Status: stt, Email: email, Name: name, PhoneNumber: phoneNumber, Address: address}, nil
 }
 
 func (h *UsersGrpcHandler) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequest) (*pb.ChangePasswordResponse, error) {

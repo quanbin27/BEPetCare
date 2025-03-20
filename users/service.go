@@ -130,7 +130,7 @@ func (s *Service) Login(ctx context.Context, email, password string, rememberMe 
 }
 
 // ChangeInfo updates user info
-func (s *Service) ChangeInfo(ctx context.Context, userID int32, email, name string) (string, string, string, error) {
+func (s *Service) ChangeInfo(ctx context.Context, userID int32, email, name, address, phoneNumber string) (string, string, string, string, string, error) {
 	updatedData := make(map[string]interface{})
 	if email != "" {
 		updatedData["email"] = email
@@ -138,19 +138,25 @@ func (s *Service) ChangeInfo(ctx context.Context, userID int32, email, name stri
 	if name != "" {
 		updatedData["name"] = name
 	}
+	if phoneNumber != "" {
+		updatedData["phone_number"] = phoneNumber
+	}
+	if address != "" {
+		updatedData["address"] = address
+	}
 	if len(updatedData) == 0 {
-		return "Failed", "", "", errors.New("no data to update")
+		return "Failed", "", "", "", "", errors.New("no data to update")
 	}
 	err := s.userStore.UpdateInfo(ctx, userID, updatedData)
 	if err != nil {
-		return "Failed", "", "", errors.New("failed to update user")
+		return "Failed", "", "", "", "", errors.New("failed to update user")
 	}
 	// Lấy thông tin user sau khi cập nhật để trả về
 	user, err := s.userStore.GetUserByID(ctx, userID)
 	if err != nil {
-		return "Failed", "", "", err
+		return "Failed", "", "", "", "", err
 	}
-	return "Success", user.Email, user.Name, nil
+	return "Success", user.Email, user.Name, user.Address, user.PhoneNumber, nil
 }
 
 // ChangePassword updates user password

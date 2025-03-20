@@ -62,7 +62,6 @@ func (h *AppointmentHandler) CreateAppointment(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid scheduled_time format, must be RFC3339"})
 	}
-
 	// Lấy context từ Echo request
 	ctx := c.Request().Context()
 	pbItems := make([]*pb.AppointmentDetail, len(req.Detail))

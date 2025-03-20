@@ -96,7 +96,7 @@ func WithJWTAuth() echo.MiddlewareFunc {
 			if err != nil {
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": err.Error()})
 			}
-			c.Set("user_id", userID)
+			c.Set("user_id", int32(userID))
 			// Gọi hàm tiếp theo
 			return next(c) // Tiếp tục xử lý yêu cầu
 		}
@@ -104,7 +104,7 @@ func WithJWTAuth() echo.MiddlewareFunc {
 }
 func GetUserIDFromContext(c echo.Context) (int32, error) {
 
-	userID, ok := c.Get("user_id").(int32) // Giả sử types.User là kiểu dữ liệu của bạn
+	userID, ok := c.Get("user_id").(int32)
 	if !ok || userID == 0 {
 		return 0, echo.NewHTTPError(http.StatusUnauthorized, "User not found in context")
 	}

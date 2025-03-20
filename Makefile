@@ -29,7 +29,7 @@ appointments:
 	cd appointments && go run . &
 notifications:
 	@echo "Starting Notification Service..."
-	cd notifications && go run . &
+	cd notification && go run . &
 stop:
 	@echo "Stopping all services..."
 	@pkill -f "go run"
