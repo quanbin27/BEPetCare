@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-
 	pb "github.com/quanbin27/commons/genproto/products"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -203,6 +202,17 @@ func (h *ProductGrpcHandler) ListAttachableProducts(ctx context.Context, req *pb
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 	resp := &pb.ListAttachableProductsResponse{}
+	for _, p := range products {
+		resp.Products = append(resp.Products, toProtoGeneralProduct(&p))
+	}
+	return resp, nil
+}
+func (h *ProductGrpcHandler) ListAllProducts(ctx context.Context, req *pb.ListAllProductsRequest) (*pb.ListAllProductsResponse, error) {
+	products, err := h.productService.ListAllProducts(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	resp := &pb.ListAllProductsResponse{}
 	for _, p := range products {
 		resp.Products = append(resp.Products, toProtoGeneralProduct(&p))
 	}

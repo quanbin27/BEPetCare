@@ -150,6 +150,9 @@ func (s *ProductServiceImpl) ListBranches(ctx context.Context) ([]Branch, error)
 func (s *ProductServiceImpl) ListAttachableProducts(ctx context.Context) ([]GeneralProduct, error) {
 	return s.store.ListAttachableProducts(ctx)
 }
+func (s *ProductServiceImpl) ListAllProducts(ctx context.Context) ([]GeneralProduct, error) {
+	return s.store.ListAllProducts(ctx)
+}
 
 // Tồn kho
 func (s *ProductServiceImpl) GetBranchInventory(ctx context.Context, branchID int32) ([]BranchProduct, error) {

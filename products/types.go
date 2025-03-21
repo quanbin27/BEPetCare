@@ -5,7 +5,6 @@ import (
 	"time"
 
 	pb "github.com/quanbin27/commons/genproto/products"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Food - Bảng thực phẩm cho thú cưng
@@ -59,12 +58,13 @@ type BranchProduct struct {
 	StockQuantity int32  `gorm:"not null"`
 }
 type GeneralProduct struct {
-	Name        string
-	Description string
-	Price       float32
-	ImgUrl      string
-	ProductID   int32
-	ProductType string
+	Name         string
+	Description  string
+	Price        float32
+	ImgUrl       string
+	ProductID    int32
+	ProductType  string
+	IsAttachable bool
 }
 
 // ProductStore Interface - Cung cấp các thao tác với database
@@ -98,6 +98,7 @@ type ProductStore interface {
 	GetBranchInventory(ctx context.Context, branchID int32) ([]BranchProduct, error)
 	UpdateBranchInventory(ctx context.Context, branchID int32, productID int32, productType string, stockQuantity int32) error
 	ListAttachableProducts(ctx context.Context) ([]GeneralProduct, error)
+	ListAllProducts(ctx context.Context) ([]GeneralProduct, error)
 }
 
 // ProductService Interface - Implement business logic with internal types
@@ -131,6 +132,7 @@ type ProductService interface {
 	GetBranchInventory(ctx context.Context, branchID int32) ([]BranchProduct, error)
 	UpdateBranchInventory(ctx context.Context, branchID, productID int32, productType string, stockQuantity int32) (string, error)
 	ListAttachableProducts(ctx context.Context) ([]GeneralProduct, error)
+	ListAllProducts(ctx context.Context) ([]GeneralProduct, error)
 }
 
 // Helper functions to convert between internal types and protobuf types
@@ -140,20 +142,19 @@ func toProtoFood(f *Food) *pb.Food {
 		Name:         f.Name,
 		Description:  f.Description,
 		Price:        f.Price,
-		CreatedAt:    timestamppb.New(f.CreatedAt),
-		UpdatedAt:    timestamppb.New(f.UpdatedAt),
 		Imgurl:       f.ImgUrl,
 		IsAttachable: f.IsAttachable,
 	}
 }
 func toProtoGeneralProduct(f *GeneralProduct) *pb.GeneralProduct {
 	return &pb.GeneralProduct{
-		Name:        f.Name,
-		Description: f.Description,
-		Price:       f.Price,
-		Imgurl:      f.ImgUrl,
-		ProductType: f.ProductType,
-		ProductId:   f.ProductID,
+		Name:         f.Name,
+		Description:  f.Description,
+		Price:        f.Price,
+		Imgurl:       f.ImgUrl,
+		ProductType:  f.ProductType,
+		ProductId:    f.ProductID,
+		IsAttachable: f.IsAttachable,
 	}
 }
 func toProtoAccessory(a *Accessory) *pb.Accessory {
@@ -162,8 +163,6 @@ func toProtoAccessory(a *Accessory) *pb.Accessory {
 		Name:         a.Name,
 		Description:  a.Description,
 		Price:        a.Price,
-		CreatedAt:    timestamppb.New(a.CreatedAt),
-		UpdatedAt:    timestamppb.New(a.UpdatedAt),
 		Imgurl:       a.ImgUrl,
 		IsAttachable: a.IsAttachable,
 	}
@@ -175,8 +174,6 @@ func toProtoMedicine(m *Medicine) *pb.Medicine {
 		Name:         m.Name,
 		Description:  m.Description,
 		Price:        m.Price,
-		CreatedAt:    timestamppb.New(m.CreatedAt),
-		UpdatedAt:    timestamppb.New(m.UpdatedAt),
 		Imgurl:       m.ImgUrl,
 		IsAttachable: m.IsAttachable,
 	}

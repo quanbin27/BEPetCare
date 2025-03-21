@@ -50,6 +50,7 @@ func (h *ProductHandler) RegisterRoutes(e *echo.Group) {
 	e.PUT("/branches/inventory", h.UpdateBranchInventory)
 
 	e.GET("/products/is_attachable", h.ListAttachableProduct)
+	e.GET("/products", h.ListAllProduct)
 }
 
 // --- Thực phẩm ---
@@ -95,7 +96,19 @@ func (h *ProductHandler) ListFoods(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, resp.Foods)
+	var foods []ProductResponse
+	for _, food := range resp.Foods {
+		foods = append(foods, ProductResponse{
+			ID:           food.Id,
+			Name:         food.Name,
+			Price:        food.Price,
+			Description:  food.Description,
+			ImgURL:       food.Imgurl,
+			IsAttachable: food.IsAttachable,
+		})
+	}
+
+	return c.JSON(http.StatusOK, foods)
 }
 
 func (h *ProductHandler) CreateFood(c echo.Context) error {
@@ -242,7 +255,19 @@ func (h *ProductHandler) ListAccessories(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, resp.Accessories)
+	var accessories []ProductResponse
+	for _, acc := range resp.Accessories {
+		accessories = append(accessories, ProductResponse{
+			ID:           acc.Id,
+			Name:         acc.Name,
+			Price:        acc.Price,
+			Description:  acc.Description,
+			ImgURL:       acc.Imgurl,
+			IsAttachable: acc.IsAttachable,
+		})
+	}
+
+	return c.JSON(http.StatusOK, accessories)
 }
 
 func (h *ProductHandler) CreateAccessory(c echo.Context) error {
@@ -384,7 +409,19 @@ func (h *ProductHandler) ListMedicines(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, resp.Medicines)
+	var medicines []ProductResponse
+	for _, med := range resp.Medicines {
+		medicines = append(medicines, ProductResponse{
+			ID:           med.Id,
+			Name:         med.Name,
+			Price:        med.Price,
+			Description:  med.Description,
+			ImgURL:       med.Imgurl,
+			IsAttachable: med.IsAttachable,
+		})
+	}
+
+	return c.JSON(http.StatusOK, medicines)
 }
 
 func (h *ProductHandler) CreateMedicine(c echo.Context) error {
@@ -616,4 +653,32 @@ func (h *ProductHandler) ListAttachableProduct(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, resp.Products)
+}
+func (h *ProductHandler) ListAllProduct(c echo.Context) error {
+	ctx := c.Request().Context()
+	resp, err := h.client.ListAllProducts(ctx, &pb.ListAllProductsRequest{})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error"})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	var products []AllProductResponse
+	for _, prod := range resp.Products {
+		products = append(products, AllProductResponse{
+			ID:           prod.ProductId,
+			Name:         prod.Name,
+			Price:        prod.Price,
+			Description:  prod.Description,
+			ImgURL:       prod.Imgurl,
+			ProductType:  prod.ProductType,
+			IsAttachable: prod.IsAttachable, // Đảm bảo trường này được gán
+		})
+	}
+
+	return c.JSON(http.StatusOK, products)
 }

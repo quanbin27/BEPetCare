@@ -333,21 +333,24 @@ func (h *UserHandler) ForgotPassword(c echo.Context) error {
 }
 func (h *UserHandler) ResetPassword(c echo.Context) error {
 	var req struct {
-		UserID      int32  `json:"userId"`
+		UserID      string `json:"userId"`
 		Token       string `json:"token"`
 		NewPassword string `json:"newPassword"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
-
-	if req.UserID == 0 || req.Token == "" || req.NewPassword == "" {
+	id, err := strconv.ParseInt(req.UserID, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid ID format, must be an integer"})
+	}
+	if id == 0 || req.Token == "" || req.NewPassword == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Missing required fields"})
 	}
 
 	ctx := c.Request().Context()
-	_, err := h.client.ResetPassword(ctx, &pb.ResetPasswordRequest{
-		UserID:      req.UserID,
+	_, err = h.client.ResetPassword(ctx, &pb.ResetPasswordRequest{
+		UserID:      int32(id),
 		Token:       req.Token,
 		NewPassword: req.NewPassword,
 	})

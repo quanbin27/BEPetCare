@@ -14,3 +14,20 @@ type UserResponse struct {
 	PhoneNumber string `json:"phoneNumber"`
 	Address     string `json:"address"`
 }
+type AllProductResponse struct {
+	ID           int32   `json:"id"`
+	Name         string  `json:"name"`
+	Price        float32 `json:"price"`
+	Description  string  `json:"description"`
+	ImgURL       string  `json:"imgUrl"`
+	ProductType  string  `json:"productType"`
+	IsAttachable bool    `json:"isAttachable"`
+}
+type ProductResponse struct {
+	ID           int32   `json:"id"`
+	Name         string  `json:"name"`
+	Price        float32 `json:"price"`
+	Description  string  `json:"description"`
+	ImgURL       string  `json:"imgUrl"`
+	IsAttachable bool    `json:"isAttachable"`
+}

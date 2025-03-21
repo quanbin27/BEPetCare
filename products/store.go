@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-
 	"gorm.io/gorm"
 )
 
@@ -182,6 +181,62 @@ func (s *Store) ListAttachableProducts(ctx context.Context) ([]GeneralProduct, e
 			ImgUrl:      medicine.ImgUrl,
 			ProductID:   medicine.ID,
 			ProductType: "medicine",
+		})
+	}
+
+	return products, nil
+}
+func (s *Store) ListAllProducts(ctx context.Context) ([]GeneralProduct, error) {
+	var products []GeneralProduct
+
+	// Query Food
+	var foods []Food
+	if err := s.db.Find(&foods).Error; err != nil {
+		return nil, err
+	}
+	for _, food := range foods {
+		products = append(products, GeneralProduct{
+			Name:         food.Name,
+			Description:  food.Description,
+			Price:        food.Price,
+			ImgUrl:       food.ImgUrl,
+			ProductID:    food.ID,
+			ProductType:  "food",
+			IsAttachable: food.IsAttachable,
+		})
+	}
+
+	// Query Accessory
+	var accessories []Accessory
+	if err := s.db.Find(&accessories).Error; err != nil {
+		return nil, err
+	}
+	for _, accessory := range accessories {
+		products = append(products, GeneralProduct{
+			Name:         accessory.Name,
+			Description:  accessory.Description,
+			Price:        accessory.Price,
+			ImgUrl:       accessory.ImgUrl,
+			ProductID:    accessory.ID,
+			ProductType:  "accessory",
+			IsAttachable: accessory.IsAttachable,
+		})
+	}
+
+	// Query Medicine
+	var medicines []Medicine
+	if err := s.db.Find(&medicines).Error; err != nil {
+		return nil, err
+	}
+	for _, medicine := range medicines {
+		products = append(products, GeneralProduct{
+			Name:         medicine.Name,
+			Description:  medicine.Description,
+			Price:        medicine.Price,
+			ImgUrl:       medicine.ImgUrl,
+			ProductID:    medicine.ID,
+			ProductType:  "medicine",
+			IsAttachable: medicine.IsAttachable,
 		})
 	}
 

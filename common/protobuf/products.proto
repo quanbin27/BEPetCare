@@ -2,8 +2,6 @@ syntax = "proto3";
 
 option go_package = "github.com/quanbin27/commons/genproto/products";
 
-import "google/protobuf/timestamp.proto";
-
 service ProductService {
   rpc GetFoodByID(GetFoodRequest) returns (Food) {}
   rpc GetAccessoryByID(GetAccessoryRequest) returns (Accessory) {}
@@ -31,6 +29,7 @@ service ProductService {
   rpc GetBranchInventory(GetBranchInventoryRequest) returns (GetBranchInventoryResponse) {}
   rpc UpdateBranchInventory(UpdateBranchInventoryRequest) returns (UpdateBranchInventoryResponse) {}
   rpc ListAttachableProducts(ListAttachableProductsRequest) returns (ListAttachableProductsResponse){}
+  rpc ListAllProducts(ListAllProductsRequest) returns (ListAllProductsResponse){}
 }
 
 message Food {
@@ -38,8 +37,6 @@ message Food {
   string name = 2;
   string description = 3;
   float price = 4;
-  google.protobuf.Timestamp created_at = 5;
-  google.protobuf.Timestamp updated_at = 6;
   string imgurl=7;
   bool is_attachable=8;
 }
@@ -49,8 +46,6 @@ message Accessory {
   string name = 2;
   string description = 3;
   float price = 4;
-  google.protobuf.Timestamp created_at = 5;
-  google.protobuf.Timestamp updated_at = 6;
   string imgurl=7;
   bool is_attachable=8;
 }
@@ -60,8 +55,6 @@ message Medicine {
   string name = 2;
   string description = 3;
   float price = 4;
-  google.protobuf.Timestamp created_at = 5;
-  google.protobuf.Timestamp updated_at = 6;
   string imgurl=7;
   bool is_attachable=8;
 }
@@ -72,6 +65,7 @@ message GeneralProduct{
   string imgurl=4;
   int32 product_id = 5;
   string product_type = 6; // "food", "accessory", "medicine"
+  bool is_attachable=8;
 }
 message Branch {
   int32 id = 1;
@@ -98,8 +92,12 @@ message ListAccessoryRequest {}
 message ListMedicineRequest {}
 message ListBranchRequest {}
 message ListAttachableProductsRequest{}
+message ListAllProductsRequest{}
 
 message ListAttachableProductsResponse{
+  repeated GeneralProduct products=1;
+}
+message ListAllProductsResponse{
   repeated GeneralProduct products=1;
 }
 message ListFoodResponse { repeated Food foods = 1; }
