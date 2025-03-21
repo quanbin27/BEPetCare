@@ -61,3 +61,42 @@ func (s *Service) SendVerificationEmail(ctx context.Context, email, token, baseU
 
 	return "Email sent", nil
 }
+func (s *Service) SendResetPasswordEmail(ctx context.Context, email, token, baseURL string) (string, error) {
+	// Tạo thông báo
+	verifyURL := fmt.Sprintf("%s/reset-password?token=%s", baseURL, token)
+	notification := &EmailNotification{
+		Email:   email,
+		Subject: "Reset Password",
+		Body:    fmt.Sprintf("Please reset your password by clicking this link: %s", verifyURL),
+	}
+
+	// Lưu thông báo vào store
+	err := s.store.SaveNotification(ctx, notification)
+	if err != nil {
+		return "", fmt.Errorf("failed to save notification: %v", err)
+	}
+
+	// Gửi email
+	m := gomail.NewMessage()
+	m.SetHeader("From", "votrungquan2002@gmail.com")
+	m.SetHeader("To", email)
+	m.SetHeader("Subject", notification.Subject)
+	m.SetBody("text/plain", notification.Body)
+
+	err = s.mailDialer.DialAndSend(m)
+	if err != nil {
+		// Cập nhật trạng thái thất bại
+		if updateErr := s.store.UpdateNotificationStatus(ctx, notification.ID, "failed"); updateErr != nil {
+			return "", fmt.Errorf("failed to send email: %v, and failed to update status: %v", err, updateErr)
+		}
+		return "", fmt.Errorf("failed to send email: %v", err)
+	}
+
+	// Cập nhật trạng thái thành công
+	err = s.store.UpdateNotificationStatus(ctx, notification.ID, "sent")
+	if err != nil {
+		return "", fmt.Errorf("failed to update status to sent: %v", err)
+	}
+
+	return "Email sent", nil
+}

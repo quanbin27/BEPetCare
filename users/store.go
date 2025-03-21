@@ -78,10 +78,10 @@ func (s *Store) CreateUser(ctx context.Context, user *User) (int32, error) {
 
 func (s *Store) UpdateInfo(ctx context.Context, userID int32, updatedData map[string]interface{}) error {
 	allowedFields := map[string]bool{
-		"name":        true,
-		"email":       true,
-		"address":     true,
-		"phoneNumber": true,
+		"name":         true,
+		"email":        true,
+		"address":      true,
+		"phone_number": true,
 	}
 	for key := range updatedData {
 		if !allowedFields[key] {

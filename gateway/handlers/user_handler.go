@@ -25,10 +25,12 @@ func (h *UserHandler) RegisterRoutes(e *echo.Group) {
 	e.GET("/users/verify", h.VerifyEmail)
 	e.POST("/users/login", h.LoginUser)
 	e.PUT("/users/change-info", h.ChangeInfo, auth.WithJWTAuth())
-	e.PUT("/users/change-password", h.ChangePassword)
-	e.GET("/users/info/:id", h.GetUserInfo)
+	e.PUT("/users/change-password", h.ChangePassword, auth.WithJWTAuth())
+	e.GET("/users/info/:id", h.GetUserInfo, auth.RoleMiddleware("1", "2"))
 	e.GET("/users/info/me", h.GetMyInfo, auth.WithJWTAuth())
 	e.GET("/users/info-by-email", h.GetUserInfoByEmail)
+	e.POST("/users/forgot-password", h.ForgotPassword)
+	e.POST("/users/reset-password", h.ResetPassword)
 	e.GET("/helloworld", helloWorld)
 }
 func helloWorld(c echo.Context) error {
@@ -182,26 +184,20 @@ func (h *UserHandler) ChangeInfo(c echo.Context) error {
 
 // ChangePassword xử lý yêu cầu thay đổi mật khẩu
 func (h *UserHandler) ChangePassword(c echo.Context) error {
+	id, err := auth.GetUserIDFromContext(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
 	var req struct {
-		ID          string `json:"id"`
-		OldPassword string `json:"old_password"`
-		NewPassword string `json:"new_password"`
+		OldPassword string `json:"oldPassword"`
+		NewPassword string `json:"newPassword"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
-
-	// Chuyển đổi ID từ string sang int32
-	id, err := strconv.ParseInt(req.ID, 10, 32)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid ID format, must be an integer"})
-	}
-
-	// Lấy context từ Echo request
 	ctx := c.Request().Context()
-
 	resp, err := h.client.ChangePassword(ctx, &pb.ChangePasswordRequest{
-		Id:          int32(id),
+		Id:          id,
 		OldPassword: req.OldPassword,
 		NewPassword: req.NewPassword,
 	})
@@ -310,4 +306,64 @@ func (h *UserHandler) GetUserInfoByEmail(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, resp)
+}
+func (h *UserHandler) ForgotPassword(c echo.Context) error {
+	var req struct {
+		Email string `json:"email"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	ctx := c.Request().Context()
+	_, err := h.client.ForgotPassword(ctx, &pb.ForgotPasswordRequest{Email: req.Email})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.NotFound:
+				return c.JSON(http.StatusNotFound, map[string]string{"error": grpcErr.Message()})
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"message": "Password reset email sent"})
+}
+func (h *UserHandler) ResetPassword(c echo.Context) error {
+	var req struct {
+		UserID      int32  `json:"userId"`
+		Token       string `json:"token"`
+		NewPassword string `json:"newPassword"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	if req.UserID == 0 || req.Token == "" || req.NewPassword == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Missing required fields"})
+	}
+
+	ctx := c.Request().Context()
+	_, err := h.client.ResetPassword(ctx, &pb.ResetPasswordRequest{
+		UserID:      req.UserID,
+		Token:       req.Token,
+		NewPassword: req.NewPassword,
+	})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.InvalidArgument:
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": grpcErr.Message()})
+			case codes.Unauthenticated:
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": grpcErr.Message()})
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"message": "Password reset successfully"})
 }

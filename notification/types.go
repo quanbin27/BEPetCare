@@ -25,5 +25,6 @@ type NotificationStore interface {
 
 // NotificationService interface
 type NotificationService interface {
+	SendResetPasswordEmail(ctx context.Context, email, token, baseURL string) (string, error)
 	SendVerificationEmail(ctx context.Context, email, token, baseURL string) (string, error)
 }

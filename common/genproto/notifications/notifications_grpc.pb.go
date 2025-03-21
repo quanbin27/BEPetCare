@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	NotificationService_SendVerificationEmail_FullMethodName = "/notifications.NotificationService/SendVerificationEmail"
+	NotificationService_SendResetPasswordEmail_FullMethodName = "/notifications.NotificationService/SendResetPasswordEmail"
+	NotificationService_SendVerificationEmail_FullMethodName  = "/notifications.NotificationService/SendVerificationEmail"
 )
 
 // NotificationServiceClient is the client API for NotificationService service.
@@ -29,6 +30,7 @@ const (
 // NotificationService định nghĩa các phương thức gRPC
 type NotificationServiceClient interface {
 	// Gửi email xác minh
+	SendResetPasswordEmail(ctx context.Context, in *SendVerificationEmailRequest, opts ...grpc.CallOption) (*SendVerificationEmailResponse, error)
 	SendVerificationEmail(ctx context.Context, in *SendVerificationEmailRequest, opts ...grpc.CallOption) (*SendVerificationEmailResponse, error)
 }
 
@@ -38,6 +40,16 @@ type notificationServiceClient struct {
 
 func NewNotificationServiceClient(cc grpc.ClientConnInterface) NotificationServiceClient {
 	return &notificationServiceClient{cc}
+}
+
+func (c *notificationServiceClient) SendResetPasswordEmail(ctx context.Context, in *SendVerificationEmailRequest, opts ...grpc.CallOption) (*SendVerificationEmailResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SendVerificationEmailResponse)
+	err := c.cc.Invoke(ctx, NotificationService_SendResetPasswordEmail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *notificationServiceClient) SendVerificationEmail(ctx context.Context, in *SendVerificationEmailRequest, opts ...grpc.CallOption) (*SendVerificationEmailResponse, error) {
@@ -57,6 +69,7 @@ func (c *notificationServiceClient) SendVerificationEmail(ctx context.Context, i
 // NotificationService định nghĩa các phương thức gRPC
 type NotificationServiceServer interface {
 	// Gửi email xác minh
+	SendResetPasswordEmail(context.Context, *SendVerificationEmailRequest) (*SendVerificationEmailResponse, error)
 	SendVerificationEmail(context.Context, *SendVerificationEmailRequest) (*SendVerificationEmailResponse, error)
 	mustEmbedUnimplementedNotificationServiceServer()
 }
@@ -68,6 +81,9 @@ type NotificationServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedNotificationServiceServer struct{}
 
+func (UnimplementedNotificationServiceServer) SendResetPasswordEmail(context.Context, *SendVerificationEmailRequest) (*SendVerificationEmailResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendResetPasswordEmail not implemented")
+}
 func (UnimplementedNotificationServiceServer) SendVerificationEmail(context.Context, *SendVerificationEmailRequest) (*SendVerificationEmailResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendVerificationEmail not implemented")
 }
@@ -90,6 +106,24 @@ func RegisterNotificationServiceServer(s grpc.ServiceRegistrar, srv Notification
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&NotificationService_ServiceDesc, srv)
+}
+
+func _NotificationService_SendResetPasswordEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendVerificationEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).SendResetPasswordEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_SendResetPasswordEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).SendResetPasswordEmail(ctx, req.(*SendVerificationEmailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _NotificationService_SendVerificationEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -117,6 +151,10 @@ var NotificationService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "notifications.NotificationService",
 	HandlerType: (*NotificationServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "SendResetPasswordEmail",
+			Handler:    _NotificationService_SendResetPasswordEmail_Handler,
+		},
 		{
 			MethodName: "SendVerificationEmail",
 			Handler:    _NotificationService_SendVerificationEmail_Handler,

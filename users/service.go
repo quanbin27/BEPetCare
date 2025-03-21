@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"github.com/go-redis/redis/v8"
 	"google.golang.org/grpc"
 	"time"
@@ -138,12 +139,8 @@ func (s *Service) ChangeInfo(ctx context.Context, userID int32, email, name, add
 	if name != "" {
 		updatedData["name"] = name
 	}
-	if phoneNumber != "" {
-		updatedData["phone_number"] = phoneNumber
-	}
-	if address != "" {
-		updatedData["address"] = address
-	}
+	updatedData["phone_number"] = phoneNumber
+	updatedData["address"] = address
 	if len(updatedData) == 0 {
 		return "Failed", "", "", "", "", errors.New("no data to update")
 	}
@@ -253,4 +250,67 @@ func (s *Service) getPendingUser(ctx context.Context, token string) (*PendingUse
 		Token:    data["token"],
 		Expires:  expires,
 	}, nil
+}
+func (s *Service) ForgotPassword(ctx context.Context, email string) error {
+	user, err := s.userStore.GetUserByEmail(ctx, email)
+	if err != nil {
+		return errors.New("user not found")
+	}
+	secret := []byte(config.Envs.JWTSecret)
+	token, err := auth.CreateJWT(secret, user.ID, 3600, 3)
+	if err != nil {
+		return errors.New("failed to generate token")
+	}
+	err = s.storeResetToken(ctx, user.ID, token, 24*time.Hour)
+	if err != nil {
+		return errors.New("failed to store ResetToken in Redis")
+	}
+	_, err = s.notificationSvc.SendResetPasswordEmail(ctx, &pbNotification.SendVerificationEmailRequest{
+		Email:   email,
+		Token:   token,
+		BaseUrl: s.baseURL,
+	})
+	if err != nil {
+		return errors.New("failed to send verification email")
+	}
+	return nil
+}
+func (s *Service) storeResetToken(ctx context.Context, userID int32, token string, ttl time.Duration) error {
+	key := fmt.Sprintf("reset_token:%d", userID)
+	return s.redis.Set(ctx, key, token, ttl).Err()
+}
+func (s *Service) VerifyResetToken(ctx context.Context, userID int32, token string) (bool, error) {
+	key := fmt.Sprintf("reset_token:%d", userID)
+	storedToken, err := s.redis.Get(ctx, key).Result()
+	if err != nil {
+		return false, err
+	}
+	return storedToken == token, nil
+}
+func (s *Service) ResetPassword(ctx context.Context, userID int32, token, newPassword string) error {
+	valid, err := s.VerifyResetToken(ctx, userID, token)
+	if err != nil || !valid {
+		return errors.New("invalid or expired token")
+	}
+
+	hashedPassword, err := auth.HashPassword(newPassword)
+	if err != nil {
+		return errors.New("failed to hash new password")
+	}
+
+	err = s.userStore.UpdatePassword(ctx, userID, hashedPassword)
+	if err != nil {
+		return errors.New("failed to update password")
+	}
+	err = s.DeleteResetToken(ctx, userID)
+	if err != nil {
+		return errors.New("failed to delete reset token")
+	}
+
+	return nil
+}
+
+func (s *Service) DeleteResetToken(ctx context.Context, userID int32) error {
+	key := fmt.Sprintf("reset_token:%d", userID)
+	return s.redis.Del(ctx, key).Err()
 }

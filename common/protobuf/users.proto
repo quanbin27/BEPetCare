@@ -9,6 +9,8 @@ service UserService{
   rpc GetUserInfo(GetUserInfoRequest) returns (User){}
   rpc GetUserInfoByEmail(GetUserInfoByEmailRequest) returns (User){}
   rpc VerifyEmail(VerifyEmailRequest) returns (VerifyEmailResponse) {}
+  rpc ForgotPassword(ForgotPasswordRequest) returns (ForgotPasswordResponse){}
+  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse){}
 }
 message User{
   int32 ID = 1;
@@ -70,4 +72,18 @@ message VerifyEmailRequest {
 
 message VerifyEmailResponse {
   int32 Id = 1; // ID của user sau khi lưu vào DB
+}
+message ForgotPasswordRequest{
+  string Email=1;
+}
+message ResetPasswordRequest{
+  int32 UserID=3;
+  string Token=1;
+  string NewPassword=2;
+}
+message ResetPasswordResponse{
+  string Status=1;
+}
+message ForgotPasswordResponse{
+  string Status=1;
 }

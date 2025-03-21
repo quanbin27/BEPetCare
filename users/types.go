@@ -31,6 +31,8 @@ type UserService interface {
 	GetUserInfo(ctx context.Context, id int32) (*User, error)
 	GetUserInfoByEmail(ctx context.Context, email string) (*User, error)
 	VerifyEmail(ctx context.Context, token string) (int32, error)
+	ForgotPassword(ctx context.Context, email string) error
+	ResetPassword(ctx context.Context, userID int32, token, newPassword string) error
 }
 
 // User represents a user in the internal system

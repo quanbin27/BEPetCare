@@ -32,3 +32,10 @@ func (h *GRPCHandler) SendVerificationEmail(ctx context.Context, req *pb.SendVer
 	}
 	return &pb.SendVerificationEmailResponse{Status: statusMsg}, nil
 }
+func (h *GRPCHandler) SendResetPasswordEmail(ctx context.Context, req *pb.SendVerificationEmailRequest) (*pb.SendVerificationEmailResponse, error) {
+	statusMsg, err := h.service.SendResetPasswordEmail(ctx, req.Email, req.Token, req.BaseUrl)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to send reset password email: %v", err)
+	}
+	return &pb.SendVerificationEmailResponse{Status: statusMsg}, nil
+}

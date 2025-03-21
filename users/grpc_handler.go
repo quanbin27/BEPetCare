@@ -93,3 +93,18 @@ func (h *UsersGrpcHandler) GetUserInfoByEmail(ctx context.Context, req *pb.GetUs
 	}
 	return toProtoUser(user), nil
 }
+
+func (h *UsersGrpcHandler) ForgotPassword(ctx context.Context, req *pb.ForgotPasswordRequest) (*pb.ForgotPasswordResponse, error) {
+	err := h.userService.ForgotPassword(ctx, req.Email)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &pb.ForgotPasswordResponse{Status: "sent reset password email"}, nil
+}
+func (h *UsersGrpcHandler) ResetPassword(ctx context.Context, req *pb.ResetPasswordRequest) (*pb.ResetPasswordResponse, error) {
+	err := h.userService.ResetPassword(ctx, req.UserID, req.Token, req.NewPassword)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &pb.ResetPasswordResponse{Status: "reset password success"}, nil
+}

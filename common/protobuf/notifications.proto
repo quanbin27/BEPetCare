@@ -6,6 +6,7 @@ option go_package = "github.com/quanbin27/commons/genproto/notifications";
 // NotificationService định nghĩa các phương thức gRPC
 service NotificationService {
   // Gửi email xác minh
+  rpc SendResetPasswordEmail (SendVerificationEmailRequest) returns (SendVerificationEmailResponse) {}
   rpc SendVerificationEmail (SendVerificationEmailRequest) returns (SendVerificationEmailResponse) {}
 }
 
