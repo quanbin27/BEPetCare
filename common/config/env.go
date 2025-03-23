@@ -34,9 +34,10 @@ type Config struct {
 var Envs = initConfig()
 
 func initConfig() Config {
-	err := godotenv.Load("../.env")
-	if err != nil {
-		log.Println("Không thể load file .env, sử dụng biến môi trường hệ thống")
+	if _, exists := os.LookupEnv("IN_DOCKER"); !exists {
+		if err := godotenv.Load(".env", "../.env"); err != nil {
+			log.Println("⚠ Không thể load file .env, sử dụng biến môi trường hệ thống")
+		}
 	}
 	return Config{
 		UsersDSN:               getEnv("USERS_DSN", ""),
