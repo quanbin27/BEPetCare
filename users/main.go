@@ -45,7 +45,7 @@ func main() {
 		log.Fatal("failed to listen")
 	}
 	defer l.Close()
-	redisClient := redis.NewClient(&redis.Options{Addr: "localhost:6379"})
+	redisClient := redis.NewClient(&redis.Options{Addr: config.Envs.RedisAddr})
 	notificationsConn, err := grpc.NewClient(config.Envs.Notification_Addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to dial order server: %v", err)
