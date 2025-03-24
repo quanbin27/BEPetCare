@@ -4,7 +4,7 @@ go 1.22.5
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/quanbin27/commons v0.0.0-20250317063402-36278007f54a
+	github.com/quanbin27/commons v0.0.0-20250323102036-68ac144a6cf2
 	google.golang.org/grpc v1.71.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/mysql v1.5.7

@@ -4,7 +4,7 @@ go 1.22.5
 
 require (
 	github.com/labstack/echo/v4 v4.13.3
-	github.com/quanbin27/commons v0.0.0-20250317063402-36278007f54a
+	github.com/quanbin27/commons v0.0.0-20250323102036-68ac144a6cf2
 	google.golang.org/grpc v1.71.0
 	google.golang.org/protobuf v1.36.5
 )

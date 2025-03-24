@@ -4,6 +4,7 @@ WORKDIR /app/gateway
 COPY ./gateway/go.mod ./gateway/go.sum ./
 RUN go mod download
 COPY ./gateway/*.go ./
+COPY ./gateway/handlers ./handlers
 RUN CGO_ENABLED=0 GOOS=linux go build -o /gateway .
 
 FROM alpine:latest

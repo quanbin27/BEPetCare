@@ -62,8 +62,7 @@ func (s *MySQLNotificationStore) UpdateNotificationStatus(ctx context.Context, i
 		Model(&EmailNotification{}).
 		Where("id = ?", id).
 		Updates(map[string]interface{}{
-			"status":  status,
-			"sent_at": time.Now(),
+			"status": status,
 		}).Error
 	if err != nil {
 		return err

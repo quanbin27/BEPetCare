@@ -3,7 +3,7 @@ module github.com/quanbin27/BEPetCare-payments
 go 1.22.5
 
 require (
-	github.com/quanbin27/commons v0.0.0-20250317063402-36278007f54a
+	github.com/quanbin27/commons v0.0.0-20250323102036-68ac144a6cf2
 	google.golang.org/grpc v1.71.0
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gorm v1.25.12
