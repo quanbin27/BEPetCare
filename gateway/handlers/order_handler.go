@@ -6,12 +6,14 @@ import (
 
 	"github.com/labstack/echo/v4"
 	pb "github.com/quanbin27/commons/genproto/orders"
+	pbUser "github.com/quanbin27/commons/genproto/users"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type OrderHandler struct {
-	client pb.OrderServiceClient
+	client     pb.OrderServiceClient
+	userClient pbUser.UserServiceClient
 }
 
 func NewOrderHandler(client pb.OrderServiceClient) *OrderHandler {
@@ -58,12 +60,18 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 
 	// Lấy context từ Echo request
 	ctx := c.Request().Context()
-
+	user, err := h.userClient.GetUserInfo(ctx, &pbUser.GetUserInfoRequest{
+		ID: req.CustomerID,
+	})
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
 	resp, err := h.client.CreateOrder(ctx, &pb.CreateOrderRequest{
 		CustomerId:    req.CustomerID,
 		BranchId:      req.BranchID,
 		Items:         pbItems,
 		AppointmentId: req.AppointmentID,
+		Email:         user.Email,
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {

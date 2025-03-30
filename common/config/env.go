@@ -29,6 +29,7 @@ type Config struct {
 	EmailPassword          string
 	BaseURL                string
 	RedisAddr              string
+	KafkaAddr              string
 }
 
 var Envs = initConfig()
@@ -61,6 +62,7 @@ func initConfig() Config {
 		EmailPassword:          getEnv("EMAIL_PASSWORD", ""),
 		BaseURL:                getEnv("BASE_URL", "http://26.30.229.237:3000"),
 		RedisAddr:              getEnv("REDIS_ADDR", "localhost:6379"),
+		KafkaAddr:              getEnv("KAFKA_ADDR", "localhost:9092"),
 	}
 }
 func getEnv(key, fallback string) string {

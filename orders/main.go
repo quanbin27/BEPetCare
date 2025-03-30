@@ -29,6 +29,7 @@ func initStorage(db *gorm.DB) {
 }
 func main() {
 	dsn := config.Envs.OrdersDSN
+	kafkaAddr := config.Envs.KafkaAddr
 	log.Println("Connecting to database ...", dsn)
 	grpcAddr := config.Envs.OrdersGrpcAddr
 	db, err := NewMySQLStorage(dsn)
@@ -45,7 +46,7 @@ func main() {
 	defer l.Close()
 	orderStore := NewOrderStore(db)
 	orderService := NewOrderService(orderStore)
-	NewOrderGrpcHandler(grpcServer, orderService)
+	NewOrderGrpcHandler(grpcServer, orderService, kafkaAddr)
 	log.Println("Orders Service Listening on", grpcAddr)
 	grpcServer.Serve(l)
 }

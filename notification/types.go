@@ -28,3 +28,17 @@ type NotificationService interface {
 	SendResetPasswordEmail(ctx context.Context, email, token, baseURL string) (string, error)
 	SendVerificationEmail(ctx context.Context, email, token, baseURL string) (string, error)
 }
+type OrderData struct {
+	OrderID    int32       `json:"order_id"`
+	CustomerID string      `json:"customer_id"`
+	BranchID   string      `json:"branch_id"`
+	Items      []OrderItem `json:"items"`
+	Status     string      `json:"status"`
+	Email      string      `json:"email"`
+}
+type OrderItem struct {
+	ProductID   string  `json:"product_id"`
+	Quantity    int32   `json:"quantity"`
+	UnitPrice   float32 `json:"unit_price"`
+	ProductType string  `json:"product_type"`
+}
