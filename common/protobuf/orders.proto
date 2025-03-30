@@ -39,6 +39,7 @@ message CreateOrderRequest {
   int32 branch_id = 2;
   repeated OrderItem items = 3;
   int32 appointment_id=4;
+  string email=5;
 }
 
 message CreateOrderResponse {

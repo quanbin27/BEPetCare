@@ -100,3 +100,42 @@ func (s *Service) SendResetPasswordEmail(ctx context.Context, email, token, base
 
 	return "Email sent", nil
 }
+
+// SendOrderConfirmationEmail gửi email xác nhận đơn hàng
+func (s *Service) SendOrderConfirmationEmail(ctx context.Context, email string, orderID int32, items []OrderItem) (string, error) {
+	body := fmt.Sprintf("Your order #%d has been placed successfully. Items:\n", orderID)
+	for _, item := range items {
+		body += fmt.Sprintf("- %s (Qty: %d, Price: %.2f)\n", item.ProductID, item.Quantity, item.UnitPrice)
+	}
+	notification := &EmailNotification{
+		Email:   email,
+		Subject: fmt.Sprintf("Order #%d Confirmation", orderID),
+		Body:    body,
+	}
+
+	err := s.store.SaveNotification(ctx, notification)
+	if err != nil {
+		return "", fmt.Errorf("failed to save notification: %v", err)
+	}
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", "votrungquan2002@gmail.com")
+	m.SetHeader("To", email)
+	m.SetHeader("Subject", notification.Subject)
+	m.SetBody("text/plain", notification.Body)
+
+	err = s.mailDialer.DialAndSend(m)
+	if err != nil {
+		if updateErr := s.store.UpdateNotificationStatus(ctx, notification.ID, "failed"); updateErr != nil {
+			return "", fmt.Errorf("failed to send email: %v, and failed to update status: %v", err, updateErr)
+		}
+		return "", fmt.Errorf("failed to send email: %v", err)
+	}
+
+	err = s.store.UpdateNotificationStatus(ctx, notification.ID, "sent")
+	if err != nil {
+		return "", fmt.Errorf("failed to update status to sent: %v", err)
+	}
+
+	return "Order confirmation email sent", nil
+}

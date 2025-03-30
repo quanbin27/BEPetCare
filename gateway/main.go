@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	_ "github.com/quanbin27/BEPetCare-gateway/docs"
 	"github.com/quanbin27/BEPetCare-gateway/handlers"
 	config "github.com/quanbin27/commons/config"
 	pbAppointments "github.com/quanbin27/commons/genproto/appointments"
@@ -11,6 +12,7 @@ import (
 	pbProducts "github.com/quanbin27/commons/genproto/products"
 	pbPetRecord "github.com/quanbin27/commons/genproto/records"
 	pbUsers "github.com/quanbin27/commons/genproto/users"
+	echoSwagger "github.com/swaggo/echo-swagger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
@@ -87,6 +89,7 @@ func main() {
 	}))
 
 	subrouter := e.Group("/api/v1")
+	subrouter.GET("/swagger/*", echoSwagger.WrapHandler)
 	gateway, err := NewGateway()
 	if err != nil {
 		log.Fatalf("Failed to initialize gateway: %v", err)

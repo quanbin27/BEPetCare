@@ -1,0 +1,524 @@
+info:
+  contact: {}
+paths:
+  /auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: Sends a password reset email to the user
+      parameters:
+      - description: User email
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            email:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password reset email sent
+          schema:
+            properties:
+              message:
+                type: string
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "404":
+          description: User not found
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Forgot password
+      tags:
+      - Users
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Logs in a user with email and password, optionally with "remember
+        me" functionality
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            email:
+              type: string
+            password:
+              type: string
+            rememberMe:
+              type: boolean
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful with JWT token
+          schema:
+            properties:
+              status:
+                type: string
+              token:
+                type: string
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "401":
+          description: Invalid credentials
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: User login
+      tags:
+      - Users
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user with email, password, and name. Sends a verification
+        email.
+      parameters:
+      - description: User registration details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            email:
+              type: string
+            name:
+              type: string
+            password:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Verification email sent
+          schema:
+            properties:
+              message:
+                type: string
+            type: object
+        "400":
+          description: Invalid request or missing fields
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "409":
+          description: User already exists
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Register a new user
+      tags:
+      - Users
+  /auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Resets the user's password using a token from the forgot password
+        email
+      parameters:
+      - description: Password reset details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            newPassword:
+              type: string
+            token:
+              type: string
+            userId:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password reset successfully
+          schema:
+            properties:
+              message:
+                type: string
+            type: object
+        "400":
+          description: Invalid request or missing fields
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "401":
+          description: Invalid token
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Reset password
+      tags:
+      - Users
+  /auth/verify:
+    get:
+      description: Verifies a user's email using a token sent in the verification
+        email
+      parameters:
+      - description: Verification token
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User ID
+          schema:
+            properties:
+              id:
+                type: integer
+            type: object
+        "400":
+          description: Token is required or invalid
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Verify user email
+      tags:
+      - Users
+  /hello-world:
+    get:
+      description: Returns a "Hello World" string to verify the API is working
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Hello World
+          schema:
+            type: string
+      summary: Test endpoint
+      tags:
+      - General
+  /user/me:
+    put:
+      consumes:
+      - application/json
+      description: Updates the authenticated user's information (email, name, phone,
+        address)
+      parameters:
+      - description: Updated user info
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            address:
+              type: string
+            email:
+              type: string
+            name:
+              type: string
+            phoneNumber:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Info updated
+          schema:
+            properties:
+              address:
+                type: string
+              email:
+                type: string
+              name:
+                type: string
+              phoneNumber:
+                type: string
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user info
+      tags:
+      - Users
+  /users/{id}:
+    get:
+      description: Retrieves user information for a specific user ID (requires role
+        1 or 2)
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User info
+          schema:
+            properties:
+              address:
+                type: string
+              email:
+                type: string
+              id:
+                type: integer
+              name:
+                type: string
+              phoneNumber:
+                type: string
+            type: object
+        "400":
+          description: Invalid ID format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "404":
+          description: User not found
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user info by ID
+      tags:
+      - Users
+  /users/email:
+    get:
+      description: Retrieves user information using their email address
+      parameters:
+      - description: User email
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User info
+          schema:
+            properties:
+              address:
+                type: string
+              email:
+                type: string
+              id:
+                type: integer
+              name:
+                type: string
+              phoneNumber:
+                type: string
+            type: object
+        "400":
+          description: Email is required
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "404":
+          description: User not found
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get user info by email
+      tags:
+      - Users
+  /users/me:
+    get:
+      description: Retrieves the information of the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User info
+          schema:
+            properties:
+              address:
+                type: string
+              email:
+                type: string
+              id:
+                type: integer
+              name:
+                type: string
+              phoneNumber:
+                type: string
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "404":
+          description: User not found
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get authenticated user's info
+      tags:
+      - Users
+  /users/me/password:
+    put:
+      consumes:
+      - application/json
+      description: Changes the authenticated user's password
+      parameters:
+      - description: Password change details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            newPassword:
+              type: string
+            oldPassword:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password changed successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request or wrong old password
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Change user password
+      tags:
+      - Users
+swagger: "2.0"
