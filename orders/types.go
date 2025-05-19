@@ -37,6 +37,7 @@ type OrderItem struct {
 	ProductType string  `gorm:"primaryKey"`
 	Quantity    int32   `gorm:"not null"`
 	UnitPrice   float32 `gorm:"not null"`
+	ProductName string  `gorm:"not null"`
 }
 
 // OrderStore interface làm việc với database
@@ -45,6 +46,7 @@ type OrderStore interface {
 	GetOrderByID(ctx context.Context, orderID int32) (*Order, error)
 	UpdateOrderStatus(ctx context.Context, orderID int32, status OrderStatus) error
 	GetOrderItems(ctx context.Context, orderID int32) ([]OrderItem, error)
+	GetOrderByAppointmentID(ctx context.Context, appointmentID int32) (*Order, error)
 }
 
 // OrderService interface cho logic xử lý với dữ liệu nội bộ
@@ -53,6 +55,7 @@ type OrderService interface {
 	GetOrder(ctx context.Context, orderID int32) (*Order, error)
 	UpdateOrderStatus(ctx context.Context, orderID int32, status OrderStatus) (string, error) // Trả về status
 	GetOrderItems(ctx context.Context, orderID int32) ([]OrderItem, error)
+	GetOrderByAppointmentID(ctx context.Context, appointmentId int32) (*Order, error)
 }
 
 // Helper functions to convert between internal types and protobuf types
@@ -87,6 +90,10 @@ func fromPbOrderStatus(pbStatus pb.OrderStatus) OrderStatus {
 }
 
 func toPbOrder(o *Order) *pb.Order {
+	var appointmentID int32
+	if o.AppointmentID != nil {
+		appointmentID = *o.AppointmentID
+	}
 	pbItems := make([]*pb.OrderItem, len(o.Items))
 	for i, item := range o.Items {
 		pbItems[i] = &pb.OrderItem{
@@ -95,17 +102,19 @@ func toPbOrder(o *Order) *pb.Order {
 			Quantity:    item.Quantity,
 			UnitPrice:   item.UnitPrice,
 			ProductType: item.ProductType,
+			ProductName: item.ProductName,
 		}
 	}
 	return &pb.Order{
-		Id:         o.ID,
-		CustomerId: o.CustomerID,
-		BranchId:   o.BranchID,
-		TotalPrice: o.TotalPrice,
-		Status:     toPbOrderStatus(o.Status),
-		CreatedAt:  o.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:  o.UpdatedAt.Format(time.RFC3339),
-		Items:      pbItems,
+		Id:            o.ID,
+		CustomerId:    o.CustomerID,
+		BranchId:      o.BranchID,
+		TotalPrice:    o.TotalPrice,
+		AppointmentId: appointmentID,
+		Status:        toPbOrderStatus(o.Status),
+		CreatedAt:     o.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:     o.UpdatedAt.Format(time.RFC3339),
+		Items:         pbItems,
 	}
 }
 
@@ -116,5 +125,6 @@ func toPbOrderItem(item OrderItem) *pb.OrderItem {
 		Quantity:    item.Quantity,
 		UnitPrice:   item.UnitPrice,
 		ProductType: item.ProductType,
+		ProductName: item.ProductName,
 	}
 }

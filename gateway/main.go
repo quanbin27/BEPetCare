@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	_ "github.com/quanbin27/BEPetCare-gateway/docs"
+	//_ "github.com/quanbin27/BEPetCare-gateway/docs"
 	"github.com/quanbin27/BEPetCare-gateway/handlers"
 	config "github.com/quanbin27/commons/config"
 	pbAppointments "github.com/quanbin27/commons/genproto/appointments"
@@ -94,7 +94,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to initialize gateway: %v", err)
 	}
-	orderHandler := handlers.NewOrderHandler(gateway.OrdersClient)
+	orderHandler := handlers.NewOrderHandler(gateway.OrdersClient, gateway.UsersClient)
 	orderHandler.RegisterRoutes(subrouter)
 	userHandler := handlers.NewUserHandler(gateway.UsersClient)
 	userHandler.RegisterRoutes(subrouter)
@@ -102,11 +102,12 @@ func main() {
 	productHandler.RegisterRoutes(subrouter)
 	paymentHandler := handlers.NewPaymentHandler(gateway.PaymentsClient)
 	paymentHandler.RegisterRoutes(subrouter)
-	appointmentHandler := handlers.NewAppointmentHandler(gateway.AppointmentsClient)
+	appointmentHandler := handlers.NewAppointmentHandler(gateway.AppointmentsClient, gateway.OrdersClient)
 	appointmentHandler.RegisterRoutes(subrouter)
 	recordsHandler := handlers.NewRecordsHandler(gateway.PetRecordClient)
 	recordsHandler.RegisterRoutes(subrouter)
 	log.Println("Starting server on", httpAddr)
+	log.Println("Test log gateway")
 	if err := e.Start(httpAddr); err != nil {
 		log.Fatal("Failed to start server:", err)
 	}

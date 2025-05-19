@@ -42,6 +42,7 @@ func (h *OrderGrpcHandler) CreateOrder(ctx context.Context, req *pb.CreateOrderR
 			Quantity:    item.Quantity,
 			UnitPrice:   item.UnitPrice,
 			ProductType: item.ProductType,
+			ProductName: item.ProductName,
 		}
 	}
 
@@ -93,7 +94,13 @@ func (h *OrderGrpcHandler) GetOrder(ctx context.Context, req *pb.GetOrderRequest
 	}
 	return &pb.GetOrderResponse{Order: toPbOrder(order)}, nil
 }
-
+func (h *OrderGrpcHandler) GetOrderByAppointmentID(ctx context.Context, req *pb.GetOrderByAppointmentIDRequest) (*pb.GetOrderByAppointmentIDResponse, error) {
+	order, err := h.orderService.GetOrderByAppointmentID(ctx, req.AppointmentId)
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, err.Error())
+	}
+	return &pb.GetOrderByAppointmentIDResponse{Order: toPbOrder(order)}, nil
+}
 func (h *OrderGrpcHandler) UpdateOrderStatus(ctx context.Context, req *pb.UpdateOrderStatusRequest) (*pb.UpdateOrderStatusResponse, error) {
 	statusMsg, err := h.orderService.UpdateOrderStatus(ctx, req.OrderId, fromPbOrderStatus(req.Status))
 	if err != nil {

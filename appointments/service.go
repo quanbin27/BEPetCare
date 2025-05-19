@@ -73,9 +73,29 @@ func (s *AppService) UpdateAppointmentStatus(ctx context.Context, appointmentID 
 	return "Success", nil
 }
 
-// Lấy chi tiết lịch hẹn
-func (s *AppService) GetAppointmentDetails(ctx context.Context, appointmentID int32) (*Appointment, []AppointmentDetail, error) {
-	return s.store.GetAppointmentDetails(ctx, appointmentID)
+func (s *AppService) GetAppointmentDetails(ctx context.Context, appointmentID int32) (*Appointment, []AppointmentDetailWithService, error) {
+	// First, get the appointment
+	appointment, details, err := s.store.GetAppointmentDetails(ctx, appointmentID)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to get appointment: %w", err)
+	}
+
+	// Enhance details with service names
+	detailsWithService := make([]AppointmentDetailWithService, len(details))
+	for i, detail := range details {
+		// Get service name from service ID
+		service, err := s.store.GetServiceByID(ctx, detail.ServiceID)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to get service information: %w", err)
+		}
+
+		detailsWithService[i] = AppointmentDetailWithService{
+			AppointmentDetail: detail,
+			ServiceName:       service.Name,
+		}
+	}
+
+	return appointment, detailsWithService, nil
 }
 
 // --- DỊCH VỤ ---

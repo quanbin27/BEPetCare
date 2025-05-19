@@ -28,11 +28,12 @@ service AppointmentService {
 
 // Trạng thái lịch hẹn
 enum AppointmentStatus {
-  PENDING = 0;       // Đã đặt
+  UNSPECIFIED=0;
+  PENDING = 4;       // Đã đặt
   IN_PROGRESS = 1;   // Đang thực hiện
   COMPLETED = 2;     // Hoàn thành
   CANCELLED = 3;     // Đã hủy
-  UNSPECIFIED=4;
+
 }
 
 // Dịch vụ thú cưng
@@ -55,7 +56,6 @@ message Appointment {
   float total=7;
   string note=8;
   int32 branch_id=9;
-
 }
 
 // Chi tiết dịch vụ trong lịch hẹn (Bảng appointment_details)
@@ -64,6 +64,15 @@ message AppointmentDetail {
   int32 service_id = 2;
   float service_price = 3;  // Lưu giá dịch vụ tại thời điểm đặt lịch
   int32 quantity =4;
+}
+
+// Chi tiết dịch vụ trong lịch hẹn với thông tin tên dịch vụ
+message AppointmentDetailWithService {
+  int32 appointment_id = 1;
+  int32 service_id = 2;
+  string service_name = 3;  // Tên dịch vụ
+  float service_price = 4;  // Lưu giá dịch vụ tại thời điểm đặt lịch
+  int32 quantity = 5;
 }
 
 // --- API Requests & Responses ---
@@ -113,7 +122,7 @@ message GetAppointmentDetailsRequest {
 
 message GetAppointmentDetailsResponse {
   Appointment appointment = 1;
-  repeated AppointmentDetail details = 2;
+  repeated AppointmentDetailWithService details = 2;
 }
 
 // --- Quản lý danh sách dịch vụ ---

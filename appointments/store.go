@@ -73,11 +73,19 @@ func (s *Store) GetServicesByIDs(ctx context.Context, serviceIDs []int32) ([]Ser
 	}
 	return services, nil
 }
+func (s *Store) GetServiceByID(ctx context.Context, serviceID int32) (Service, error) {
+	var service Service
+	if err := s.db.WithContext(ctx).First(&service, serviceID).Error; err != nil {
+		return Service{}, err
+	}
+	return service, nil
+}
 
 // Lấy lịch hẹn theo khách hàng
 func (s *Store) GetAppointmentsByCustomer(ctx context.Context, customerID int32) ([]Appointment, error) {
 	var appointments []Appointment
 	err := s.db.WithContext(ctx).Where("customer_id = ?", customerID).Find(&appointments).Error
+
 	return appointments, err
 }
 

@@ -38,6 +38,20 @@ func (s *Store) GetOrderByID(ctx context.Context, orderID int32) (*Order, error)
 	}
 	return &order, nil
 }
+func (s *Store) GetOrderByAppointmentID(ctx context.Context, appointmentID int32) (*Order, error) {
+	var order Order
+	if err := s.db.WithContext(ctx).
+		Preload("Items").
+		Where("appointment_id = ?", appointmentID).
+		First(&order).Error; err != nil {
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &order, nil
+}
 
 // UpdateOrderStatus cập nhật trạng thái đơn hàng
 func (s *Store) UpdateOrderStatus(ctx context.Context, orderID int32, status OrderStatus) error {

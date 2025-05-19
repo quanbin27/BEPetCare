@@ -8,17 +8,19 @@ import (
 
 	"github.com/labstack/echo/v4"
 	pb "github.com/quanbin27/commons/genproto/appointments"
+	pbOrder "github.com/quanbin27/commons/genproto/orders"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type AppointmentHandler struct {
-	client pb.AppointmentServiceClient
+	client      pb.AppointmentServiceClient
+	orderClient pbOrder.OrderServiceClient
 }
 
-func NewAppointmentHandler(client pb.AppointmentServiceClient) *AppointmentHandler {
-	return &AppointmentHandler{client: client}
+func NewAppointmentHandler(client pb.AppointmentServiceClient, orderClient pbOrder.OrderServiceClient) *AppointmentHandler {
+	return &AppointmentHandler{client: client, orderClient: orderClient}
 }
 
 // RegisterRoutes đăng ký các route cho Appointments service
@@ -121,8 +123,13 @@ func (h *AppointmentHandler) GetAppointmentsByCustomer(c echo.Context) error {
 		}
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
+	responses := make([]AppointmentResponse, 0, len(resp.Appointments))
+	for _, pbApp := range resp.Appointments {
+		responses = append(responses, toAppointmentResponse(pbApp))
+	}
 
-	return c.JSON(http.StatusOK, resp.Appointments)
+	return c.JSON(http.StatusOK, responses)
+
 }
 
 // GetAppointmentsByEmployee xử lý yêu cầu lấy danh sách lịch hẹn theo employee_id
@@ -151,8 +158,13 @@ func (h *AppointmentHandler) GetAppointmentsByEmployee(c echo.Context) error {
 		}
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
+	responses := make([]AppointmentResponse, 0, len(resp.Appointments))
+	for _, pbApp := range resp.Appointments {
+		responses = append(responses, toAppointmentResponse(pbApp))
+	}
 
-	return c.JSON(http.StatusOK, resp.Appointments)
+	return c.JSON(http.StatusOK, responses)
+
 }
 
 // UpdateAppointmentStatus xử lý yêu cầu cập nhật trạng thái lịch hẹn
@@ -200,6 +212,7 @@ func (h *AppointmentHandler) UpdateAppointmentStatus(c echo.Context) error {
 }
 
 // GetAppointmentDetails xử lý yêu cầu lấy chi tiết lịch hẹn
+// GetAppointmentDetails xử lý yêu cầu lấy chi tiết lịch hẹn
 func (h *AppointmentHandler) GetAppointmentDetails(c echo.Context) error {
 	appointmentIDStr := c.Param("appointment_id")
 	if appointmentIDStr == "" {
@@ -215,6 +228,7 @@ func (h *AppointmentHandler) GetAppointmentDetails(c echo.Context) error {
 	// Lấy context từ Echo request
 	ctx := c.Request().Context()
 
+	// Gọi AppointmentService
 	resp, err := h.client.GetAppointmentDetails(ctx, &pb.GetAppointmentDetailsRequest{AppointmentId: int32(appointmentID)})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
@@ -228,9 +242,27 @@ func (h *AppointmentHandler) GetAppointmentDetails(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
+	// Convert Appointment
+	appointment := toAppointmentResponse(resp.Appointment)
+
+	// Gọi OrderService để tìm đơn hàng gắn với lịch hẹn
+	orderResp, err := h.orderClient.GetOrderByAppointmentID(ctx, &pbOrder.GetOrderByAppointmentIDRequest{
+		AppointmentId: int32(appointmentID),
+	})
+
+	var order interface{} = nil
+	if err == nil && orderResp != nil && orderResp.Order != nil {
+		order = orderResp.Order
+	} else if grpcErr, ok := status.FromError(err); ok && grpcErr.Code() != codes.NotFound {
+		// Nếu không phải lỗi "not found" thì trả về lỗi
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+	}
+
+	// Trả về JSON gồm appointment, details và (nếu có) order
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"appointment": resp.Appointment,
+		"appointment": appointment,
 		"details":     resp.Details,
+		"order":       order, // null nếu không có
 	})
 }
 
