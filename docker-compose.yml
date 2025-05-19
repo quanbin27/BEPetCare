@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+
   gateway:
     build:
       context: .
@@ -9,6 +10,8 @@ services:
       - "8080:8080"
     depends_on:
       mysql:
+        condition: service_healthy
+      kafka:
         condition: service_healthy
     env_file:
       - .env.docker
@@ -24,6 +27,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      kafka:
+        condition: service_healthy
     env_file:
       - .env.docker
     networks:
@@ -37,6 +42,8 @@ services:
       - "8082:8082"
     depends_on:
       mysql:
+        condition: service_healthy
+      kafka:
         condition: service_healthy
     env_file:
       - .env.docker
@@ -52,6 +59,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      kafka:
+        condition: service_healthy
     env_file:
       - .env.docker
     networks:
@@ -65,6 +74,8 @@ services:
       - "8084:8084"
     depends_on:
       mysql:
+        condition: service_healthy
+      kafka:
         condition: service_healthy
     env_file:
       - .env.docker
@@ -80,6 +91,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      kafka:
+        condition: service_healthy
     env_file:
       - .env.docker
     networks:
@@ -94,6 +107,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      kafka:
+        condition: service_healthy
     env_file:
       - .env.docker
     networks:
@@ -107,6 +122,8 @@ services:
       - "8077:8077"
     depends_on:
       mysql:
+        condition: service_healthy
+      kafka:
         condition: service_healthy
     env_file:
       - .env.docker
@@ -140,6 +157,41 @@ services:
       - "6379:6379"
     networks:
       - backend
+
+  # Kafka configuration
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - backend
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server kafka:29092 --list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 networks:
   backend:

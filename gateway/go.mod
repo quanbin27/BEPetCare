@@ -4,7 +4,7 @@ go 1.22.5
 
 require (
 	github.com/labstack/echo/v4 v4.13.3
-	github.com/quanbin27/commons v0.0.0-20250323102036-68ac144a6cf2
+	github.com/quanbin27/commons v0.0.0-20250511124218-3e10d6de4d39
 	github.com/swaggo/echo-swagger v1.4.1
 	github.com/swaggo/swag v1.16.4
 	google.golang.org/grpc v1.71.0

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -16,25 +17,28 @@ type OrderHandler struct {
 	userClient pbUser.UserServiceClient
 }
 
-func NewOrderHandler(client pb.OrderServiceClient) *OrderHandler {
-	return &OrderHandler{client: client}
+func NewOrderHandler(client pb.OrderServiceClient, userClient pbUser.UserServiceClient) *OrderHandler {
+	return &OrderHandler{client: client, userClient: userClient}
 }
 
 // RegisterRoutes đăng ký các route cho Orders service với tiền tố "/orders"
 func (h *OrderHandler) RegisterRoutes(e *echo.Group) {
 	e.POST("/orders", h.CreateOrder)
 	e.GET("/orders/:order_id", h.GetOrder)
+	e.GET("/orders/appointment/:appointment_id", h.GetOrderByAppointmentID)
 	e.PUT("/orders/update-status", h.UpdateOrderStatus)
 	e.GET("/orders/:order_id/items", h.GetOrderItems)
 }
 
 // CreateOrder xử lý yêu cầu tạo đơn hàng
 func (h *OrderHandler) CreateOrder(c echo.Context) error {
+	fmt.Println("CREATE ORDERS")
 	type OrderItemReq struct {
 		ProductID   int32   `json:"product_id"`
 		ProductType string  `json:"product_type"`
 		Quantity    int32   `json:"quantity"`
 		UnitPrice   float32 `json:"unit_price"`
+		ProductName string  `json:"product_name"`
 	}
 	var req struct {
 		CustomerID    int32          `json:"customer_id"`
@@ -55,6 +59,7 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 			Quantity:    item.Quantity,
 			UnitPrice:   item.UnitPrice,
 			ProductType: item.ProductType,
+			ProductName: item.ProductName,
 		}
 	}
 
@@ -96,13 +101,11 @@ func (h *OrderHandler) GetOrder(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Order ID is required"})
 	}
 
-	// Chuyển đổi order_id từ string sang int32
 	orderID, err := strconv.ParseInt(orderIDStr, 10, 32)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid order_id format, must be an integer"})
 	}
 
-	// Lấy context từ Echo request
 	ctx := c.Request().Context()
 
 	resp, err := h.client.GetOrder(ctx, &pb.GetOrderRequest{OrderId: int32(orderID)})
@@ -118,6 +121,33 @@ func (h *OrderHandler) GetOrder(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
+	return c.JSON(http.StatusOK, resp.Order)
+}
+func (h *OrderHandler) GetOrderByAppointmentID(c echo.Context) error {
+	appointmentIDStr := c.Param("appointment_id")
+	if appointmentIDStr == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "appointment ID is required"})
+	}
+
+	appointmentID, err := strconv.ParseInt(appointmentIDStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid appointment_id format, must be an integer"})
+	}
+
+	ctx := c.Request().Context()
+
+	resp, err := h.client.GetOrderByAppointmentID(ctx, &pb.GetOrderByAppointmentIDRequest{AppointmentId: int32(appointmentID)})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.NotFound:
+				return c.JSON(http.StatusNotFound, map[string]string{"error": grpcErr.Message()})
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
 	return c.JSON(http.StatusOK, resp.Order)
 }
 

@@ -36,7 +36,7 @@ var Envs = initConfig()
 
 func initConfig() Config {
 	if _, exists := os.LookupEnv("IN_DOCKER"); !exists {
-		if err := godotenv.Load(".env", "../.env"); err != nil {
+		if err := godotenv.Load("../.env"); err != nil {
 			log.Println("⚠ Không thể load file .env, sử dụng biến môi trường hệ thống")
 		}
 	}

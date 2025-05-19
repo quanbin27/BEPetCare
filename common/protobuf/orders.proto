@@ -7,6 +7,7 @@ service OrderService {
   rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
   rpc UpdateOrderStatus(UpdateOrderStatusRequest) returns (UpdateOrderStatusResponse);
   rpc GetOrderItems(GetOrderItemsRequest) returns (GetOrderItemsResponse);
+  rpc GetOrderByAppointmentID(GetOrderByAppointmentIDRequest) returns (GetOrderByAppointmentIDResponse);
 }
 message Order {
   int32 id = 1;
@@ -17,6 +18,7 @@ message Order {
   string created_at = 6;
   string updated_at = 7;
   repeated OrderItem items = 8;
+  int32 appointment_id=9;
 }
 
 message OrderItem {
@@ -26,6 +28,7 @@ message OrderItem {
   int32 quantity = 4;
   float unit_price = 5;
   string product_type=6;
+  string product_name=7;
 }
 enum OrderStatus {
   ORDER_STATUS_UNSPECIFIED = 0; // Giá trị mặc định (bắt buộc trong Protobuf)
@@ -73,3 +76,10 @@ message GetOrderItemsResponse{
 }
 
 
+message GetOrderByAppointmentIDRequest {
+  int32 appointment_id = 1;
+}
+
+message GetOrderByAppointmentIDResponse {
+  Order order = 1;
+}

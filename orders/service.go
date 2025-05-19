@@ -49,6 +49,16 @@ func (s *Service) GetOrder(ctx context.Context, orderID int32) (*Order, error) {
 	}
 	return order, nil
 }
+func (s *Service) GetOrderByAppointmentID(ctx context.Context, appointmentID int32) (*Order, error) {
+	order, err := s.store.GetOrderByAppointmentID(ctx, appointmentID)
+	if err != nil {
+		return nil, err
+	}
+	if order == nil {
+		return nil, errors.New("order not found")
+	}
+	return order, nil
+}
 
 // UpdateOrderStatus cập nhật trạng thái đơn hàng
 func (s *Service) UpdateOrderStatus(ctx context.Context, orderID int32, status OrderStatus) (string, error) {

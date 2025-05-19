@@ -111,13 +111,17 @@ func (h *UserHandler) Register(c echo.Context) error {
 // @Failure 500 {object} object{error=string} "Internal server error"
 // @Router /auth/verify [get]
 func (h *UserHandler) VerifyEmail(c echo.Context) error {
-	token := c.QueryParam("token")
-	if token == "" {
+	var req VerifyEmailRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
+	}
+
+	if req.Token == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Token is required"})
 	}
 
 	ctx := c.Request().Context()
-	resp, err := h.client.VerifyEmail(ctx, &pb.VerifyEmailRequest{Token: token})
+	resp, err := h.client.VerifyEmail(ctx, &pb.VerifyEmailRequest{Token: req.Token})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
 			switch grpcErr.Code() {

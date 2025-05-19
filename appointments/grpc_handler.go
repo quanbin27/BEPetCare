@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
-
+	"fmt"
 	pb "github.com/quanbin27/commons/genproto/appointments"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"log"
 )
 
 type AppointmentGrpcHandler struct {
@@ -42,10 +43,14 @@ func (h *AppointmentGrpcHandler) GetAppointmentsByCustomer(ctx context.Context, 
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
+
+	log.Printf("Appointments fetched from service for customerID %d: %+v", req.CustomerId, appointments)
+
 	pbAppointments := make([]*pb.Appointment, len(appointments))
 	for i, a := range appointments {
-		pbAppointments[i] = toProtoAppointment(&a)
+		pbAppointments[len(appointments)-1-i] = toProtoAppointment(&a)
 	}
+
 	return &pb.GetAppointmentsResponse{Appointments: pbAppointments}, nil
 }
 
@@ -54,9 +59,10 @@ func (h *AppointmentGrpcHandler) GetAppointmentsByEmployee(ctx context.Context, 
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
+	fmt.Println("---", appointments)
 	pbAppointments := make([]*pb.Appointment, len(appointments))
 	for i, a := range appointments {
-		pbAppointments[i] = toProtoAppointment(&a)
+		pbAppointments[len(appointments)-1-i] = toProtoAppointment(&a)
 	}
 	return &pb.GetAppointmentsResponse{Appointments: pbAppointments}, nil
 }
@@ -69,18 +75,21 @@ func (h *AppointmentGrpcHandler) UpdateAppointmentStatus(ctx context.Context, re
 	return &pb.UpdateAppointmentStatusResponse{Status: statusMsg}, nil
 }
 
+// Updated GetAppointmentDetails handler to include service names
 func (h *AppointmentGrpcHandler) GetAppointmentDetails(ctx context.Context, req *pb.GetAppointmentDetailsRequest) (*pb.GetAppointmentDetailsResponse, error) {
-	appointment, details, err := h.appointmentService.GetAppointmentDetails(ctx, req.AppointmentId)
+	appointment, detailsWithService, err := h.appointmentService.GetAppointmentDetails(ctx, req.AppointmentId)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
-	pbDetails := make([]*pb.AppointmentDetail, len(details))
-	for i, d := range details {
-		pbDetails[i] = toProtoAppointmentDetail(&d)
+
+	pbDetailsWithService := make([]*pb.AppointmentDetailWithService, len(detailsWithService))
+	for i, d := range detailsWithService {
+		pbDetailsWithService[i] = toProtoAppointmentDetailWithService(&d.AppointmentDetail, d.ServiceName)
 	}
+
 	return &pb.GetAppointmentDetailsResponse{
 		Appointment: toProtoAppointment(appointment),
-		Details:     pbDetails,
+		Details:     pbDetailsWithService,
 	}, nil
 }
 

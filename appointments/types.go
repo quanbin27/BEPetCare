@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"time"
 
 	pb "github.com/quanbin27/commons/genproto/appointments"
@@ -70,26 +71,31 @@ type AppointmentStore interface {
 	UpdateService(ctx context.Context, service *Service) error
 	DeleteService(ctx context.Context, serviceID int32) error
 	GetServicesByIDs(ctx context.Context, serviceIDs []int32) ([]Service, error)
+	GetServiceByID(ctx context.Context, serviceID int32) (Service, error)
 }
 
 // --- INTERFACE CHO APPOINTMENT SERVICE (SỬ DỤNG DỮ LIỆU NỘI BỘ) ---
 type AppointmentService interface {
 	// Lịch hẹn
-	CreateAppointment(ctx context.Context, customerID int32, customerAddress string, scheduledTime time.Time, services []AppointmentDetail, note string, branchID int32) (int32, string, error) // Trả về appointmentID, status
+	CreateAppointment(ctx context.Context, customerID int32, customerAddress string, scheduledTime time.Time, details []AppointmentDetail, note string, branchID int32) (int32, string, error)
 	GetAppointmentsByCustomer(ctx context.Context, customerID int32) ([]Appointment, error)
 	GetAppointmentsByEmployee(ctx context.Context, employeeID int32) ([]Appointment, error)
-	UpdateAppointmentStatus(ctx context.Context, appointmentID int32, status AppointmentStatus) (string, error) // Trả về status
-	GetAppointmentDetails(ctx context.Context, appointmentID int32) (*Appointment, []AppointmentDetail, error)
+	UpdateAppointmentStatus(ctx context.Context, appointmentID int32, status AppointmentStatus) (string, error)
 
-	// Dịch vụ
-	CreateService(ctx context.Context, name, description string, price float32) (int32, string, error) // Trả về serviceID, status
+	// Updated to include service information
+	GetAppointmentDetails(ctx context.Context, appointmentID int32) (*Appointment, []AppointmentDetailWithService, error)
+
+	// Service-related methods
+	CreateService(ctx context.Context, name, description string, price float32) (int32, string, error)
 	GetServices(ctx context.Context) ([]Service, error)
-	UpdateService(ctx context.Context, serviceID int32, name, description string, price float32) (string, error) // Trả về status
-	DeleteService(ctx context.Context, serviceID int32) (string, error)                                          // Trả về status
+	UpdateService(ctx context.Context, serviceID int32, name, description string, price float32) (string, error)
+	DeleteService(ctx context.Context, serviceID int32) (string, error) // Trả về status
 }
 
 // --- CHUYỂN ĐỔI ENUM PROTO <-> GO ---
 func toPbAppointmentStatus(status AppointmentStatus) pb.AppointmentStatus {
+	log.Printf("Status before converting: %v", status) // Kiểm tra Status trước khi chuyển đổi
+
 	switch status {
 	case StatusPending:
 		return pb.AppointmentStatus_PENDING
@@ -120,14 +126,26 @@ func fromPbAppointmentStatus(pbStatus pb.AppointmentStatus) AppointmentStatus {
 
 // --- HÀM CHUYỂN ĐỔI GIỮA DỮ LIỆU NỘI BỘ VÀ PROTOBUF ---
 func toProtoAppointment(a *Appointment) *pb.Appointment {
-	return &pb.Appointment{
+	// Log ra giá trị của Appointment trước khi chuyển đổi
+	log.Printf("Converting Appointment: %+v", a)
+
+	// Thực hiện chuyển đổi sang pb.Appointment
+	pbApp := &pb.Appointment{
 		Id:              a.ID,
 		CustomerId:      a.CustomerID,
 		EmployeeId:      a.EmployeeID,
 		CustomerAddress: a.CustomerAddress,
 		ScheduledTime:   timestamppb.New(a.ScheduledTime),
 		Status:          toPbAppointmentStatus(a.Status),
+		BranchId:        a.BranchID,
+		Note:            a.Note,
+		Total:           a.Total,
 	}
+	log.Printf("Converted pb.Appointment: id=%d, status=%v", pbApp.Id, pbApp.Status)
+	// Log ra giá trị sau khi chuyển đổi
+
+	// Trả về kết quả
+	return pbApp
 }
 
 func toProtoService(s *Service) *pb.Service {
@@ -146,4 +164,20 @@ func toProtoAppointmentDetail(ad *AppointmentDetail) *pb.AppointmentDetail {
 		ServiceId:     ad.ServiceID,
 		ServicePrice:  ad.ServicePrice,
 	}
+}
+
+// Helper function to convert domain AppointmentDetail to proto AppointmentDetailWithService
+func toProtoAppointmentDetailWithService(detail *AppointmentDetail, serviceName string) *pb.AppointmentDetailWithService {
+	return &pb.AppointmentDetailWithService{
+		AppointmentId: detail.AppointmentID,
+		ServiceId:     detail.ServiceID,
+		ServiceName:   serviceName,
+		ServicePrice:  detail.ServicePrice,
+		Quantity:      detail.Quantity,
+	}
+}
+
+type AppointmentDetailWithService struct {
+	AppointmentDetail
+	ServiceName string
 }
