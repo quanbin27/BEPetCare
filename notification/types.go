@@ -30,15 +30,16 @@ type NotificationService interface {
 }
 type OrderData struct {
 	OrderID    int32       `json:"order_id"`
-	CustomerID string      `json:"customer_id"`
-	BranchID   string      `json:"branch_id"`
+	CustomerID int32       `json:"customer_id"`
+	BranchID   int32       `json:"branch_id"`
 	Items      []OrderItem `json:"items"`
 	Status     string      `json:"status"`
 	Email      string      `json:"email"`
 }
 type OrderItem struct {
-	ProductID   string  `json:"product_id"`
+	ProductID   int32   `json:"product_id"`
 	Quantity    int32   `json:"quantity"`
 	UnitPrice   float32 `json:"unit_price"`
 	ProductType string  `json:"product_type"`
+	ProductName string  `json:"product_name"`
 }

@@ -10,12 +10,479 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/appointments": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a new appointment with details like customer ID, address, scheduled time, services, note, and branch ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Create a new appointment",
+                "parameters": [
+                    {
+                        "description": "Appointment details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "branch_id": {
+                                    "type": "integer"
+                                },
+                                "customer_address": {
+                                    "type": "string"
+                                },
+                                "customer_id": {
+                                    "type": "integer"
+                                },
+                                "note": {
+                                    "type": "string"
+                                },
+                                "scheduled_time": {
+                                    "type": "string"
+                                },
+                                "services": {
+                                    "allOf": [
+                                        {
+                                            "type": "array"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "quantity": {
+                                                    "type": "integer"
+                                                },
+                                                "service_id": {
+                                                    "type": "integer"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointment created successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "appointment_id": {
+                                    "type": "integer"
+                                },
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or invalid scheduled_time format (must be RFC3339)",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/appointments/customer/{customer_id}": {
+            "get": {
+                "description": "Retrieves a list of appointment records for a specific customer ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Get appointments by customer",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Customer ID",
+                        "name": "customer_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of appointments",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "branch_id": {
+                                        "type": "integer"
+                                    },
+                                    "customer_address": {
+                                        "type": "string"
+                                    },
+                                    "customer_id": {
+                                        "type": "integer"
+                                    },
+                                    "employee_id": {
+                                        "type": "integer"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "note": {
+                                        "type": "string"
+                                    },
+                                    "scheduled_time": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Customer ID is required or invalid format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/appointments/employee/{employee_id}": {
+            "get": {
+                "description": "Retrieves a list of appointment records for a specific employee ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Get appointments by employee",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Employee ID",
+                        "name": "employee_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of appointments",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "branch_id": {
+                                        "type": "integer"
+                                    },
+                                    "customer_address": {
+                                        "type": "string"
+                                    },
+                                    "customer_id": {
+                                        "type": "integer"
+                                    },
+                                    "employee_id": {
+                                        "type": "integer"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "note": {
+                                        "type": "string"
+                                    },
+                                    "scheduled_time": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Employee ID is required or invalid format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/appointments/update-status": {
+            "put": {
+                "description": "Updates the status of an appointment for a specific appointment ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Update appointment status",
+                "parameters": [
+                    {
+                        "description": "Appointment status update details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "appointment_id": {
+                                    "type": "string"
+                                },
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointment status updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request, invalid appointment_id format, or invalid status",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/appointments/{appointment_id}": {
+            "get": {
+                "description": "Retrieves detailed information for a specific appointment ID, including associated order if available",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Get appointment details",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Appointment ID",
+                        "name": "appointment_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointment details",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "appointment": {
+                                    "type": "object",
+                                    "properties": {
+                                        "branch_id": {
+                                            "type": "integer"
+                                        },
+                                        "customer_address": {
+                                            "type": "string"
+                                        },
+                                        "customer_id": {
+                                            "type": "integer"
+                                        },
+                                        "employee_id": {
+                                            "type": "integer"
+                                        },
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "note": {
+                                            "type": "string"
+                                        },
+                                        "scheduled_time": {
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "details": {
+                                    "allOf": [
+                                        {
+                                            "type": "array"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "quantity": {
+                                                    "type": "integer"
+                                                },
+                                                "service_id": {
+                                                    "type": "integer"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "order": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Appointment ID is required or invalid format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Appointment not found",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/auth/forgot-password": {
             "post": {
                 "description": "Sends a password reset email to the user",
@@ -401,6 +868,652 @@ const docTemplate = `{
                 }
             }
         },
+        "/branches": {
+            "get": {
+                "description": "Retrieves a list of all branch records",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Branches"
+                ],
+                "summary": "List all branches",
+                "responses": {
+                    "200": {
+                        "description": "List of branches",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "location": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/branches/inventory": {
+            "put": {
+                "description": "Updates the inventory for a specific branch with details like branch ID, product ID, product type, and stock quantity",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Inventory"
+                ],
+                "summary": "Update branch inventory",
+                "parameters": [
+                    {
+                        "description": "Inventory update details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "branch_id": {
+                                    "type": "integer"
+                                },
+                                "product_id": {
+                                    "type": "integer"
+                                },
+                                "product_type": {
+                                    "type": "string"
+                                },
+                                "stock_quantity": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Inventory updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request, missing required fields, or invalid product type",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/branches/{branch_id}/inventory": {
+            "get": {
+                "description": "Retrieves the inventory details for a specific branch by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Inventory"
+                ],
+                "summary": "Get branch inventory",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Branch ID",
+                        "name": "branch_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Branch inventory details",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "product_id": {
+                                        "type": "integer"
+                                    },
+                                    "product_type": {
+                                        "type": "string"
+                                    },
+                                    "stock_quantity": {
+                                        "type": "integer"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Branch ID is required or invalid format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/branches/{id}": {
+            "get": {
+                "description": "Retrieves a branch record using its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Branches"
+                ],
+                "summary": "Get branch by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Branch ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Branch details",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "location": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID is required or invalid ID format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Branch not found",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/examinations": {
+            "put": {
+                "description": "Updates an examination record with details like pet ID, date, vet ID, diagnosis, and notes",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Examinations"
+                ],
+                "summary": "Update an examination",
+                "parameters": [
+                    {
+                        "description": "Updated examination details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "date": {
+                                    "type": "string"
+                                },
+                                "diagnosis": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "notes": {
+                                    "type": "string"
+                                },
+                                "pet_id": {
+                                    "type": "string"
+                                },
+                                "vet_id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Examination updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "date": {
+                                    "type": "string"
+                                },
+                                "diagnosis": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "notes": {
+                                    "type": "string"
+                                },
+                                "pet_id": {
+                                    "type": "string"
+                                },
+                                "vet_id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request, ID is required, or invalid date format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new examination record for a pet with details like pet ID, date, vet ID, diagnosis, and notes",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Examinations"
+                ],
+                "summary": "Create a new examination",
+                "parameters": [
+                    {
+                        "description": "Examination details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "date": {
+                                    "type": "string"
+                                },
+                                "diagnosis": {
+                                    "type": "string"
+                                },
+                                "notes": {
+                                    "type": "string"
+                                },
+                                "pet_id": {
+                                    "type": "string"
+                                },
+                                "vet_id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Examination created successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request, missing required fields, or invalid date format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/examinations/pet/{pet_id}": {
+            "get": {
+                "description": "Retrieves a list of examination records for a specific pet ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Examinations"
+                ],
+                "summary": "List examinations by pet",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Pet ID",
+                        "name": "pet_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of examinations",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "date": {
+                                        "type": "string"
+                                    },
+                                    "diagnosis": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "notes": {
+                                        "type": "string"
+                                    },
+                                    "pet_id": {
+                                        "type": "string"
+                                    },
+                                    "vet_id": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Pet ID is required",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/examinations/{id}": {
+            "get": {
+                "description": "Retrieves an examination record using its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Examinations"
+                ],
+                "summary": "Get examination by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Examination ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Examination details",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "date": {
+                                    "type": "string"
+                                },
+                                "diagnosis": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "notes": {
+                                    "type": "string"
+                                },
+                                "pet_id": {
+                                    "type": "string"
+                                },
+                                "vet_id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID is required",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Examination not found",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes an examination record by its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Examinations"
+                ],
+                "summary": "Delete an examination",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Examination ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Examination deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "success": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID is required",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/hello-world": {
             "get": {
                 "description": "Returns a \"Hello World\" string to verify the API is working",
@@ -416,6 +1529,2677 @@ const docTemplate = `{
                         "description": "Hello World",
                         "schema": {
                             "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/payments": {
+            "post": {
+                "description": "Creates a new payment record with details like order ID, appointment ID, amount, description, and payment method",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Create a new payment",
+                "parameters": [
+                    {
+                        "description": "Payment details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "amount": {
+                                    "type": "number"
+                                },
+                                "appointment_id": {
+                                    "type": "integer"
+                                },
+                                "description": {
+                                    "type": "string"
+                                },
+                                "method": {
+                                    "type": "string"
+                                },
+                                "order_id": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payment created successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "payment_id": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or invalid payment method",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/cancel": {
+            "post": {
+                "description": "Cancels a payment link for a specific payment ID with a cancellation reason",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Cancel a payment link",
+                "parameters": [
+                    {
+                        "description": "Cancellation details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "cancellation_reason": {
+                                    "type": "string"
+                                },
+                                "payment_id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payment link cancelled successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or invalid payment_id format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/update-amount": {
+            "put": {
+                "description": "Updates the amount for a specific payment ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Update payment amount",
+                "parameters": [
+                    {
+                        "description": "Payment amount update details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "amount": {
+                                    "type": "number"
+                                },
+                                "payment_id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payment amount updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or invalid payment_id format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/update-method": {
+            "put": {
+                "description": "Updates the payment method for a specific payment ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Update payment method",
+                "parameters": [
+                    {
+                        "description": "Payment method update details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "method": {
+                                    "type": "string"
+                                },
+                                "payment_id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payment method updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request, invalid payment_id format, or invalid payment method",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/update-status": {
+            "put": {
+                "description": "Updates the status of a payment record for a specific payment ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Update payment status",
+                "parameters": [
+                    {
+                        "description": "Payment status update details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "payment_id": {
+                                    "type": "string"
+                                },
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payment status updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request, invalid payment_id format, or invalid payment status",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/url": {
+            "post": {
+                "description": "Creates a payment URL for a specific payment with details like payment ID, amount, and description",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Create a payment URL",
+                "parameters": [
+                    {
+                        "description": "Payment URL details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "amount": {
+                                    "type": "number"
+                                },
+                                "description": {
+                                    "type": "string"
+                                },
+                                "payment_id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payment URL created successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "checkout_url": {
+                                    "type": "string"
+                                },
+                                "payment_link_id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or invalid payment_id format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/{payment_id}": {
+            "get": {
+                "description": "Retrieves a payment record using its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Get payment by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Payment ID",
+                        "name": "payment_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payment details",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "amount": {
+                                    "type": "number"
+                                },
+                                "appointment_id": {
+                                    "type": "integer"
+                                },
+                                "description": {
+                                    "type": "string"
+                                },
+                                "method": {
+                                    "type": "string"
+                                },
+                                "order_id": {
+                                    "type": "integer"
+                                },
+                                "payment_id": {
+                                    "type": "integer"
+                                },
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Payment ID is required or invalid format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Payment not found",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/pets": {
+            "put": {
+                "description": "Updates a pet record with details like name, species, age, owner ID, etc.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pets"
+                ],
+                "summary": "Update a pet",
+                "parameters": [
+                    {
+                        "description": "Updated pet details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "age": {
+                                    "type": "integer"
+                                },
+                                "color": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "owner_id": {
+                                    "type": "string"
+                                },
+                                "size": {
+                                    "type": "string"
+                                },
+                                "species": {
+                                    "type": "string"
+                                },
+                                "weight": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pet updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "age": {
+                                    "type": "integer"
+                                },
+                                "color": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "owner_id": {
+                                    "type": "string"
+                                },
+                                "size": {
+                                    "type": "string"
+                                },
+                                "species": {
+                                    "type": "string"
+                                },
+                                "weight": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or ID is required",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new pet record with details like name, species, age, owner ID, etc.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pets"
+                ],
+                "summary": "Create a new pet",
+                "parameters": [
+                    {
+                        "description": "Pet details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "age": {
+                                    "type": "integer"
+                                },
+                                "color": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "owner_id": {
+                                    "type": "string"
+                                },
+                                "size": {
+                                    "type": "string"
+                                },
+                                "species": {
+                                    "type": "string"
+                                },
+                                "weight": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pet created successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or missing fields",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/pets/owner/{owner_id}": {
+            "get": {
+                "description": "Retrieves a list of pet records for a specific owner ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pets"
+                ],
+                "summary": "List pets by owner",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Owner ID",
+                        "name": "owner_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of pets",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "age": {
+                                        "type": "integer"
+                                    },
+                                    "color": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "owner_id": {
+                                        "type": "string"
+                                    },
+                                    "size": {
+                                        "type": "string"
+                                    },
+                                    "species": {
+                                        "type": "string"
+                                    },
+                                    "weight": {
+                                        "type": "number"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Owner ID is required",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/pets/{id}": {
+            "get": {
+                "description": "Retrieves a pet record using its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pets"
+                ],
+                "summary": "Get pet by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Pet ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pet details",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "age": {
+                                    "type": "integer"
+                                },
+                                "color": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "owner_id": {
+                                    "type": "string"
+                                },
+                                "size": {
+                                    "type": "string"
+                                },
+                                "species": {
+                                    "type": "string"
+                                },
+                                "weight": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID is required",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Pet not found",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a pet record by its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pets"
+                ],
+                "summary": "Delete a pet",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Pet ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pet deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "success": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID is required",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/prescriptions": {
+            "put": {
+                "description": "Updates a prescription record with details like pet ID, medication, dosage, start date, and end date",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Prescriptions"
+                ],
+                "summary": "Update a prescription",
+                "parameters": [
+                    {
+                        "description": "Updated prescription details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "dosage": {
+                                    "type": "string"
+                                },
+                                "end_date": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "medication": {
+                                    "type": "string"
+                                },
+                                "pet_id": {
+                                    "type": "string"
+                                },
+                                "start_date": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Prescription updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "dosage": {
+                                    "type": "string"
+                                },
+                                "end_date": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "medication": {
+                                    "type": "string"
+                                },
+                                "pet_id": {
+                                    "type": "string"
+                                },
+                                "start_date": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request, ID is required, or invalid date format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new prescription record for a pet with details like pet ID, medication, dosage, start date, and end date",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Prescriptions"
+                ],
+                "summary": "Create a new prescription",
+                "parameters": [
+                    {
+                        "description": "Prescription details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "dosage": {
+                                    "type": "string"
+                                },
+                                "end_date": {
+                                    "type": "string"
+                                },
+                                "medication": {
+                                    "type": "string"
+                                },
+                                "pet_id": {
+                                    "type": "string"
+                                },
+                                "start_date": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Prescription created successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request, missing required fields, or invalid date format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/prescriptions/pet/{pet_id}": {
+            "get": {
+                "description": "Retrieves a list of prescription records for a specific pet ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Prescriptions"
+                ],
+                "summary": "List prescriptions by pet",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Pet ID",
+                        "name": "pet_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of prescriptions",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "dosage": {
+                                        "type": "string"
+                                    },
+                                    "end_date": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "medication": {
+                                        "type": "string"
+                                    },
+                                    "pet_id": {
+                                        "type": "string"
+                                    },
+                                    "start_date": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Pet ID is required",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/prescriptions/{id}": {
+            "get": {
+                "description": "Retrieves a prescription record using its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Prescriptions"
+                ],
+                "summary": "Get prescription by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Prescription ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Prescription details",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "dosage": {
+                                    "type": "string"
+                                },
+                                "end_date": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "medication": {
+                                    "type": "string"
+                                },
+                                "pet_id": {
+                                    "type": "string"
+                                },
+                                "start_date": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID is required",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Prescription not found",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a prescription record by its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Prescriptions"
+                ],
+                "summary": "Delete a prescription",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Prescription ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Prescription deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "success": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID is required",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/products": {
+            "get": {
+                "description": "Retrieves a list of all products (foods, accessories, medicines) with their details",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "List all products",
+                "responses": {
+                    "200": {
+                        "description": "List of all products",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "imgurl": {
+                                        "type": "string"
+                                    },
+                                    "is_attachable": {
+                                        "type": "boolean"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "price": {
+                                        "type": "number"
+                                    },
+                                    "product_type": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/products/accessories": {
+            "get": {
+                "description": "Retrieves a list of all accessory product records",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Accessories"
+                ],
+                "summary": "List all accessories",
+                "responses": {
+                    "200": {
+                        "description": "List of accessories",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "imgurl": {
+                                        "type": "string"
+                                    },
+                                    "is_attachable": {
+                                        "type": "boolean"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "price": {
+                                        "type": "number"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates an accessory product with details like ID, name, description, and price",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Accessories"
+                ],
+                "summary": "Update an accessory",
+                "parameters": [
+                    {
+                        "description": "Updated accessory details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "price": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Accessory updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request, ID or name missing, or price must be positive",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new accessory product with details like name, description, and price",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Accessories"
+                ],
+                "summary": "Create a new accessory",
+                "parameters": [
+                    {
+                        "description": "Accessory details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "price": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Accessory created successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or missing required fields",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/products/accessories/{id}": {
+            "get": {
+                "description": "Retrieves an accessory product record using its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Accessories"
+                ],
+                "summary": "Get accessory by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Accessory ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Accessory details",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "imgurl": {
+                                    "type": "string"
+                                },
+                                "is_attachable": {
+                                    "type": "boolean"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "price": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID is required or invalid ID format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Accessory not found",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes an accessory product by its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Accessories"
+                ],
+                "summary": "Delete an accessory",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Accessory ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Accessory deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID is required or invalid ID format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/products/foods": {
+            "get": {
+                "description": "Retrieves a list of all food product records",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Foods"
+                ],
+                "summary": "List all foods",
+                "responses": {
+                    "200": {
+                        "description": "List of foods",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "imgurl": {
+                                        "type": "string"
+                                    },
+                                    "is_attachable": {
+                                        "type": "boolean"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "price": {
+                                        "type": "number"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates a food product with details like ID, name, description, and price",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Foods"
+                ],
+                "summary": "Update a food",
+                "parameters": [
+                    {
+                        "description": "Updated food details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "price": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Food updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request, ID or name missing, or price must be positive",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new food product with details like name, description, and price",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Foods"
+                ],
+                "summary": "Create a new food",
+                "parameters": [
+                    {
+                        "description": "Food details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "price": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Food created successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or missing required fields",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/products/foods/{id}": {
+            "get": {
+                "description": "Retrieves a food product record using its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Foods"
+                ],
+                "summary": "Get food by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Food ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Food details",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "imgurl": {
+                                    "type": "string"
+                                },
+                                "is_attachable": {
+                                    "type": "boolean"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "price": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID is required or invalid ID format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Food not found",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a food product by its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Foods"
+                ],
+                "summary": "Delete a food",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Food ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Food deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID is required or invalid ID format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/products/is_attachable": {
+            "get": {
+                "description": "Retrieves a list of all products marked as attachable",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "List attachable products",
+                "responses": {
+                    "200": {
+                        "description": "List of attachable products",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "imgurl": {
+                                        "type": "string"
+                                    },
+                                    "is_attachable": {
+                                        "type": "boolean"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "price": {
+                                        "type": "number"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/products/medicines": {
+            "get": {
+                "description": "Retrieves a list of all medicine product records",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Medicines"
+                ],
+                "summary": "List all medicines",
+                "responses": {
+                    "200": {
+                        "description": "List of medicines",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "imgurl": {
+                                        "type": "string"
+                                    },
+                                    "is_attachable": {
+                                        "type": "boolean"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "price": {
+                                        "type": "number"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates a medicine product with details like ID, name, description, and price",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Medicines"
+                ],
+                "summary": "Update a medicine",
+                "parameters": [
+                    {
+                        "description": "Updated medicine details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "price": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Medicine updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request, ID or name missing, or price must be positive",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new medicine product with details like name, description, and price",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Medicines"
+                ],
+                "summary": "Create a new medicine",
+                "parameters": [
+                    {
+                        "description": "Medicine details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "price": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Medicine created successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or missing required fields",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/products/medicines/{id}": {
+            "get": {
+                "description": "Retrieves a medicine product record using its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Medicines"
+                ],
+                "summary": "Get medicine by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Medicine ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Medicine details",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "imgurl": {
+                                    "type": "string"
+                                },
+                                "is_attachable": {
+                                    "type": "boolean"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "price": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID is required or invalid ID format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Medicine not found",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a medicine product by its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Medicines"
+                ],
+                "summary": "Delete a medicine",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Medicine ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Medicine deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID is required or invalid ID format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/services": {
+            "get": {
+                "description": "Retrieves a list of all service records",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "List all services",
+                "responses": {
+                    "200": {
+                        "description": "List of services",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "imgurl": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "price": {
+                                        "type": "number"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates a service with details like service ID, name, description, and price",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Update a service",
+                "parameters": [
+                    {
+                        "description": "Updated service details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "price": {
+                                    "type": "number"
+                                },
+                                "service_id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Service updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or invalid service_id format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new service with details like name, description, and price",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Create a new service",
+                "parameters": [
+                    {
+                        "description": "Service details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "price": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Service created successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "service_id": {
+                                    "type": "integer"
+                                },
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/services/{service_id}": {
+            "delete": {
+                "description": "Deletes a service by its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Delete a service",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Service ID",
+                        "name": "service_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Service deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Service ID is required or invalid format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
                         }
                     }
                 }
@@ -824,18 +4608,392 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/vaccinations": {
+            "put": {
+                "description": "Updates a vaccination record with details like pet ID, vaccine name, date, and vet ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vaccinations"
+                ],
+                "summary": "Update a vaccination",
+                "parameters": [
+                    {
+                        "description": "Updated vaccination details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "date": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "pet_id": {
+                                    "type": "string"
+                                },
+                                "vaccine_name": {
+                                    "type": "string"
+                                },
+                                "vet_id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Vaccination updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "date": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "pet_id": {
+                                    "type": "string"
+                                },
+                                "vaccine_name": {
+                                    "type": "string"
+                                },
+                                "vet_id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request, ID is required, or invalid date format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new vaccination record for a pet with details like pet ID, vaccine name, date, and vet ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vaccinations"
+                ],
+                "summary": "Create a new vaccination",
+                "parameters": [
+                    {
+                        "description": "Vaccination details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "date": {
+                                    "type": "string"
+                                },
+                                "pet_id": {
+                                    "type": "string"
+                                },
+                                "vaccine_name": {
+                                    "type": "string"
+                                },
+                                "vet_id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Vaccination created successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request, missing required fields, or invalid date format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/vaccinations/pet/{pet_id}": {
+            "get": {
+                "description": "Retrieves a list of vaccination records for a specific pet ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vaccinations"
+                ],
+                "summary": "List vaccinations by pet",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Pet ID",
+                        "name": "pet_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of vaccinations",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "date": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "pet_id": {
+                                        "type": "string"
+                                    },
+                                    "vaccine_name": {
+                                        "type": "string"
+                                    },
+                                    "vet_id": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Pet ID is required",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/vaccinations/{id}": {
+            "get": {
+                "description": "Retrieves a vaccination record using its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vaccinations"
+                ],
+                "summary": "Get vaccination by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Vaccination ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Vaccination details",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "date": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "pet_id": {
+                                    "type": "string"
+                                },
+                                "vaccine_name": {
+                                    "type": "string"
+                                },
+                                "vet_id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID is required",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Vaccination not found",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a vaccination record by its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vaccinations"
+                ],
+                "summary": "Delete a vaccination",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Vaccination ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Vaccination deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "success": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID is required",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
-	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Version:          "1.0",
+	Host:             "localhost:8080",
+	BasePath:         "/api/v1",
+	Schemes:          []string{"http"},
+	Title:            "BEPetCare Gateway API",
+	Description:      "This is the API gateway for the BEPetCare system, providing access to user, order, product, payment, appointment, and pet record services.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

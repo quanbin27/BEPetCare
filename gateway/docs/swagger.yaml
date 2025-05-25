@@ -1,6 +1,314 @@
+basePath: /api/v1
+host: localhost:8080
 info:
-  contact: {}
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is the API gateway for the BEPetCare system, providing access
+    to user, order, product, payment, appointment, and pet record services.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: BEPetCare Gateway API
+  version: "1.0"
 paths:
+  /appointments:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new appointment with details like customer ID, address,
+        scheduled time, services, note, and branch ID
+      parameters:
+      - description: Appointment details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            branch_id:
+              type: integer
+            customer_address:
+              type: string
+            customer_id:
+              type: integer
+            note:
+              type: string
+            scheduled_time:
+              type: string
+            services:
+              allOf:
+              - type: array
+              - properties:
+                  quantity:
+                    type: integer
+                  service_id:
+                    type: integer
+                type: object
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Appointment created successfully
+          schema:
+            properties:
+              appointment_id:
+                type: integer
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request or invalid scheduled_time format (must be RFC3339)
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new appointment
+      tags:
+      - Appointments
+  /appointments/{appointment_id}:
+    get:
+      description: Retrieves detailed information for a specific appointment ID, including
+        associated order if available
+      parameters:
+      - description: Appointment ID
+        in: path
+        name: appointment_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Appointment details
+          schema:
+            properties:
+              appointment:
+                properties:
+                  branch_id:
+                    type: integer
+                  customer_address:
+                    type: string
+                  customer_id:
+                    type: integer
+                  employee_id:
+                    type: integer
+                  id:
+                    type: integer
+                  note:
+                    type: string
+                  scheduled_time:
+                    type: string
+                  status:
+                    type: string
+                type: object
+              details:
+                allOf:
+                - type: array
+                - properties:
+                    quantity:
+                      type: integer
+                    service_id:
+                      type: integer
+                  type: object
+              order:
+                type: object
+            type: object
+        "400":
+          description: Appointment ID is required or invalid format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "404":
+          description: Appointment not found
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get appointment details
+      tags:
+      - Appointments
+  /appointments/customer/{customer_id}:
+    get:
+      description: Retrieves a list of appointment records for a specific customer
+        ID
+      parameters:
+      - description: Customer ID
+        in: path
+        name: customer_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of appointments
+          schema:
+            items:
+              properties:
+                branch_id:
+                  type: integer
+                customer_address:
+                  type: string
+                customer_id:
+                  type: integer
+                employee_id:
+                  type: integer
+                id:
+                  type: integer
+                note:
+                  type: string
+                scheduled_time:
+                  type: string
+                status:
+                  type: string
+              type: object
+            type: array
+        "400":
+          description: Customer ID is required or invalid format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get appointments by customer
+      tags:
+      - Appointments
+  /appointments/employee/{employee_id}:
+    get:
+      description: Retrieves a list of appointment records for a specific employee
+        ID
+      parameters:
+      - description: Employee ID
+        in: path
+        name: employee_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of appointments
+          schema:
+            items:
+              properties:
+                branch_id:
+                  type: integer
+                customer_address:
+                  type: string
+                customer_id:
+                  type: integer
+                employee_id:
+                  type: integer
+                id:
+                  type: integer
+                note:
+                  type: string
+                scheduled_time:
+                  type: string
+                status:
+                  type: string
+              type: object
+            type: array
+        "400":
+          description: Employee ID is required or invalid format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get appointments by employee
+      tags:
+      - Appointments
+  /appointments/update-status:
+    put:
+      consumes:
+      - application/json
+      description: Updates the status of an appointment for a specific appointment
+        ID
+      parameters:
+      - description: Appointment status update details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            appointment_id:
+              type: string
+            status:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Appointment status updated successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request, invalid appointment_id format, or invalid
+            status
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Update appointment status
+      tags:
+      - Appointments
   /auth/forgot-password:
     post:
       consumes:
@@ -251,6 +559,427 @@ paths:
       summary: Verify user email
       tags:
       - Users
+  /branches:
+    get:
+      description: Retrieves a list of all branch records
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of branches
+          schema:
+            items:
+              properties:
+                description:
+                  type: string
+                id:
+                  type: integer
+                location:
+                  type: string
+                name:
+                  type: string
+              type: object
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: List all branches
+      tags:
+      - Branches
+  /branches/{branch_id}/inventory:
+    get:
+      description: Retrieves the inventory details for a specific branch by its ID
+      parameters:
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Branch inventory details
+          schema:
+            items:
+              properties:
+                product_id:
+                  type: integer
+                product_type:
+                  type: string
+                stock_quantity:
+                  type: integer
+              type: object
+            type: array
+        "400":
+          description: Branch ID is required or invalid format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get branch inventory
+      tags:
+      - Inventory
+  /branches/{id}:
+    get:
+      description: Retrieves a branch record using its unique ID
+      parameters:
+      - description: Branch ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Branch details
+          schema:
+            properties:
+              description:
+                type: string
+              id:
+                type: integer
+              location:
+                type: string
+              name:
+                type: string
+            type: object
+        "400":
+          description: ID is required or invalid ID format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "404":
+          description: Branch not found
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get branch by ID
+      tags:
+      - Branches
+  /branches/inventory:
+    put:
+      consumes:
+      - application/json
+      description: Updates the inventory for a specific branch with details like branch
+        ID, product ID, product type, and stock quantity
+      parameters:
+      - description: Inventory update details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            branch_id:
+              type: integer
+            product_id:
+              type: integer
+            product_type:
+              type: string
+            stock_quantity:
+              type: integer
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Inventory updated successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request, missing required fields, or invalid product
+            type
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Update branch inventory
+      tags:
+      - Inventory
+  /examinations:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new examination record for a pet with details like pet
+        ID, date, vet ID, diagnosis, and notes
+      parameters:
+      - description: Examination details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            date:
+              type: string
+            diagnosis:
+              type: string
+            notes:
+              type: string
+            pet_id:
+              type: string
+            vet_id:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Examination created successfully
+          schema:
+            properties:
+              id:
+                type: string
+            type: object
+        "400":
+          description: Invalid request, missing required fields, or invalid date format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Create a new examination
+      tags:
+      - Examinations
+    put:
+      consumes:
+      - application/json
+      description: Updates an examination record with details like pet ID, date, vet
+        ID, diagnosis, and notes
+      parameters:
+      - description: Updated examination details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            date:
+              type: string
+            diagnosis:
+              type: string
+            id:
+              type: string
+            notes:
+              type: string
+            pet_id:
+              type: string
+            vet_id:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Examination updated successfully
+          schema:
+            properties:
+              date:
+                type: string
+              diagnosis:
+                type: string
+              id:
+                type: string
+              notes:
+                type: string
+              pet_id:
+                type: string
+              vet_id:
+                type: string
+            type: object
+        "400":
+          description: Invalid request, ID is required, or invalid date format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Update an examination
+      tags:
+      - Examinations
+  /examinations/{id}:
+    delete:
+      description: Deletes an examination record by its unique ID
+      parameters:
+      - description: Examination ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Examination deleted successfully
+          schema:
+            properties:
+              success:
+                type: boolean
+            type: object
+        "400":
+          description: ID is required
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Delete an examination
+      tags:
+      - Examinations
+    get:
+      description: Retrieves an examination record using its unique ID
+      parameters:
+      - description: Examination ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Examination details
+          schema:
+            properties:
+              date:
+                type: string
+              diagnosis:
+                type: string
+              id:
+                type: string
+              notes:
+                type: string
+              pet_id:
+                type: string
+              vet_id:
+                type: string
+            type: object
+        "400":
+          description: ID is required
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "404":
+          description: Examination not found
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get examination by ID
+      tags:
+      - Examinations
+  /examinations/pet/{pet_id}:
+    get:
+      description: Retrieves a list of examination records for a specific pet ID
+      parameters:
+      - description: Pet ID
+        in: path
+        name: pet_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of examinations
+          schema:
+            items:
+              properties:
+                date:
+                  type: string
+                diagnosis:
+                  type: string
+                id:
+                  type: string
+                notes:
+                  type: string
+                pet_id:
+                  type: string
+                vet_id:
+                  type: string
+              type: object
+            type: array
+        "400":
+          description: Pet ID is required
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: List examinations by pet
+      tags:
+      - Examinations
   /hello-world:
     get:
       description: Returns a "Hello World" string to verify the API is working
@@ -264,6 +993,1747 @@ paths:
       summary: Test endpoint
       tags:
       - General
+  /payments:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new payment record with details like order ID, appointment
+        ID, amount, description, and payment method
+      parameters:
+      - description: Payment details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            amount:
+              type: number
+            appointment_id:
+              type: integer
+            description:
+              type: string
+            method:
+              type: string
+            order_id:
+              type: integer
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payment created successfully
+          schema:
+            properties:
+              payment_id:
+                type: integer
+            type: object
+        "400":
+          description: Invalid request or invalid payment method
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Create a new payment
+      tags:
+      - Payments
+  /payments/{payment_id}:
+    get:
+      description: Retrieves a payment record using its unique ID
+      parameters:
+      - description: Payment ID
+        in: path
+        name: payment_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payment details
+          schema:
+            properties:
+              amount:
+                type: number
+              appointment_id:
+                type: integer
+              description:
+                type: string
+              method:
+                type: string
+              order_id:
+                type: integer
+              payment_id:
+                type: integer
+              status:
+                type: string
+            type: object
+        "400":
+          description: Payment ID is required or invalid format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "404":
+          description: Payment not found
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get payment by ID
+      tags:
+      - Payments
+  /payments/cancel:
+    post:
+      consumes:
+      - application/json
+      description: Cancels a payment link for a specific payment ID with a cancellation
+        reason
+      parameters:
+      - description: Cancellation details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            cancellation_reason:
+              type: string
+            payment_id:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payment link cancelled successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request or invalid payment_id format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Cancel a payment link
+      tags:
+      - Payments
+  /payments/update-amount:
+    put:
+      consumes:
+      - application/json
+      description: Updates the amount for a specific payment ID
+      parameters:
+      - description: Payment amount update details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            amount:
+              type: number
+            payment_id:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payment amount updated successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request or invalid payment_id format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Update payment amount
+      tags:
+      - Payments
+  /payments/update-method:
+    put:
+      consumes:
+      - application/json
+      description: Updates the payment method for a specific payment ID
+      parameters:
+      - description: Payment method update details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            method:
+              type: string
+            payment_id:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payment method updated successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request, invalid payment_id format, or invalid payment
+            method
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Update payment method
+      tags:
+      - Payments
+  /payments/update-status:
+    put:
+      consumes:
+      - application/json
+      description: Updates the status of a payment record for a specific payment ID
+      parameters:
+      - description: Payment status update details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            payment_id:
+              type: string
+            status:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payment status updated successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request, invalid payment_id format, or invalid payment
+            status
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Update payment status
+      tags:
+      - Payments
+  /payments/url:
+    post:
+      consumes:
+      - application/json
+      description: Creates a payment URL for a specific payment with details like
+        payment ID, amount, and description
+      parameters:
+      - description: Payment URL details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            amount:
+              type: number
+            description:
+              type: string
+            payment_id:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payment URL created successfully
+          schema:
+            properties:
+              checkout_url:
+                type: string
+              payment_link_id:
+                type: string
+            type: object
+        "400":
+          description: Invalid request or invalid payment_id format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Create a payment URL
+      tags:
+      - Payments
+  /pets:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new pet record with details like name, species, age,
+        owner ID, etc.
+      parameters:
+      - description: Pet details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            age:
+              type: integer
+            color:
+              type: string
+            name:
+              type: string
+            owner_id:
+              type: string
+            size:
+              type: string
+            species:
+              type: string
+            weight:
+              type: number
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pet created successfully
+          schema:
+            properties:
+              id:
+                type: string
+            type: object
+        "400":
+          description: Invalid request or missing fields
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Create a new pet
+      tags:
+      - Pets
+    put:
+      consumes:
+      - application/json
+      description: Updates a pet record with details like name, species, age, owner
+        ID, etc.
+      parameters:
+      - description: Updated pet details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            age:
+              type: integer
+            color:
+              type: string
+            id:
+              type: string
+            name:
+              type: string
+            owner_id:
+              type: string
+            size:
+              type: string
+            species:
+              type: string
+            weight:
+              type: number
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pet updated successfully
+          schema:
+            properties:
+              age:
+                type: integer
+              color:
+                type: string
+              id:
+                type: string
+              name:
+                type: string
+              owner_id:
+                type: string
+              size:
+                type: string
+              species:
+                type: string
+              weight:
+                type: number
+            type: object
+        "400":
+          description: Invalid request or ID is required
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Update a pet
+      tags:
+      - Pets
+  /pets/{id}:
+    delete:
+      description: Deletes a pet record by its unique ID
+      parameters:
+      - description: Pet ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pet deleted successfully
+          schema:
+            properties:
+              success:
+                type: boolean
+            type: object
+        "400":
+          description: ID is required
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Delete a pet
+      tags:
+      - Pets
+    get:
+      description: Retrieves a pet record using its unique ID
+      parameters:
+      - description: Pet ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pet details
+          schema:
+            properties:
+              age:
+                type: integer
+              color:
+                type: string
+              id:
+                type: string
+              name:
+                type: string
+              owner_id:
+                type: string
+              size:
+                type: string
+              species:
+                type: string
+              weight:
+                type: number
+            type: object
+        "400":
+          description: ID is required
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "404":
+          description: Pet not found
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get pet by ID
+      tags:
+      - Pets
+  /pets/owner/{owner_id}:
+    get:
+      description: Retrieves a list of pet records for a specific owner ID
+      parameters:
+      - description: Owner ID
+        in: path
+        name: owner_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of pets
+          schema:
+            items:
+              properties:
+                age:
+                  type: integer
+                color:
+                  type: string
+                id:
+                  type: string
+                name:
+                  type: string
+                owner_id:
+                  type: string
+                size:
+                  type: string
+                species:
+                  type: string
+                weight:
+                  type: number
+              type: object
+            type: array
+        "400":
+          description: Owner ID is required
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: List pets by owner
+      tags:
+      - Pets
+  /prescriptions:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new prescription record for a pet with details like pet
+        ID, medication, dosage, start date, and end date
+      parameters:
+      - description: Prescription details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            dosage:
+              type: string
+            end_date:
+              type: string
+            medication:
+              type: string
+            pet_id:
+              type: string
+            start_date:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Prescription created successfully
+          schema:
+            properties:
+              id:
+                type: string
+            type: object
+        "400":
+          description: Invalid request, missing required fields, or invalid date format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Create a new prescription
+      tags:
+      - Prescriptions
+    put:
+      consumes:
+      - application/json
+      description: Updates a prescription record with details like pet ID, medication,
+        dosage, start date, and end date
+      parameters:
+      - description: Updated prescription details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            dosage:
+              type: string
+            end_date:
+              type: string
+            id:
+              type: string
+            medication:
+              type: string
+            pet_id:
+              type: string
+            start_date:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Prescription updated successfully
+          schema:
+            properties:
+              dosage:
+                type: string
+              end_date:
+                type: string
+              id:
+                type: string
+              medication:
+                type: string
+              pet_id:
+                type: string
+              start_date:
+                type: string
+            type: object
+        "400":
+          description: Invalid request, ID is required, or invalid date format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Update a prescription
+      tags:
+      - Prescriptions
+  /prescriptions/{id}:
+    delete:
+      description: Deletes a prescription record by its unique ID
+      parameters:
+      - description: Prescription ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Prescription deleted successfully
+          schema:
+            properties:
+              success:
+                type: boolean
+            type: object
+        "400":
+          description: ID is required
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Delete a prescription
+      tags:
+      - Prescriptions
+    get:
+      description: Retrieves a prescription record using its unique ID
+      parameters:
+      - description: Prescription ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Prescription details
+          schema:
+            properties:
+              dosage:
+                type: string
+              end_date:
+                type: string
+              id:
+                type: string
+              medication:
+                type: string
+              pet_id:
+                type: string
+              start_date:
+                type: string
+            type: object
+        "400":
+          description: ID is required
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "404":
+          description: Prescription not found
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get prescription by ID
+      tags:
+      - Prescriptions
+  /prescriptions/pet/{pet_id}:
+    get:
+      description: Retrieves a list of prescription records for a specific pet ID
+      parameters:
+      - description: Pet ID
+        in: path
+        name: pet_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of prescriptions
+          schema:
+            items:
+              properties:
+                dosage:
+                  type: string
+                end_date:
+                  type: string
+                id:
+                  type: string
+                medication:
+                  type: string
+                pet_id:
+                  type: string
+                start_date:
+                  type: string
+              type: object
+            type: array
+        "400":
+          description: Pet ID is required
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: List prescriptions by pet
+      tags:
+      - Prescriptions
+  /products:
+    get:
+      description: Retrieves a list of all products (foods, accessories, medicines)
+        with their details
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of all products
+          schema:
+            items:
+              properties:
+                description:
+                  type: string
+                id:
+                  type: integer
+                imgurl:
+                  type: string
+                is_attachable:
+                  type: boolean
+                name:
+                  type: string
+                price:
+                  type: number
+                product_type:
+                  type: string
+              type: object
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: List all products
+      tags:
+      - Products
+  /products/accessories:
+    get:
+      description: Retrieves a list of all accessory product records
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of accessories
+          schema:
+            items:
+              properties:
+                description:
+                  type: string
+                id:
+                  type: integer
+                imgurl:
+                  type: string
+                is_attachable:
+                  type: boolean
+                name:
+                  type: string
+                price:
+                  type: number
+              type: object
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: List all accessories
+      tags:
+      - Accessories
+    post:
+      consumes:
+      - application/json
+      description: Creates a new accessory product with details like name, description,
+        and price
+      parameters:
+      - description: Accessory details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            description:
+              type: string
+            name:
+              type: string
+            price:
+              type: number
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Accessory created successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request or missing required fields
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Create a new accessory
+      tags:
+      - Accessories
+    put:
+      consumes:
+      - application/json
+      description: Updates an accessory product with details like ID, name, description,
+        and price
+      parameters:
+      - description: Updated accessory details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            description:
+              type: string
+            id:
+              type: integer
+            name:
+              type: string
+            price:
+              type: number
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Accessory updated successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request, ID or name missing, or price must be positive
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Update an accessory
+      tags:
+      - Accessories
+  /products/accessories/{id}:
+    delete:
+      description: Deletes an accessory product by its unique ID
+      parameters:
+      - description: Accessory ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Accessory deleted successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: ID is required or invalid ID format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Delete an accessory
+      tags:
+      - Accessories
+    get:
+      description: Retrieves an accessory product record using its unique ID
+      parameters:
+      - description: Accessory ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Accessory details
+          schema:
+            properties:
+              description:
+                type: string
+              id:
+                type: integer
+              imgurl:
+                type: string
+              is_attachable:
+                type: boolean
+              name:
+                type: string
+              price:
+                type: number
+            type: object
+        "400":
+          description: ID is required or invalid ID format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "404":
+          description: Accessory not found
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get accessory by ID
+      tags:
+      - Accessories
+  /products/foods:
+    get:
+      description: Retrieves a list of all food product records
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of foods
+          schema:
+            items:
+              properties:
+                description:
+                  type: string
+                id:
+                  type: integer
+                imgurl:
+                  type: string
+                is_attachable:
+                  type: boolean
+                name:
+                  type: string
+                price:
+                  type: number
+              type: object
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: List all foods
+      tags:
+      - Foods
+    post:
+      consumes:
+      - application/json
+      description: Creates a new food product with details like name, description,
+        and price
+      parameters:
+      - description: Food details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            description:
+              type: string
+            name:
+              type: string
+            price:
+              type: number
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Food created successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request or missing required fields
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Create a new food
+      tags:
+      - Foods
+    put:
+      consumes:
+      - application/json
+      description: Updates a food product with details like ID, name, description,
+        and price
+      parameters:
+      - description: Updated food details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            description:
+              type: string
+            id:
+              type: integer
+            name:
+              type: string
+            price:
+              type: number
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Food updated successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request, ID or name missing, or price must be positive
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Update a food
+      tags:
+      - Foods
+  /products/foods/{id}:
+    delete:
+      description: Deletes a food product by its unique ID
+      parameters:
+      - description: Food ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Food deleted successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: ID is required or invalid ID format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Delete a food
+      tags:
+      - Foods
+    get:
+      description: Retrieves a food product record using its unique ID
+      parameters:
+      - description: Food ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Food details
+          schema:
+            properties:
+              description:
+                type: string
+              id:
+                type: integer
+              imgurl:
+                type: string
+              is_attachable:
+                type: boolean
+              name:
+                type: string
+              price:
+                type: number
+            type: object
+        "400":
+          description: ID is required or invalid ID format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "404":
+          description: Food not found
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get food by ID
+      tags:
+      - Foods
+  /products/is_attachable:
+    get:
+      description: Retrieves a list of all products marked as attachable
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of attachable products
+          schema:
+            items:
+              properties:
+                description:
+                  type: string
+                id:
+                  type: integer
+                imgurl:
+                  type: string
+                is_attachable:
+                  type: boolean
+                name:
+                  type: string
+                price:
+                  type: number
+              type: object
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: List attachable products
+      tags:
+      - Products
+  /products/medicines:
+    get:
+      description: Retrieves a list of all medicine product records
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of medicines
+          schema:
+            items:
+              properties:
+                description:
+                  type: string
+                id:
+                  type: integer
+                imgurl:
+                  type: string
+                is_attachable:
+                  type: boolean
+                name:
+                  type: string
+                price:
+                  type: number
+              type: object
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: List all medicines
+      tags:
+      - Medicines
+    post:
+      consumes:
+      - application/json
+      description: Creates a new medicine product with details like name, description,
+        and price
+      parameters:
+      - description: Medicine details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            description:
+              type: string
+            name:
+              type: string
+            price:
+              type: number
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Medicine created successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request or missing required fields
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Create a new medicine
+      tags:
+      - Medicines
+    put:
+      consumes:
+      - application/json
+      description: Updates a medicine product with details like ID, name, description,
+        and price
+      parameters:
+      - description: Updated medicine details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            description:
+              type: string
+            id:
+              type: integer
+            name:
+              type: string
+            price:
+              type: number
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Medicine updated successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request, ID or name missing, or price must be positive
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Update a medicine
+      tags:
+      - Medicines
+  /products/medicines/{id}:
+    delete:
+      description: Deletes a medicine product by its unique ID
+      parameters:
+      - description: Medicine ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Medicine deleted successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: ID is required or invalid ID format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Delete a medicine
+      tags:
+      - Medicines
+    get:
+      description: Retrieves a medicine product record using its unique ID
+      parameters:
+      - description: Medicine ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Medicine details
+          schema:
+            properties:
+              description:
+                type: string
+              id:
+                type: integer
+              imgurl:
+                type: string
+              is_attachable:
+                type: boolean
+              name:
+                type: string
+              price:
+                type: number
+            type: object
+        "400":
+          description: ID is required or invalid ID format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "404":
+          description: Medicine not found
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get medicine by ID
+      tags:
+      - Medicines
+  /services:
+    get:
+      description: Retrieves a list of all service records
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of services
+          schema:
+            items:
+              properties:
+                description:
+                  type: string
+                id:
+                  type: integer
+                imgurl:
+                  type: string
+                name:
+                  type: string
+                price:
+                  type: number
+              type: object
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: List all services
+      tags:
+      - Services
+    post:
+      consumes:
+      - application/json
+      description: Creates a new service with details like name, description, and
+        price
+      parameters:
+      - description: Service details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            description:
+              type: string
+            name:
+              type: string
+            price:
+              type: number
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Service created successfully
+          schema:
+            properties:
+              service_id:
+                type: integer
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Create a new service
+      tags:
+      - Services
+    put:
+      consumes:
+      - application/json
+      description: Updates a service with details like service ID, name, description,
+        and price
+      parameters:
+      - description: Updated service details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            description:
+              type: string
+            name:
+              type: string
+            price:
+              type: number
+            service_id:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Service updated successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request or invalid service_id format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Update a service
+      tags:
+      - Services
+  /services/{service_id}:
+    delete:
+      description: Deletes a service by its unique ID
+      parameters:
+      - description: Service ID
+        in: path
+        name: service_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Service deleted successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Service ID is required or invalid format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Delete a service
+      tags:
+      - Services
   /user/me:
     put:
       consumes:
@@ -521,4 +2991,250 @@ paths:
       summary: Change user password
       tags:
       - Users
+  /vaccinations:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new vaccination record for a pet with details like pet
+        ID, vaccine name, date, and vet ID
+      parameters:
+      - description: Vaccination details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            date:
+              type: string
+            pet_id:
+              type: string
+            vaccine_name:
+              type: string
+            vet_id:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Vaccination created successfully
+          schema:
+            properties:
+              id:
+                type: string
+            type: object
+        "400":
+          description: Invalid request, missing required fields, or invalid date format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Create a new vaccination
+      tags:
+      - Vaccinations
+    put:
+      consumes:
+      - application/json
+      description: Updates a vaccination record with details like pet ID, vaccine
+        name, date, and vet ID
+      parameters:
+      - description: Updated vaccination details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            date:
+              type: string
+            id:
+              type: string
+            pet_id:
+              type: string
+            vaccine_name:
+              type: string
+            vet_id:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Vaccination updated successfully
+          schema:
+            properties:
+              date:
+                type: string
+              id:
+                type: string
+              pet_id:
+                type: string
+              vaccine_name:
+                type: string
+              vet_id:
+                type: string
+            type: object
+        "400":
+          description: Invalid request, ID is required, or invalid date format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Update a vaccination
+      tags:
+      - Vaccinations
+  /vaccinations/{id}:
+    delete:
+      description: Deletes a vaccination record by its unique ID
+      parameters:
+      - description: Vaccination ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Vaccination deleted successfully
+          schema:
+            properties:
+              success:
+                type: boolean
+            type: object
+        "400":
+          description: ID is required
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Delete a vaccination
+      tags:
+      - Vaccinations
+    get:
+      description: Retrieves a vaccination record using its unique ID
+      parameters:
+      - description: Vaccination ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Vaccination details
+          schema:
+            properties:
+              date:
+                type: string
+              id:
+                type: string
+              pet_id:
+                type: string
+              vaccine_name:
+                type: string
+              vet_id:
+                type: string
+            type: object
+        "400":
+          description: ID is required
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "404":
+          description: Vaccination not found
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get vaccination by ID
+      tags:
+      - Vaccinations
+  /vaccinations/pet/{pet_id}:
+    get:
+      description: Retrieves a list of vaccination records for a specific pet ID
+      parameters:
+      - description: Pet ID
+        in: path
+        name: pet_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of vaccinations
+          schema:
+            items:
+              properties:
+                date:
+                  type: string
+                id:
+                  type: string
+                pet_id:
+                  type: string
+                vaccine_name:
+                  type: string
+                vet_id:
+                  type: string
+              type: object
+            type: array
+        "400":
+          description: Pet ID is required
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: List vaccinations by pet
+      tags:
+      - Vaccinations
+schemes:
+- http
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

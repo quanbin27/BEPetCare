@@ -78,6 +78,7 @@ message BranchProduct {
   int32 product_id = 2;
   string product_type = 3; // "food", "accessory", "medicine"
   int32 stock_quantity = 4;
+  int32 reserved_quantity = 5;
 }
 
 /* ------------------- Requests & Responses ------------------- */
@@ -164,5 +165,6 @@ message UpdateBranchInventoryRequest {
   int32 product_id = 2;
   string product_type = 3;
   int32 stock_quantity = 4;
+  int32 reserved_quantity = 5;
 }
 message UpdateBranchInventoryResponse { string status = 1; }

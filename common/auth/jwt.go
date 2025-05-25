@@ -16,7 +16,7 @@ func CreateJWT(secret []byte, userID int32, seconds int64, roleId int32) (string
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id":   strconv.Itoa(int(userID)),
 		"expiredAt": time.Now().Add(expiration).Unix(),
-		"role":      roleId,
+		"role":      strconv.Itoa(int(roleId)),
 	})
 	tokenString, err := token.SignedString(secret)
 	if err != nil {
@@ -24,7 +24,7 @@ func CreateJWT(secret []byte, userID int32, seconds int64, roleId int32) (string
 	}
 	return tokenString, nil
 }
-func RoleMiddleware(allowedRoles ...string) echo.MiddlewareFunc {
+func RoleMiddleware(allowedRoles ...int) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			// Lấy token từ header hoặc query
@@ -46,9 +46,9 @@ func RoleMiddleware(allowedRoles ...string) echo.MiddlewareFunc {
 
 			// Lấy claims từ token
 			claims := token.Claims.(jwt.MapClaims)
-			role, ok := claims["role"].(string)
-			if !ok {
-				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "role not found in token"})
+			role, err := strconv.Atoi(claims["role"].(string))
+			if err != nil {
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid role"})
 			}
 
 			// Kiểm tra role có trong danh sách allowedRoles không

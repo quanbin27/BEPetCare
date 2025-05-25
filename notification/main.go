@@ -36,11 +36,11 @@ func initStorage(db *gorm.DB) {
 
 func startKafkaConsumer(service *Service, kafkaAddr string) {
 	reader := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:   []string{kafkaAddr},
-		Topic:     "order_topic",
-		Partition: 0,
-		MinBytes:  10e3,
-		MaxBytes:  10e6,
+		Brokers:  []string{kafkaAddr},
+		Topic:    "order_topic",
+		GroupID:  "notification-service",
+		MinBytes: 10e3,
+		MaxBytes: 10e6,
 	})
 	defer reader.Close()
 
@@ -58,7 +58,7 @@ func startKafkaConsumer(service *Service, kafkaAddr string) {
 			log.Printf("Error unmarshaling Kafka message: %v", err)
 			continue
 		}
-
+		log.Printf("Order received: %v", order)
 		_, err = service.SendOrderConfirmationEmail(context.Background(), order.Email, order.OrderID, order.Items)
 		if err != nil {
 			log.Printf("Failed to send order confirmation email: %v", err)

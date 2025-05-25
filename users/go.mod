@@ -4,7 +4,7 @@ go 1.22.5
 
 require (
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/quanbin27/commons v0.0.0-20250323102036-68ac144a6cf2
+	github.com/quanbin27/commons v0.0.0-20250520153201-468c1870654d
 	google.golang.org/grpc v1.71.0
 	google.golang.org/protobuf v1.36.5
 	gorm.io/driver/mysql v1.5.7

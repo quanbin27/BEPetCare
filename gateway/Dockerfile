@@ -2,6 +2,7 @@ FROM golang:1.22.5 AS builder
 
 WORKDIR /app/gateway
 COPY ./gateway/go.mod ./gateway/go.sum ./
+COPY ./gateway/docs ./docs
 RUN go mod download
 COPY ./gateway/*.go ./
 COPY ./gateway/handlers ./handlers

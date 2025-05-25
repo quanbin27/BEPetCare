@@ -49,8 +49,17 @@ func (h *RecordsHandler) RegisterRoutes(e *echo.Group) {
 	e.GET("/prescriptions/pet/:pet_id", h.ListPrescriptions)
 }
 
-// --- Pet Methods ---
-
+// CreatePet creates a new pet record
+// @Summary Create a new pet
+// @Description Creates a new pet record with details like name, species, age, owner ID, etc.
+// @Tags Pets
+// @Accept json
+// @Produce json
+// @Param request body object{name=string,species=string,age=integer,owner_id=string,color=string,weight=number,size=string} true "Pet details"
+// @Success 200 {object} object{id=string} "Pet created successfully"
+// @Failure 400 {object} object{error=string} "Invalid request or missing fields"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /pets [post]
 func (h *RecordsHandler) CreatePet(c echo.Context) error {
 	var req struct {
 		Name    string  `json:"name"`
@@ -93,6 +102,17 @@ func (h *RecordsHandler) CreatePet(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"id": resp.Id})
 }
 
+// GetPet retrieves a pet record by ID
+// @Summary Get pet by ID
+// @Description Retrieves a pet record using its unique ID
+// @Tags Pets
+// @Produce json
+// @Param id path string true "Pet ID"
+// @Success 200 {object} object{id=string,name=string,species=string,age=integer,owner_id=string,color=string,weight=number,size=string} "Pet details"
+// @Failure 400 {object} object{error=string} "ID is required"
+// @Failure 404 {object} object{error=string} "Pet not found"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /pets/{id} [get]
 func (h *RecordsHandler) GetPet(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -116,6 +136,17 @@ func (h *RecordsHandler) GetPet(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp.Pet)
 }
 
+// UpdatePet updates an existing pet record
+// @Summary Update a pet
+// @Description Updates a pet record with details like name, species, age, owner ID, etc.
+// @Tags Pets
+// @Accept json
+// @Produce json
+// @Param request body object{id=string,name=string,species=string,age=integer,owner_id=string,color=string,weight=number,size=string} true "Updated pet details"
+// @Success 200 {object} object{id=string,name=string,species=string,age=integer,owner_id=string,color=string,weight=number,size=string} "Pet updated successfully"
+// @Failure 400 {object} object{error=string} "Invalid request or ID is required"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /pets [put]
 func (h *RecordsHandler) UpdatePet(c echo.Context) error {
 	var req struct {
 		ID      string  `json:"id"`
@@ -159,6 +190,16 @@ func (h *RecordsHandler) UpdatePet(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp.Pet)
 }
 
+// DeletePet deletes a pet record
+// @Summary Delete a pet
+// @Description Deletes a pet record by its unique ID
+// @Tags Pets
+// @Produce json
+// @Param id path string true "Pet ID"
+// @Success 200 {object} object{success=boolean} "Pet deleted successfully"
+// @Failure 400 {object} object{error=string} "ID is required"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /pets/{id} [delete]
 func (h *RecordsHandler) DeletePet(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -180,6 +221,16 @@ func (h *RecordsHandler) DeletePet(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]bool{"success": resp.Success})
 }
 
+// ListPets lists all pets for a given owner
+// @Summary List pets by owner
+// @Description Retrieves a list of pet records for a specific owner ID
+// @Tags Pets
+// @Produce json
+// @Param owner_id path string true "Owner ID"
+// @Success 200 {array} object{id=string,name=string,species=string,age=integer,owner_id=string,color=string,weight=number,size=string} "List of pets"
+// @Failure 400 {object} object{error=string} "Owner ID is required"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /pets/owner/{owner_id} [get]
 func (h *RecordsHandler) ListPets(c echo.Context) error {
 	ownerID := c.Param("owner_id")
 	if ownerID == "" {
@@ -202,7 +253,17 @@ func (h *RecordsHandler) ListPets(c echo.Context) error {
 }
 
 // --- Examination Methods ---
-
+// CreateExamination creates a new examination record
+// @Summary Create a new examination
+// @Description Creates a new examination record for a pet with details like pet ID, date, vet ID, diagnosis, and notes
+// @Tags Examinations
+// @Accept json
+// @Produce json
+// @Param request body object{pet_id=string,date=string,vet_id=string,diagnosis=string,notes=string} true "Examination details"
+// @Success 200 {object} object{id=string} "Examination created successfully"
+// @Failure 400 {object} object{error=string} "Invalid request, missing required fields, or invalid date format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /examinations [post]
 func (h *RecordsHandler) CreateExamination(c echo.Context) error {
 	var req struct {
 		PetID     string `json:"pet_id"`
@@ -248,6 +309,17 @@ func (h *RecordsHandler) CreateExamination(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"id": resp.Id})
 }
 
+// GetExamination retrieves an examination record by ID
+// @Summary Get examination by ID
+// @Description Retrieves an examination record using its unique ID
+// @Tags Examinations
+// @Produce json
+// @Param id path string true "Examination ID"
+// @Success 200 {object} object{id=string,pet_id=string,date=string,vet_id=string,diagnosis=string,notes=string} "Examination details"
+// @Failure 400 {object} object{error=string} "ID is required"
+// @Failure 404 {object} object{error=string} "Examination not found"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /examinations/{id} [get]
 func (h *RecordsHandler) GetExamination(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -271,6 +343,17 @@ func (h *RecordsHandler) GetExamination(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp.Examination)
 }
 
+// UpdateExamination updates an existing examination record
+// @Summary Update an examination
+// @Description Updates an examination record with details like pet ID, date, vet ID, diagnosis, and notes
+// @Tags Examinations
+// @Accept json
+// @Produce json
+// @Param request body object{id=string,pet_id=string,date=string,vet_id=string,diagnosis=string,notes=string} true "Updated examination details"
+// @Success 200 {object} object{id=string,pet_id=string,date=string,vet_id=string,diagnosis=string,notes=string} "Examination updated successfully"
+// @Failure 400 {object} object{error=string} "Invalid request, ID is required, or invalid date format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /examinations [put]
 func (h *RecordsHandler) UpdateExamination(c echo.Context) error {
 	var req struct {
 		ID        string `json:"id"`
@@ -318,6 +401,16 @@ func (h *RecordsHandler) UpdateExamination(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp.Examination)
 }
 
+// DeleteExamination deletes an examination record
+// @Summary Delete an examination
+// @Description Deletes an examination record by its unique ID
+// @Tags Examinations
+// @Produce json
+// @Param id path string true "Examination ID"
+// @Success 200 {object} object{success=boolean} "Examination deleted successfully"
+// @Failure 400 {object} object{error=string} "ID is required"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /examinations/{id} [delete]
 func (h *RecordsHandler) DeleteExamination(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -339,6 +432,16 @@ func (h *RecordsHandler) DeleteExamination(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]bool{"success": resp.Success})
 }
 
+// ListExaminations lists all examinations for a given pet
+// @Summary List examinations by pet
+// @Description Retrieves a list of examination records for a specific pet ID
+// @Tags Examinations
+// @Produce json
+// @Param pet_id path string true "Pet ID"
+// @Success 200 {array} object{id=string,pet_id=string,date=string,vet_id=string,diagnosis=string,notes=string} "List of examinations"
+// @Failure 400 {object} object{error=string} "Pet ID is required"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /examinations/pet/{pet_id} [get]
 func (h *RecordsHandler) ListExaminations(c echo.Context) error {
 	petID := c.Param("pet_id")
 	if petID == "" {
@@ -361,7 +464,17 @@ func (h *RecordsHandler) ListExaminations(c echo.Context) error {
 }
 
 // --- Vaccination Methods ---
-
+// CreateVaccination creates a new vaccination record
+// @Summary Create a new vaccination
+// @Description Creates a new vaccination record for a pet with details like pet ID, vaccine name, date, and vet ID
+// @Tags Vaccinations
+// @Accept json
+// @Produce json
+// @Param request body object{pet_id=string,vaccine_name=string,date=string,vet_id=string} true "Vaccination details"
+// @Success 200 {object} object{id=string} "Vaccination created successfully"
+// @Failure 400 {object} object{error=string} "Invalid request, missing required fields, or invalid date format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /vaccinations [post]
 func (h *RecordsHandler) CreateVaccination(c echo.Context) error {
 	var req struct {
 		PetID       string `json:"pet_id"`
@@ -405,6 +518,17 @@ func (h *RecordsHandler) CreateVaccination(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"id": resp.Id})
 }
 
+// GetVaccination retrieves a vaccination record by ID
+// @Summary Get vaccination by ID
+// @Description Retrieves a vaccination record using its unique ID
+// @Tags Vaccinations
+// @Produce json
+// @Param id path string true "Vaccination ID"
+// @Success 200 {object} object{id=string,pet_id=string,vaccine_name=string,date=string,vet_id=string} "Vaccination details"
+// @Failure 400 {object} object{error=string} "ID is required"
+// @Failure 404 {object} object{error=string} "Vaccination not found"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /vaccinations/{id} [get]
 func (h *RecordsHandler) GetVaccination(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -428,6 +552,17 @@ func (h *RecordsHandler) GetVaccination(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp.Vaccination)
 }
 
+// UpdateVaccination updates an existing vaccination record
+// @Summary Update a vaccination
+// @Description Updates a vaccination record with details like pet ID, vaccine name, date, and vet ID
+// @Tags Vaccinations
+// @Accept json
+// @Produce json
+// @Param request body object{id=string,pet_id=string,vaccine_name=string,date=string,vet_id=string} true "Updated vaccination details"
+// @Success 200 {object} object{id=string,pet_id=string,vaccine_name=string,date=string,vet_id=string} "Vaccination updated successfully"
+// @Failure 400 {object} object{error=string} "Invalid request, ID is required, or invalid date format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /vaccinations [put]
 func (h *RecordsHandler) UpdateVaccination(c echo.Context) error {
 	var req struct {
 		ID          string `json:"id"`
@@ -473,6 +608,16 @@ func (h *RecordsHandler) UpdateVaccination(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp.Vaccination)
 }
 
+// DeleteVaccination deletes a vaccination record
+// @Summary Delete a vaccination
+// @Description Deletes a vaccination record by its unique ID
+// @Tags Vaccinations
+// @Produce json
+// @Param id path string true "Vaccination ID"
+// @Success 200 {object} object{success=boolean} "Vaccination deleted successfully"
+// @Failure 400 {object} object{error=string} "ID is required"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /vaccinations/{id} [delete]
 func (h *RecordsHandler) DeleteVaccination(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -494,6 +639,16 @@ func (h *RecordsHandler) DeleteVaccination(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]bool{"success": resp.Success})
 }
 
+// ListVaccinations lists all vaccinations for a given pet
+// @Summary List vaccinations by pet
+// @Description Retrieves a list of vaccination records for a specific pet ID
+// @Tags Vaccinations
+// @Produce json
+// @Param pet_id path string true "Pet ID"
+// @Success 200 {array} object{id=string,pet_id=string,vaccine_name=string,date=string,vet_id=string} "List of vaccinations"
+// @Failure 400 {object} object{error=string} "Pet ID is required"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /vaccinations/pet/{pet_id} [get]
 func (h *RecordsHandler) ListVaccinations(c echo.Context) error {
 	petID := c.Param("pet_id")
 	if petID == "" {
@@ -516,7 +671,17 @@ func (h *RecordsHandler) ListVaccinations(c echo.Context) error {
 }
 
 // --- Prescription Methods ---
-
+// CreatePrescription creates a new prescription record
+// @Summary Create a new prescription
+// @Description Creates a new prescription record for a pet with details like pet ID, medication, dosage, start date, and end date
+// @Tags Prescriptions
+// @Accept json
+// @Produce json
+// @Param request body object{pet_id=string,medication=string,dosage=string,start_date=string,end_date=string} true "Prescription details"
+// @Success 200 {object} object{id=string} "Prescription created successfully"
+// @Failure 400 {object} object{error=string} "Invalid request, missing required fields, or invalid date format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /prescriptions [post]
 func (h *RecordsHandler) CreatePrescription(c echo.Context) error {
 	var req struct {
 		PetID      string `json:"pet_id"`
@@ -566,6 +731,17 @@ func (h *RecordsHandler) CreatePrescription(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"id": resp.Id})
 }
 
+// GetPrescription retrieves a prescription record by ID
+// @Summary Get prescription by ID
+// @Description Retrieves a prescription record using its unique ID
+// @Tags Prescriptions
+// @Produce json
+// @Param id path string true "Prescription ID"
+// @Success 200 {object} object{id=string,pet_id=string,medication=string,dosage=string,start_date=string,end_date=string} "Prescription details"
+// @Failure 400 {object} object{error=string} "ID is required"
+// @Failure 404 {object} object{error=string} "Prescription not found"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /prescriptions/{id} [get]
 func (h *RecordsHandler) GetPrescription(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -589,6 +765,17 @@ func (h *RecordsHandler) GetPrescription(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp.Prescription)
 }
 
+// UpdatePrescription updates an existing prescription record
+// @Summary Update a prescription
+// @Description Updates a prescription record with details like pet ID, medication, dosage, start date, and end date
+// @Tags Prescriptions
+// @Accept json
+// @Produce json
+// @Param request body object{id=string,pet_id=string,medication=string,dosage=string,start_date=string,end_date=string} true "Updated prescription details"
+// @Success 200 {object} object{id=string,pet_id=string,medication=string,dosage=string,start_date=string,end_date=string} "Prescription updated successfully"
+// @Failure 400 {object} object{error=string} "Invalid request, ID is required, or invalid date format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /prescriptions [put]
 func (h *RecordsHandler) UpdatePrescription(c echo.Context) error {
 	var req struct {
 		ID         string `json:"id"`
@@ -642,6 +829,16 @@ func (h *RecordsHandler) UpdatePrescription(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp.Prescription)
 }
 
+// DeletePrescription deletes a prescription record
+// @Summary Delete a prescription
+// @Description Deletes a prescription record by its unique ID
+// @Tags Prescriptions
+// @Produce json
+// @Param id path string true "Prescription ID"
+// @Success 200 {object} object{success=boolean} "Prescription deleted successfully"
+// @Failure 400 {object} object{error=string} "ID is required"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /prescriptions/{id} [delete]
 func (h *RecordsHandler) DeletePrescription(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -663,6 +860,16 @@ func (h *RecordsHandler) DeletePrescription(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]bool{"success": resp.Success})
 }
 
+// ListPrescriptions lists all prescriptions for a given pet
+// @Summary List prescriptions by pet
+// @Description Retrieves a list of prescription records for a specific pet ID
+// @Tags Prescriptions
+// @Produce json
+// @Param pet_id path string true "Pet ID"
+// @Success 200 {array} object{id=string,pet_id=string,medication=string,dosage=string,start_date=string,end_date=string} "List of prescriptions"
+// @Failure 400 {object} object{error=string} "Pet ID is required"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /prescriptions/pet/{pet_id} [get]
 func (h *RecordsHandler) ListPrescriptions(c echo.Context) error {
 	petID := c.Param("pet_id")
 	if petID == "" {

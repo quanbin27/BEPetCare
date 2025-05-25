@@ -42,6 +42,19 @@ func (h *AppointmentHandler) RegisterRoutes(e *echo.Group) {
 // --- Lịch hẹn ---
 
 // CreateAppointment xử lý yêu cầu tạo lịch hẹn
+// CreateAppointment creates a new appointment
+// @Summary Create a new appointment
+// @Description Creates a new appointment with details like customer ID, address, scheduled time, services, note, and branch ID
+// @Tags Appointments
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body object{customer_id=integer,customer_address=string,scheduled_time=string,services=array{service_id=integer,quantity=integer},note=string,branch_id=integer} true "Appointment details"
+// @Success 200 {object} object{appointment_id=integer,status=string} "Appointment created successfully"
+// @Failure 400 {object} object{error=string} "Invalid request or invalid scheduled_time format (must be RFC3339)"
+// @Failure 401 {object} object{error=string} "Unauthorized"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /appointments [post]
 func (h *AppointmentHandler) CreateAppointment(c echo.Context) error {
 	type ServiceItemReq struct {
 		ServiceId int32 `json:"service_id"`
@@ -97,7 +110,16 @@ func (h *AppointmentHandler) CreateAppointment(c echo.Context) error {
 	})
 }
 
-// GetAppointmentsByCustomer xử lý yêu cầu lấy danh sách lịch hẹn theo customer_id
+// GetAppointmentsByCustomer retrieves appointments by customer ID
+// @Summary Get appointments by customer
+// @Description Retrieves a list of appointment records for a specific customer ID
+// @Tags Appointments
+// @Produce json
+// @Param customer_id path int true "Customer ID"
+// @Success 200 {array} object{id=integer,customer_id=integer,employee_id=integer,branch_id=integer,scheduled_time=string,status=string,note=string,customer_address=string} "List of appointments"
+// @Failure 400 {object} object{error=string} "Customer ID is required or invalid format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /appointments/customer/{customer_id} [get]
 func (h *AppointmentHandler) GetAppointmentsByCustomer(c echo.Context) error {
 	customerIDStr := c.Param("customer_id")
 	if customerIDStr == "" {
@@ -132,7 +154,16 @@ func (h *AppointmentHandler) GetAppointmentsByCustomer(c echo.Context) error {
 
 }
 
-// GetAppointmentsByEmployee xử lý yêu cầu lấy danh sách lịch hẹn theo employee_id
+// GetAppointmentsByEmployee retrieves appointments by employee ID
+// @Summary Get appointments by employee
+// @Description Retrieves a list of appointment records for a specific employee ID
+// @Tags Appointments
+// @Produce json
+// @Param employee_id path int true "Employee ID"
+// @Success 200 {array} object{id=integer,customer_id=integer,employee_id=integer,branch_id=integer,scheduled_time=string,status=string,note=string,customer_address=string} "List of appointments"
+// @Failure 400 {object} object{error=string} "Employee ID is required or invalid format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /appointments/employee/{employee_id} [get]
 func (h *AppointmentHandler) GetAppointmentsByEmployee(c echo.Context) error {
 	employeeIDStr := c.Param("employee_id")
 	if employeeIDStr == "" {
@@ -167,7 +198,17 @@ func (h *AppointmentHandler) GetAppointmentsByEmployee(c echo.Context) error {
 
 }
 
-// UpdateAppointmentStatus xử lý yêu cầu cập nhật trạng thái lịch hẹn
+// UpdateAppointmentStatus updates the status of an appointment
+// @Summary Update appointment status
+// @Description Updates the status of an appointment for a specific appointment ID
+// @Tags Appointments
+// @Accept json
+// @Produce json
+// @Param request body object{appointment_id=string,status=string} true "Appointment status update details"
+// @Success 200 {object} object{status=string} "Appointment status updated successfully"
+// @Failure 400 {object} object{error=string} "Invalid request, invalid appointment_id format, or invalid status"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /appointments/update-status [put]
 func (h *AppointmentHandler) UpdateAppointmentStatus(c echo.Context) error {
 	var req struct {
 		AppointmentID string `json:"appointment_id"`
@@ -211,8 +252,17 @@ func (h *AppointmentHandler) UpdateAppointmentStatus(c echo.Context) error {
 	})
 }
 
-// GetAppointmentDetails xử lý yêu cầu lấy chi tiết lịch hẹn
-// GetAppointmentDetails xử lý yêu cầu lấy chi tiết lịch hẹn
+// GetAppointmentDetails retrieves appointment details by ID
+// @Summary Get appointment details
+// @Description Retrieves detailed information for a specific appointment ID, including associated order if available
+// @Tags Appointments
+// @Produce json
+// @Param appointment_id path int true "Appointment ID"
+// @Success 200 {object} object{appointment=object{id=integer,customer_id=integer,employee_id=integer,branch_id=integer,scheduled_time=string,status=string,note=string,customer_address=string},details=array{service_id=integer,quantity=integer},order=object} "Appointment details"
+// @Failure 400 {object} object{error=string} "Appointment ID is required or invalid format"
+// @Failure 404 {object} object{error=string} "Appointment not found"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /appointments/{appointment_id} [get]
 func (h *AppointmentHandler) GetAppointmentDetails(c echo.Context) error {
 	appointmentIDStr := c.Param("appointment_id")
 	if appointmentIDStr == "" {
@@ -268,7 +318,17 @@ func (h *AppointmentHandler) GetAppointmentDetails(c echo.Context) error {
 
 // --- Dịch vụ ---
 
-// CreateService xử lý yêu cầu tạo dịch vụ
+// CreateService creates a new service
+// @Summary Create a new service
+// @Description Creates a new service with details like name, description, and price
+// @Tags Services
+// @Accept json
+// @Produce json
+// @Param request body object{name=string,description=string,price=number} true "Service details"
+// @Success 200 {object} object{service_id=integer,status=string} "Service created successfully"
+// @Failure 400 {object} object{error=string} "Invalid request"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /services [post]
 func (h *AppointmentHandler) CreateService(c echo.Context) error {
 	var req struct {
 		Name        string  `json:"name"`
@@ -303,7 +363,14 @@ func (h *AppointmentHandler) CreateService(c echo.Context) error {
 	})
 }
 
-// GetServices xử lý yêu cầu lấy danh sách dịch vụ
+// GetServices retrieves all services
+// @Summary List all services
+// @Description Retrieves a list of all service records
+// @Tags Services
+// @Produce json
+// @Success 200 {array} object{id=integer,name=string,description=string,price=number,imgurl=string} "List of services"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /services [get]
 func (h *AppointmentHandler) GetServices(c echo.Context) error {
 	// Lấy context từ Echo request
 	ctx := c.Request().Context()
@@ -334,7 +401,17 @@ func (h *AppointmentHandler) GetServices(c echo.Context) error {
 	return c.JSON(http.StatusOK, services)
 }
 
-// UpdateService xử lý yêu cầu cập nhật dịch vụ
+// UpdateService updates an existing service
+// @Summary Update a service
+// @Description Updates a service with details like service ID, name, description, and price
+// @Tags Services
+// @Accept json
+// @Produce json
+// @Param request body object{service_id=string,name=string,description=string,price=number} true "Updated service details"
+// @Success 200 {object} object{status=string} "Service updated successfully"
+// @Failure 400 {object} object{error=string} "Invalid request or invalid service_id format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /services [put]
 func (h *AppointmentHandler) UpdateService(c echo.Context) error {
 	var req struct {
 		ServiceID   string  `json:"service_id"`
@@ -376,7 +453,16 @@ func (h *AppointmentHandler) UpdateService(c echo.Context) error {
 	})
 }
 
-// DeleteService xử lý yêu cầu xóa dịch vụ
+// DeleteService deletes a service
+// @Summary Delete a service
+// @Description Deletes a service by its unique ID
+// @Tags Services
+// @Produce json
+// @Param service_id path int true "Service ID"
+// @Success 200 {object} object{status=string} "Service deleted successfully"
+// @Failure 400 {object} object{error=string} "Service ID is required or invalid format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /services/{service_id} [delete]
 func (h *AppointmentHandler) DeleteService(c echo.Context) error {
 	serviceIDStr := c.Param("service_id")
 	if serviceIDStr == "" {

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"gopkg.in/gomail.v2"
 )
@@ -105,7 +106,8 @@ func (s *Service) SendResetPasswordEmail(ctx context.Context, email, token, base
 func (s *Service) SendOrderConfirmationEmail(ctx context.Context, email string, orderID int32, items []OrderItem) (string, error) {
 	body := fmt.Sprintf("Your order #%d has been placed successfully. Items:\n", orderID)
 	for _, item := range items {
-		body += fmt.Sprintf("- %s (Qty: %d, Price: %.2f)\n", item.ProductID, item.Quantity, item.UnitPrice)
+		log.Printf("ProductName: %q, Quantity: %d, UnitPrice: %f", item.ProductName, item.Quantity, item.UnitPrice)
+		body += fmt.Sprintf("- %s (Qty: %d, Price: %.2f)\n", item.ProductName, item.Quantity, item.UnitPrice)
 	}
 	notification := &EmailNotification{
 		Email:   email,

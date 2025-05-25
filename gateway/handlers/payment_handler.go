@@ -29,7 +29,17 @@ func (h *PaymentHandler) RegisterRoutes(e *echo.Group) {
 	e.PUT("/payments/update-amount", h.UpdatePaymentAmount)
 }
 
-// CreatePayment xử lý yêu cầu tạo thanh toán
+// CreatePayment creates a new payment
+// @Summary Create a new payment
+// @Description Creates a new payment record with details like order ID, appointment ID, amount, description, and payment method
+// @Tags Payments
+// @Accept json
+// @Produce json
+// @Param request body object{order_id=integer,appointment_id=integer,amount=number,description=string,method=string} true "Payment details"
+// @Success 200 {object} object{payment_id=integer} "Payment created successfully"
+// @Failure 400 {object} object{error=string} "Invalid request or invalid payment method"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /payments [post]
 func (h *PaymentHandler) CreatePayment(c echo.Context) error {
 	var req struct {
 		OrderID       int32   `json:"order_id"`
@@ -73,7 +83,17 @@ func (h *PaymentHandler) CreatePayment(c echo.Context) error {
 	})
 }
 
-// GetPaymentInfo xử lý yêu cầu lấy thông tin thanh toán
+// GetPaymentInfo retrieves payment information by ID
+// @Summary Get payment by ID
+// @Description Retrieves a payment record using its unique ID
+// @Tags Payments
+// @Produce json
+// @Param payment_id path int true "Payment ID"
+// @Success 200 {object} object{payment_id=integer,order_id=integer,appointment_id=integer,amount=number,description=string,method=string,status=string} "Payment details"
+// @Failure 400 {object} object{error=string} "Payment ID is required or invalid format"
+// @Failure 404 {object} object{error=string} "Payment not found"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /payments/{payment_id} [get]
 func (h *PaymentHandler) GetPaymentInfo(c echo.Context) error {
 	paymentIDStr := c.Param("payment_id")
 	if paymentIDStr == "" {
@@ -105,7 +125,17 @@ func (h *PaymentHandler) GetPaymentInfo(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
-// CreatePaymentURL xử lý yêu cầu tạo URL thanh toán
+// CreatePaymentURL creates a payment URL
+// @Summary Create a payment URL
+// @Description Creates a payment URL for a specific payment with details like payment ID, amount, and description
+// @Tags Payments
+// @Accept json
+// @Produce json
+// @Param request body object{payment_id=string,amount=number,description=string} true "Payment URL details"
+// @Success 200 {object} object{payment_link_id=string,checkout_url=string} "Payment URL created successfully"
+// @Failure 400 {object} object{error=string} "Invalid request or invalid payment_id format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /payments/url [post]
 func (h *PaymentHandler) CreatePaymentURL(c echo.Context) error {
 	var req struct {
 		PaymentID   string  `json:"payment_id"`
@@ -146,7 +176,17 @@ func (h *PaymentHandler) CreatePaymentURL(c echo.Context) error {
 	})
 }
 
-// CancelPaymentLink xử lý yêu cầu hủy link thanh toán
+// CancelPaymentLink cancels a payment link
+// @Summary Cancel a payment link
+// @Description Cancels a payment link for a specific payment ID with a cancellation reason
+// @Tags Payments
+// @Accept json
+// @Produce json
+// @Param request body object{payment_id=string,cancellation_reason=string} true "Cancellation details"
+// @Success 200 {object} object{status=string} "Payment link cancelled successfully"
+// @Failure 400 {object} object{error=string} "Invalid request or invalid payment_id format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /payments/cancel [post]
 func (h *PaymentHandler) CancelPaymentLink(c echo.Context) error {
 	var req struct {
 		PaymentID          string `json:"payment_id"`
@@ -184,7 +224,17 @@ func (h *PaymentHandler) CancelPaymentLink(c echo.Context) error {
 	})
 }
 
-// UpdatePaymentStatus xử lý yêu cầu cập nhật trạng thái thanh toán
+// UpdatePaymentStatus updates the status of a payment
+// @Summary Update payment status
+// @Description Updates the status of a payment record for a specific payment ID
+// @Tags Payments
+// @Accept json
+// @Produce json
+// @Param request body object{payment_id=string,status=string} true "Payment status update details"
+// @Success 200 {object} object{status=string} "Payment status updated successfully"
+// @Failure 400 {object} object{error=string} "Invalid request, invalid payment_id format, or invalid payment status"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /payments/update-status [put]
 func (h *PaymentHandler) UpdatePaymentStatus(c echo.Context) error {
 	var req struct {
 		PaymentID string `json:"payment_id"`
@@ -228,7 +278,17 @@ func (h *PaymentHandler) UpdatePaymentStatus(c echo.Context) error {
 	})
 }
 
-// UpdatePaymentMethod xử lý yêu cầu cập nhật phương thức thanh toán
+// UpdatePaymentMethod updates the payment method
+// @Summary Update payment method
+// @Description Updates the payment method for a specific payment ID
+// @Tags Payments
+// @Accept json
+// @Produce json
+// @Param request body object{payment_id=string,method=string} true "Payment method update details"
+// @Success 200 {object} object{status=string} "Payment method updated successfully"
+// @Failure 400 {object} object{error=string} "Invalid request, invalid payment_id format, or invalid payment method"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /payments/update-method [put]
 func (h *PaymentHandler) UpdatePaymentMethod(c echo.Context) error {
 	var req struct {
 		PaymentID string `json:"payment_id"`
@@ -272,7 +332,17 @@ func (h *PaymentHandler) UpdatePaymentMethod(c echo.Context) error {
 	})
 }
 
-// UpdatePaymentAmount xử lý yêu cầu cập nhật số tiền thanh toán
+// UpdatePaymentAmount updates the payment amount
+// @Summary Update payment amount
+// @Description Updates the amount for a specific payment ID
+// @Tags Payments
+// @Accept json
+// @Produce json
+// @Param request body object{payment_id=string,amount=number} true "Payment amount update details"
+// @Success 200 {object} object{status=string} "Payment amount updated successfully"
+// @Failure 400 {object} object{error=string} "Invalid request or invalid payment_id format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /payments/update-amount [put]
 func (h *PaymentHandler) UpdatePaymentAmount(c echo.Context) error {
 	var req struct {
 		PaymentID string  `json:"payment_id"`

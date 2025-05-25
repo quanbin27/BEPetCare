@@ -54,7 +54,17 @@ func (h *ProductHandler) RegisterRoutes(e *echo.Group) {
 }
 
 // --- Thực phẩm ---
-
+// GetFoodByID retrieves a food product by ID
+// @Summary Get food by ID
+// @Description Retrieves a food product record using its unique ID
+// @Tags Foods
+// @Produce json
+// @Param id path int true "Food ID"
+// @Success 200 {object} object{id=int32,name=string,description=string,price=number,imgurl=string,is_attachable=boolean} "Food details"
+// @Failure 400 {object} object{error=string} "ID is required or invalid ID format"
+// @Failure 404 {object} object{error=string} "Food not found"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products/foods/{id} [get]
 func (h *ProductHandler) GetFoodByID(c echo.Context) error {
 	idStr := c.Param("id")
 	if idStr == "" {
@@ -83,6 +93,14 @@ func (h *ProductHandler) GetFoodByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
+// ListFoods lists all food products
+// @Summary List all foods
+// @Description Retrieves a list of all food product records
+// @Tags Foods
+// @Produce json
+// @Success 200 {array} object{id=int32,name=string,description=string,price=number,imgurl=string,is_attachable=boolean} "List of foods"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products/foods [get]
 func (h *ProductHandler) ListFoods(c echo.Context) error {
 	ctx := c.Request().Context()
 	resp, err := h.client.ListFoods(ctx, &pb.ListFoodRequest{})
@@ -111,6 +129,17 @@ func (h *ProductHandler) ListFoods(c echo.Context) error {
 	return c.JSON(http.StatusOK, foods)
 }
 
+// CreateFood creates a new food product
+// @Summary Create a new food
+// @Description Creates a new food product with details like name, description, and price
+// @Tags Foods
+// @Accept json
+// @Produce json
+// @Param request body object{name=string,description=string,price=number} true "Food details"
+// @Success 200 {object} object{status=string} "Food created successfully"
+// @Failure 400 {object} object{error=string} "Invalid request or missing required fields"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products/foods [post]
 func (h *ProductHandler) CreateFood(c echo.Context) error {
 	var req struct {
 		Name        string  `json:"name"`
@@ -149,6 +178,17 @@ func (h *ProductHandler) CreateFood(c echo.Context) error {
 	})
 }
 
+// UpdateFood updates an existing food product
+// @Summary Update a food
+// @Description Updates a food product with details like ID, name, description, and price
+// @Tags Foods
+// @Accept json
+// @Produce json
+// @Param request body object{id=integer,name=string,description=string,price=number} true "Updated food details"
+// @Success 200 {object} object{status=string} "Food updated successfully"
+// @Failure 400 {object} object{error=string} "Invalid request, ID or name missing, or price must be positive"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products/foods [put]
 func (h *ProductHandler) UpdateFood(c echo.Context) error {
 	var req struct {
 		ID          int32   `json:"id"`
@@ -186,6 +226,16 @@ func (h *ProductHandler) UpdateFood(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"status": resp.Status})
 }
 
+// DeleteFood deletes a food product
+// @Summary Delete a food
+// @Description Deletes a food product by its unique ID
+// @Tags Foods
+// @Produce json
+// @Param id path int true "Food ID"
+// @Success 200 {object} object{status=string} "Food deleted successfully"
+// @Failure 400 {object} object{error=string} "ID is required or invalid ID format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products/foods/{id} [delete]
 func (h *ProductHandler) DeleteFood(c echo.Context) error {
 	idStr := c.Param("id")
 	if idStr == "" {
@@ -213,7 +263,17 @@ func (h *ProductHandler) DeleteFood(c echo.Context) error {
 }
 
 // --- Phụ kiện ---
-
+// GetAccessoryByID retrieves an accessory product by ID
+// @Summary Get accessory by ID
+// @Description Retrieves an accessory product record using its unique ID
+// @Tags Accessories
+// @Produce json
+// @Param id path int true "Accessory ID"
+// @Success 200 {object} object{id=int32,name=string,description=string,price=number,imgurl=string,is_attachable=boolean} "Accessory details"
+// @Failure 400 {object} object{error=string} "ID is required or invalid ID format"
+// @Failure 404 {object} object{error=string} "Accessory not found"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products/accessories/{id} [get]
 func (h *ProductHandler) GetAccessoryByID(c echo.Context) error {
 	idStr := c.Param("id")
 	if idStr == "" {
@@ -242,6 +302,14 @@ func (h *ProductHandler) GetAccessoryByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
+// ListAccessories lists all accessory products
+// @Summary List all accessories
+// @Description Retrieves a list of all accessory product records
+// @Tags Accessories
+// @Produce json
+// @Success 200 {array} object{id=int32,name=string,description=string,price=number,imgurl=string,is_attachable=boolean} "List of accessories"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products/accessories [get]
 func (h *ProductHandler) ListAccessories(c echo.Context) error {
 	ctx := c.Request().Context()
 	resp, err := h.client.ListAccessories(ctx, &pb.ListAccessoryRequest{})
@@ -270,6 +338,17 @@ func (h *ProductHandler) ListAccessories(c echo.Context) error {
 	return c.JSON(http.StatusOK, accessories)
 }
 
+// CreateAccessory creates a new accessory product
+// @Summary Create a new accessory
+// @Description Creates a new accessory product with details like name, description, and price
+// @Tags Accessories
+// @Accept json
+// @Produce json
+// @Param request body object{name=string,description=string,price=number} true "Accessory details"
+// @Success 200 {object} object{status=string} "Accessory created successfully"
+// @Failure 400 {object} object{error=string} "Invalid request or missing required fields"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products/accessories [post]
 func (h *ProductHandler) CreateAccessory(c echo.Context) error {
 	var req struct {
 		Name        string  `json:"name"`
@@ -303,6 +382,17 @@ func (h *ProductHandler) CreateAccessory(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"status": resp.Status})
 }
 
+// UpdateAccessory updates an existing accessory product
+// @Summary Update an accessory
+// @Description Updates an accessory product with details like ID, name, description, and price
+// @Tags Accessories
+// @Accept json
+// @Produce json
+// @Param request body object{id=integer,name=string,description=string,price=number} true "Updated accessory details"
+// @Success 200 {object} object{status=string} "Accessory updated successfully"
+// @Failure 400 {object} object{error=string} "Invalid request, ID or name missing, or price must be positive"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products/accessories [put]
 func (h *ProductHandler) UpdateAccessory(c echo.Context) error {
 	var req struct {
 		ID          int32   `json:"id"`
@@ -340,6 +430,16 @@ func (h *ProductHandler) UpdateAccessory(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"status": resp.Status})
 }
 
+// DeleteAccessory deletes an accessory product
+// @Summary Delete an accessory
+// @Description Deletes an accessory product by its unique ID
+// @Tags Accessories
+// @Produce json
+// @Param id path int true "Accessory ID"
+// @Success 200 {object} object{status=string} "Accessory deleted successfully"
+// @Failure 400 {object} object{error=string} "ID is required or invalid ID format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products/accessories/{id} [delete]
 func (h *ProductHandler) DeleteAccessory(c echo.Context) error {
 	idStr := c.Param("id")
 	if idStr == "" {
@@ -367,7 +467,17 @@ func (h *ProductHandler) DeleteAccessory(c echo.Context) error {
 }
 
 // --- Thuốc ---
-
+// GetMedicineByID retrieves a medicine product by ID
+// @Summary Get medicine by ID
+// @Description Retrieves a medicine product record using its unique ID
+// @Tags Medicines
+// @Produce json
+// @Param id path int true "Medicine ID"
+// @Success 200 {object} object{id=int32,name=string,description=string,price=number,imgurl=string,is_attachable=boolean} "Medicine details"
+// @Failure 400 {object} object{error=string} "ID is required or invalid ID format"
+// @Failure 404 {object} object{error=string} "Medicine not found"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products/medicines/{id} [get]
 func (h *ProductHandler) GetMedicineByID(c echo.Context) error {
 	idStr := c.Param("id")
 	if idStr == "" {
@@ -396,6 +506,14 @@ func (h *ProductHandler) GetMedicineByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
+// ListMedicines lists all medicine products
+// @Summary List all medicines
+// @Description Retrieves a list of all medicine product records
+// @Tags Medicines
+// @Produce json
+// @Success 200 {array} object{id=int32,name=string,description=string,price=number,imgurl=string,is_attachable=boolean} "List of medicines"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products/medicines [get]
 func (h *ProductHandler) ListMedicines(c echo.Context) error {
 	ctx := c.Request().Context()
 	resp, err := h.client.ListMedicines(ctx, &pb.ListMedicineRequest{})
@@ -424,6 +542,17 @@ func (h *ProductHandler) ListMedicines(c echo.Context) error {
 	return c.JSON(http.StatusOK, medicines)
 }
 
+// CreateMedicine creates a new medicine product
+// @Summary Create a new medicine
+// @Description Creates a new medicine product with details like name, description, and price
+// @Tags Medicines
+// @Accept json
+// @Produce json
+// @Param request body object{name=string,description=string,price=number} true "Medicine details"
+// @Success 200 {object} object{status=string} "Medicine created successfully"
+// @Failure 400 {object} object{error=string} "Invalid request or missing required fields"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products/medicines [post]
 func (h *ProductHandler) CreateMedicine(c echo.Context) error {
 	var req struct {
 		Name        string  `json:"name"`
@@ -457,6 +586,17 @@ func (h *ProductHandler) CreateMedicine(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"status": resp.Status})
 }
 
+// UpdateMedicine updates an existing medicine product
+// @Summary Update a medicine
+// @Description Updates a medicine product with details like ID, name, description, and price
+// @Tags Medicines
+// @Accept json
+// @Produce json
+// @Param request body object{id=integer,name=string,description=string,price=number} true "Updated medicine details"
+// @Success 200 {object} object{status=string} "Medicine updated successfully"
+// @Failure 400 {object} object{error=string} "Invalid request, ID or name missing, or price must be positive"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products/medicines [put]
 func (h *ProductHandler) UpdateMedicine(c echo.Context) error {
 	var req struct {
 		ID          int32   `json:"id"`
@@ -494,6 +634,16 @@ func (h *ProductHandler) UpdateMedicine(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"status": resp.Status})
 }
 
+// DeleteMedicine deletes a medicine product
+// @Summary Delete a medicine
+// @Description Deletes a medicine product by its unique ID
+// @Tags Medicines
+// @Produce json
+// @Param id path int true "Medicine ID"
+// @Success 200 {object} object{status=string} "Medicine deleted successfully"
+// @Failure 400 {object} object{error=string} "ID is required or invalid ID format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products/medicines/{id} [delete]
 func (h *ProductHandler) DeleteMedicine(c echo.Context) error {
 	idStr := c.Param("id")
 	if idStr == "" {
@@ -521,7 +671,17 @@ func (h *ProductHandler) DeleteMedicine(c echo.Context) error {
 }
 
 // --- Chi nhánh ---
-
+// GetBranchByID retrieves a branch by ID
+// @Summary Get branch by ID
+// @Description Retrieves a branch record using its unique ID
+// @Tags Branches
+// @Produce json
+// @Param id path int true "Branch ID"
+// @Success 200 {object} object{id=int32,name=string,description=string,location=string} "Branch details"
+// @Failure 400 {object} object{error=string} "ID is required or invalid ID format"
+// @Failure 404 {object} object{error=string} "Branch not found"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /branches/{id} [get]
 func (h *ProductHandler) GetBranchByID(c echo.Context) error {
 	idStr := c.Param("id")
 	if idStr == "" {
@@ -550,6 +710,14 @@ func (h *ProductHandler) GetBranchByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
+// ListBranches lists all branches
+// @Summary List all branches
+// @Description Retrieves a list of all branch records
+// @Tags Branches
+// @Produce json
+// @Success 200 {array} object{id=int32,name=string,description=string,location=string} "List of branches"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /branches [get]
 func (h *ProductHandler) ListBranches(c echo.Context) error {
 	ctx := c.Request().Context()
 	resp, err := h.client.ListBranches(ctx, &pb.ListBranchRequest{})
@@ -567,7 +735,16 @@ func (h *ProductHandler) ListBranches(c echo.Context) error {
 }
 
 // --- Tồn kho ---
-
+// GetBranchInventory retrieves the inventory for a specific branch
+// @Summary Get branch inventory
+// @Description Retrieves the inventory details for a specific branch by its ID
+// @Tags Inventory
+// @Produce json
+// @Param branch_id path int true "Branch ID"
+// @Success 200 {array} object{product_id=int32,product_type=string,stock_quantity=int32} "Branch inventory details"
+// @Failure 400 {object} object{error=string} "Branch ID is required or invalid format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /branches/{branch_id}/inventory [get]
 func (h *ProductHandler) GetBranchInventory(c echo.Context) error {
 	branchIDStr := c.Param("branch_id")
 	if branchIDStr == "" {
@@ -594,6 +771,17 @@ func (h *ProductHandler) GetBranchInventory(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp.Inventory)
 }
 
+// UpdateBranchInventory updates the inventory for a branch
+// @Summary Update branch inventory
+// @Description Updates the inventory for a specific branch with details like branch ID, product ID, product type, and stock quantity
+// @Tags Inventory
+// @Accept json
+// @Produce json
+// @Param request body object{branch_id=integer,product_id=integer,product_type=string,stock_quantity=integer} true "Inventory update details"
+// @Success 200 {object} object{status=string} "Inventory updated successfully"
+// @Failure 400 {object} object{error=string} "Invalid request, missing required fields, or invalid product type"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /branches/inventory [put]
 func (h *ProductHandler) UpdateBranchInventory(c echo.Context) error {
 	var req struct {
 		BranchID      int32  `json:"branch_id"`
@@ -639,6 +827,15 @@ func (h *ProductHandler) UpdateBranchInventory(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]string{"status": resp.Status})
 }
+
+// ListAttachableProduct lists all attachable products
+// @Summary List attachable products
+// @Description Retrieves a list of all products marked as attachable
+// @Tags Products
+// @Produce json
+// @Success 200 {array} object{id=int32,name=string,description=string,price=number,imgurl=string,is_attachable=boolean} "List of attachable products"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products/is_attachable [get]
 func (h *ProductHandler) ListAttachableProduct(c echo.Context) error {
 	ctx := c.Request().Context()
 	resp, err := h.client.ListAttachableProducts(ctx, &pb.ListAttachableProductsRequest{})
@@ -654,6 +851,15 @@ func (h *ProductHandler) ListAttachableProduct(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, resp.Products)
 }
+
+// ListAllProduct lists all products across all categories
+// @Summary List all products
+// @Description Retrieves a list of all products (foods, accessories, medicines) with their details
+// @Tags Products
+// @Produce json
+// @Success 200 {array} object{id=int32,name=string,description=string,price=number,imgurl=string,product_type=string,is_attachable=boolean} "List of all products"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products [get]
 func (h *ProductHandler) ListAllProduct(c echo.Context) error {
 	ctx := c.Request().Context()
 	resp, err := h.client.ListAllProducts(ctx, &pb.ListAllProductsRequest{})

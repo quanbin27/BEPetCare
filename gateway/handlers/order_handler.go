@@ -7,18 +7,20 @@ import (
 
 	"github.com/labstack/echo/v4"
 	pb "github.com/quanbin27/commons/genproto/orders"
+	pbProduct "github.com/quanbin27/commons/genproto/products"
 	pbUser "github.com/quanbin27/commons/genproto/users"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type OrderHandler struct {
-	client     pb.OrderServiceClient
-	userClient pbUser.UserServiceClient
+	client        pb.OrderServiceClient
+	userClient    pbUser.UserServiceClient
+	productClient pbProduct.ProductServiceClient
 }
 
-func NewOrderHandler(client pb.OrderServiceClient, userClient pbUser.UserServiceClient) *OrderHandler {
-	return &OrderHandler{client: client, userClient: userClient}
+func NewOrderHandler(client pb.OrderServiceClient, userClient pbUser.UserServiceClient, productClient pbProduct.ProductServiceClient) *OrderHandler {
+	return &OrderHandler{client: client, userClient: userClient, productClient: productClient}
 }
 
 // RegisterRoutes đăng ký các route cho Orders service với tiền tố "/orders"

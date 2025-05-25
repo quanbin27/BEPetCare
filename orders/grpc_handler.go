@@ -3,34 +3,36 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"github.com/segmentio/kafka-go"
-	"log"
-	"strconv"
-	"sync"
-
 	pb "github.com/quanbin27/commons/genproto/orders"
+	"github.com/segmentio/kafka-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"log"
+	"strconv"
 )
 
 type OrderGrpcHandler struct {
 	orderService OrderService
 	pb.UnimplementedOrderServiceServer
-	kafkaConn *kafka.Conn
-	kafkaMu   sync.Mutex
+	kafkaWriter *kafka.Writer
 }
 
-func NewOrderGrpcHandler(grpc *grpc.Server, orderService OrderService, kafkaAddr string) {
-	conn, err := kafka.DialLeader(context.Background(), "tcp", kafkaAddr, "order_topic", 0)
-	if err != nil {
-		log.Fatalf("Failed to dial Kafka leader: %v", err)
+func NewOrderGrpcHandler(grpc *grpc.Server, orderService OrderService, kafkaAddr string) *OrderGrpcHandler {
+	writer := &kafka.Writer{
+		Addr:     kafka.TCP(kafkaAddr),
+		Topic:    "order_topic",
+		Balancer: &kafka.LeastBytes{}, // hoặc RoundRobin nếu bạn muốn chia đều
+		Async:    false,               // true nếu bạn chấp nhận gửi async
 	}
-	grpcHandler := &OrderGrpcHandler{
+
+	handler := &OrderGrpcHandler{
 		orderService: orderService,
-		kafkaConn:    conn,
+		kafkaWriter:  writer,
 	}
-	pb.RegisterOrderServiceServer(grpc, grpcHandler)
+
+	pb.RegisterOrderServiceServer(grpc, handler)
+	return handler
 }
 
 func (h *OrderGrpcHandler) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
@@ -50,10 +52,8 @@ func (h *OrderGrpcHandler) CreateOrder(ctx context.Context, req *pb.CreateOrderR
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
-	go func() {
-		h.kafkaMu.Lock()
-		defer h.kafkaMu.Unlock()
 
+	go func() {
 		orderData := map[string]interface{}{
 			"order_id":    orderID,
 			"customer_id": req.CustomerId,
@@ -62,31 +62,34 @@ func (h *OrderGrpcHandler) CreateOrder(ctx context.Context, req *pb.CreateOrderR
 			"status":      statusMsg,
 			"email":       req.Email,
 		}
+
 		orderJSON, err := json.Marshal(orderData)
 		if err != nil {
 			log.Printf("Failed to marshal order data: %v", err)
 			return
 		}
 
-		_, err = h.kafkaConn.WriteMessages(
-			kafka.Message{
-				Key:   []byte(strconv.FormatInt(int64(orderID), 10)),
-				Value: orderJSON,
-			},
-		)
-		if err != nil {
+		msg := kafka.Message{
+			Key:   []byte(strconv.FormatInt(int64(orderID), 10)),
+			Value: orderJSON,
+		}
+
+		if err := h.kafkaWriter.WriteMessages(context.Background(), msg); err != nil {
 			log.Printf("Failed to write message to Kafka: %v", err)
 		} else {
 			log.Printf("Order %d sent to Kafka", orderID)
 		}
 	}()
+
 	return &pb.CreateOrderResponse{OrderId: orderID, Status: statusMsg}, nil
 }
+
 func (h *OrderGrpcHandler) Close() {
-	if err := h.kafkaConn.Close(); err != nil {
-		log.Printf("Failed to close Kafka connection: %v", err)
+	if err := h.kafkaWriter.Close(); err != nil {
+		log.Printf("Failed to close Kafka writer: %v", err)
 	}
 }
+
 func (h *OrderGrpcHandler) GetOrder(ctx context.Context, req *pb.GetOrderRequest) (*pb.GetOrderResponse, error) {
 	order, err := h.orderService.GetOrder(ctx, req.OrderId)
 	if err != nil {

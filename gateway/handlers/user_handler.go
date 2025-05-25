@@ -33,8 +33,8 @@ func (h *UserHandler) RegisterRoutes(e *echo.Group) {
 	e.PUT("/users/me/password", h.ChangePassword, auth.WithJWTAuth())
 
 	// User Information Retrieval
-	e.GET("/users/:id", h.GetUserInfo, auth.RoleMiddleware("1", "2"))
-	e.GET("/users/email", h.GetUserInfoByEmail, auth.RoleMiddleware("1", "2"))
+	e.GET("/users/:id", h.GetUserInfo, auth.RoleMiddleware(1, 2, 3))
+	e.GET("/users/email", h.GetUserInfoByEmail, auth.RoleMiddleware(1, 2, 3))
 
 	e.GET("/hello-world", helloWorld)
 	e.Static("/swagger", "docs")

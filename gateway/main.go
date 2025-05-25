@@ -3,9 +3,9 @@ package main
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	//_ "github.com/quanbin27/BEPetCare-gateway/docs"
+	_ "github.com/quanbin27/BEPetCare-gateway/docs"
 	"github.com/quanbin27/BEPetCare-gateway/handlers"
-	config "github.com/quanbin27/commons/config"
+	"github.com/quanbin27/commons/config"
 	pbAppointments "github.com/quanbin27/commons/genproto/appointments"
 	pbOrders "github.com/quanbin27/commons/genproto/orders"
 	pbPayments "github.com/quanbin27/commons/genproto/payments"
@@ -18,6 +18,27 @@ import (
 	"log"
 )
 
+// @title BEPetCare Gateway API
+// @version 1.0
+// @description This is the API gateway for the BEPetCare system, providing access to user, order, product, payment, appointment, and pet record services.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8080
+// @BasePath /api/v1
+// @schemes http
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+
+// Gateway struct holds gRPC clients for various services
 type Gateway struct {
 	PetRecordClient    pbPetRecord.PetRecordServiceClient
 	UsersClient        pbUsers.UserServiceClient
@@ -94,7 +115,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to initialize gateway: %v", err)
 	}
-	orderHandler := handlers.NewOrderHandler(gateway.OrdersClient, gateway.UsersClient)
+	orderHandler := handlers.NewOrderHandler(gateway.OrdersClient, gateway.UsersClient, gateway.ProductsClient)
 	orderHandler.RegisterRoutes(subrouter)
 	userHandler := handlers.NewUserHandler(gateway.UsersClient)
 	userHandler.RegisterRoutes(subrouter)
