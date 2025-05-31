@@ -96,6 +96,13 @@ func (s *Store) GetAppointmentsByEmployee(ctx context.Context, employeeID int32)
 	return appointments, err
 }
 
+// Lấy lịch hẹn theo chi nhanh
+func (s *Store) GetAppointmentsByBranch(ctx context.Context, branchID int32) ([]Appointment, error) {
+	var appointments []Appointment
+	err := s.db.WithContext(ctx).Where("branch_id = ?", branchID).Find(&appointments).Error
+	return appointments, err
+}
+
 // Cập nhật trạng thái lịch hẹn
 func (s *Store) UpdateAppointmentStatus(ctx context.Context, appointmentID int32, status AppointmentStatus) error {
 	return s.db.WithContext(ctx).Model(&Appointment{}).

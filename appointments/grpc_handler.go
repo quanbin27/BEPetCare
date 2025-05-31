@@ -66,6 +66,17 @@ func (h *AppointmentGrpcHandler) GetAppointmentsByEmployee(ctx context.Context, 
 	}
 	return &pb.GetAppointmentsResponse{Appointments: pbAppointments}, nil
 }
+func (h *AppointmentGrpcHandler) GetAppointmentsByBranch(ctx context.Context, req *pb.GetAppointmentsByBranchRequest) (*pb.GetAppointmentsResponse, error) {
+	appointments, err := h.appointmentService.GetAppointmentsByEmployee(ctx, req.BranchId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	pbAppointments := make([]*pb.Appointment, len(appointments))
+	for i, a := range appointments {
+		pbAppointments[len(appointments)-1-i] = toProtoAppointment(&a)
+	}
+	return &pb.GetAppointmentsResponse{Appointments: pbAppointments}, nil
+}
 
 func (h *AppointmentGrpcHandler) UpdateAppointmentStatus(ctx context.Context, req *pb.UpdateAppointmentStatusRequest) (*pb.UpdateAppointmentStatusResponse, error) {
 	statusMsg, err := h.appointmentService.UpdateAppointmentStatus(ctx, req.AppointmentId, fromPbAppointmentStatus(req.Status))

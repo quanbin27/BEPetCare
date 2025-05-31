@@ -64,7 +64,7 @@ type AppointmentStore interface {
 	GetAppointmentsByEmployee(ctx context.Context, employeeID int32) ([]Appointment, error)
 	UpdateAppointmentStatus(ctx context.Context, appointmentID int32, status AppointmentStatus) error
 	GetAppointmentDetails(ctx context.Context, appointmentID int32) (*Appointment, []AppointmentDetail, error)
-
+	GetAppointmentsByBranch(ctx context.Context, branchID int32) ([]Appointment, error)
 	// Dịch vụ
 	CreateService(ctx context.Context, service *Service) error
 	GetServices(ctx context.Context) ([]Service, error)
@@ -81,7 +81,7 @@ type AppointmentService interface {
 	GetAppointmentsByCustomer(ctx context.Context, customerID int32) ([]Appointment, error)
 	GetAppointmentsByEmployee(ctx context.Context, employeeID int32) ([]Appointment, error)
 	UpdateAppointmentStatus(ctx context.Context, appointmentID int32, status AppointmentStatus) (string, error)
-
+	GetAppointmentsByBranch(ctx context.Context, branchID int32) ([]Appointment, error)
 	// Updated to include service information
 	GetAppointmentDetails(ctx context.Context, appointmentID int32) (*Appointment, []AppointmentDetailWithService, error)
 

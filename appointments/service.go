@@ -65,6 +65,11 @@ func (s *AppService) GetAppointmentsByEmployee(ctx context.Context, employeeID i
 	return s.store.GetAppointmentsByEmployee(ctx, employeeID)
 }
 
+// Lấy lịch hẹn theo nhân viên
+func (s *AppService) GetAppointmentsByBranch(ctx context.Context, branchID int32) ([]Appointment, error) {
+	return s.store.GetAppointmentsByEmployee(ctx, branchID)
+}
+
 // Cập nhật trạng thái lịch hẹn
 func (s *AppService) UpdateAppointmentStatus(ctx context.Context, appointmentID int32, status AppointmentStatus) (string, error) {
 	if err := s.store.UpdateAppointmentStatus(ctx, appointmentID, status); err != nil {

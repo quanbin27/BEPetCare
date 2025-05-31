@@ -12,7 +12,7 @@ service AppointmentService {
   // Lấy danh sách lịch hẹn theo khách hàng hoặc nhân viên
   rpc GetAppointmentsByCustomer(GetAppointmentsByCustomerRequest) returns (GetAppointmentsResponse);
   rpc GetAppointmentsByEmployee(GetAppointmentsByEmployeeRequest) returns (GetAppointmentsResponse);
-
+  rpc GetAppointmentsByBranch(GetAppointmentsByBranchRequest) returns (GetAppointmentsResponse);
   // Cập nhật trạng thái lịch hẹn
   rpc UpdateAppointmentStatus(UpdateAppointmentStatusRequest) returns (UpdateAppointmentStatusResponse);
 
@@ -99,6 +99,9 @@ message GetAppointmentsByCustomerRequest {
 
 message GetAppointmentsByEmployeeRequest {
   int32 employee_id = 1;
+}
+message GetAppointmentsByBranchRequest {
+  int32 branch_id = 1;
 }
 
 message GetAppointmentsResponse {

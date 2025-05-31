@@ -28,6 +28,7 @@ func (h *AppointmentHandler) RegisterRoutes(e *echo.Group) {
 	// Routes cho lịch hẹn
 	e.POST("/appointments", h.CreateAppointment, auth.WithJWTAuth())
 	e.GET("/appointments/customer/:customer_id", h.GetAppointmentsByCustomer)
+	e.GET("/appointments/branch/:branch_id", h.GetAppointmentsByBranch)
 	e.GET("/appointments/employee/:employee_id", h.GetAppointmentsByEmployee)
 	e.PUT("/appointments/update-status", h.UpdateAppointmentStatus)
 	e.GET("/appointments/:appointment_id", h.GetAppointmentDetails)
@@ -180,6 +181,50 @@ func (h *AppointmentHandler) GetAppointmentsByEmployee(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	resp, err := h.client.GetAppointmentsByEmployee(ctx, &pb.GetAppointmentsByEmployeeRequest{EmployeeId: int32(employeeID)})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	responses := make([]AppointmentResponse, 0, len(resp.Appointments))
+	for _, pbApp := range resp.Appointments {
+		responses = append(responses, toAppointmentResponse(pbApp))
+	}
+
+	return c.JSON(http.StatusOK, responses)
+
+}
+
+// GetAppointmentsByBranch retrieves appointments by branch ID
+// @Summary Get appointments by branch
+// @Description Retrieves a list of appointment records for a specific branch ID
+// @Tags Appointments
+// @Produce json
+// @Param branch_id path int true "Branch ID"
+// @Success 200 {array} object{id=integer,customer_id=integer,employee_id=integer,branch_id=integer,scheduled_time=string,status=string,note=string,customer_address=string} "List of appointments"
+// @Failure 400 {object} object{error=string} "Branch ID is required or invalid format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /appointments/branch/{branch_id} [get]
+func (h *AppointmentHandler) GetAppointmentsByBranch(c echo.Context) error {
+	branchIDStr := c.Param("branch_id")
+	if branchIDStr == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "branchI ID is required"})
+	}
+
+	// Chuyển đổi branchIDStrtừ string sang int32
+	branchID, err := strconv.ParseInt(branchIDStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid branch_id format, must be an integer"})
+	}
+
+	// Lấy context từ Echo request
+	ctx := c.Request().Context()
+
+	resp, err := h.client.GetAppointmentsByBranch(ctx, &pb.GetAppointmentsByBranchRequest{BranchId: int32(branchID)})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
 			switch grpcErr.Code() {

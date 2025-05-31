@@ -22,6 +22,7 @@ const (
 	AppointmentService_CreateAppointment_FullMethodName         = "/appointments.AppointmentService/CreateAppointment"
 	AppointmentService_GetAppointmentsByCustomer_FullMethodName = "/appointments.AppointmentService/GetAppointmentsByCustomer"
 	AppointmentService_GetAppointmentsByEmployee_FullMethodName = "/appointments.AppointmentService/GetAppointmentsByEmployee"
+	AppointmentService_GetAppointmentsByBranch_FullMethodName   = "/appointments.AppointmentService/GetAppointmentsByBranch"
 	AppointmentService_UpdateAppointmentStatus_FullMethodName   = "/appointments.AppointmentService/UpdateAppointmentStatus"
 	AppointmentService_GetAppointmentDetails_FullMethodName     = "/appointments.AppointmentService/GetAppointmentDetails"
 	AppointmentService_CreateService_FullMethodName             = "/appointments.AppointmentService/CreateService"
@@ -39,6 +40,7 @@ type AppointmentServiceClient interface {
 	// Lấy danh sách lịch hẹn theo khách hàng hoặc nhân viên
 	GetAppointmentsByCustomer(ctx context.Context, in *GetAppointmentsByCustomerRequest, opts ...grpc.CallOption) (*GetAppointmentsResponse, error)
 	GetAppointmentsByEmployee(ctx context.Context, in *GetAppointmentsByEmployeeRequest, opts ...grpc.CallOption) (*GetAppointmentsResponse, error)
+	GetAppointmentsByBranch(ctx context.Context, in *GetAppointmentsByBranchRequest, opts ...grpc.CallOption) (*GetAppointmentsResponse, error)
 	// Cập nhật trạng thái lịch hẹn
 	UpdateAppointmentStatus(ctx context.Context, in *UpdateAppointmentStatusRequest, opts ...grpc.CallOption) (*UpdateAppointmentStatusResponse, error)
 	// Lấy chi tiết lịch hẹn
@@ -82,6 +84,16 @@ func (c *appointmentServiceClient) GetAppointmentsByEmployee(ctx context.Context
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetAppointmentsResponse)
 	err := c.cc.Invoke(ctx, AppointmentService_GetAppointmentsByEmployee_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appointmentServiceClient) GetAppointmentsByBranch(ctx context.Context, in *GetAppointmentsByBranchRequest, opts ...grpc.CallOption) (*GetAppointmentsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAppointmentsResponse)
+	err := c.cc.Invoke(ctx, AppointmentService_GetAppointmentsByBranch_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -157,6 +169,7 @@ type AppointmentServiceServer interface {
 	// Lấy danh sách lịch hẹn theo khách hàng hoặc nhân viên
 	GetAppointmentsByCustomer(context.Context, *GetAppointmentsByCustomerRequest) (*GetAppointmentsResponse, error)
 	GetAppointmentsByEmployee(context.Context, *GetAppointmentsByEmployeeRequest) (*GetAppointmentsResponse, error)
+	GetAppointmentsByBranch(context.Context, *GetAppointmentsByBranchRequest) (*GetAppointmentsResponse, error)
 	// Cập nhật trạng thái lịch hẹn
 	UpdateAppointmentStatus(context.Context, *UpdateAppointmentStatusRequest) (*UpdateAppointmentStatusResponse, error)
 	// Lấy chi tiết lịch hẹn
@@ -184,6 +197,9 @@ func (UnimplementedAppointmentServiceServer) GetAppointmentsByCustomer(context.C
 }
 func (UnimplementedAppointmentServiceServer) GetAppointmentsByEmployee(context.Context, *GetAppointmentsByEmployeeRequest) (*GetAppointmentsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAppointmentsByEmployee not implemented")
+}
+func (UnimplementedAppointmentServiceServer) GetAppointmentsByBranch(context.Context, *GetAppointmentsByBranchRequest) (*GetAppointmentsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAppointmentsByBranch not implemented")
 }
 func (UnimplementedAppointmentServiceServer) UpdateAppointmentStatus(context.Context, *UpdateAppointmentStatusRequest) (*UpdateAppointmentStatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateAppointmentStatus not implemented")
@@ -274,6 +290,24 @@ func _AppointmentService_GetAppointmentsByEmployee_Handler(srv interface{}, ctx 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AppointmentServiceServer).GetAppointmentsByEmployee(ctx, req.(*GetAppointmentsByEmployeeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AppointmentService_GetAppointmentsByBranch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAppointmentsByBranchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppointmentServiceServer).GetAppointmentsByBranch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AppointmentService_GetAppointmentsByBranch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppointmentServiceServer).GetAppointmentsByBranch(ctx, req.(*GetAppointmentsByBranchRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -404,6 +438,10 @@ var AppointmentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAppointmentsByEmployee",
 			Handler:    _AppointmentService_GetAppointmentsByEmployee_Handler,
+		},
+		{
+			MethodName: "GetAppointmentsByBranch",
+			Handler:    _AppointmentService_GetAppointmentsByBranch_Handler,
 		},
 		{
 			MethodName: "UpdateAppointmentStatus",
