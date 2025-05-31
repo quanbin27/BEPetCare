@@ -314,3 +314,36 @@ func (s *Service) DeleteResetToken(ctx context.Context, userID int32) error {
 	key := fmt.Sprintf("reset_token:%d", userID)
 	return s.redis.Del(ctx, key).Err()
 }
+
+// GetAllCustomers retrieves all users with role_id = 1
+func (s *Service) GetAllCustomers(ctx context.Context) ([]User, error) {
+	users, err := s.userStore.GetAllCustomers(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get customers: %w", err)
+	}
+	return users, nil
+}
+
+// GetCustomersPaginated retrieves customers with pagination
+func (s *Service) GetCustomersPaginated(ctx context.Context, page int32, pageSize int32) ([]User, int64, error) {
+	if page < 1 || pageSize < 1 {
+		return nil, 0, errors.New("invalid pagination parameters")
+	}
+	users, total, err := s.userStore.GetCustomersPaginated(ctx, page, pageSize)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to get paginated customers: %w", err)
+	}
+	return users, total, nil
+}
+
+// GetCustomersByName retrieves customers filtered by name
+func (s *Service) GetCustomersByName(ctx context.Context, nameFilter string) ([]User, error) {
+	if nameFilter == "" {
+		return nil, errors.New("name filter cannot be empty")
+	}
+	users, err := s.userStore.GetCustomersByName(ctx, nameFilter)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get customers by name: %w", err)
+	}
+	return users, nil
+}

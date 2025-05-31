@@ -1,13 +1,15 @@
-go 1.22.5
+go 1.23
+
+toolchain go1.24.3
 
 use (
 	./appointments
 	./common
 	./gateway
+	./notification
 	./orders
 	./payments
 	./products
 	./records
 	./users
-	./notification
 )

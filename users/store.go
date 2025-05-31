@@ -96,3 +96,55 @@ func (s *Store) UpdateInfo(ctx context.Context, userID int32, updatedData map[st
 func (s *Store) UpdatePassword(ctx context.Context, userID int32, password string) error {
 	return s.db.WithContext(ctx).Model(&User{}).Where("id = ?", userID).Update("password", password).Error
 }
+func (s *Store) GetAllCustomers(ctx context.Context) ([]User, error) {
+	var users []User
+	err := s.db.WithContext(ctx).
+		Joins("JOIN user_roles ON users.id = user_roles.user_id").
+		Where("user_roles.role_id = ?", 1).
+		Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+// Get customers with pagination
+func (s *Store) GetCustomersPaginated(ctx context.Context, page int32, pageSize int32) ([]User, int64, error) {
+	var users []User
+	var total int64
+
+	query := s.db.WithContext(ctx).
+		Joins("JOIN user_roles ON users.id = user_roles.user_id").
+		Where("user_roles.role_id = ?", 1)
+
+	// Count total records for pagination
+	if err := query.Model(&User{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Apply pagination
+	offset := (page - 1) * pageSize
+	err := query.
+		Limit(int(pageSize)).
+		Offset(int(offset)).
+		Find(&users).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return users, total, nil
+}
+
+// Get customers filtered by name
+func (s *Store) GetCustomersByName(ctx context.Context, nameFilter string) ([]User, error) {
+	var users []User
+	err := s.db.WithContext(ctx).
+		Joins("JOIN user_roles ON users.id = user_roles.user_id").
+		Where("user_roles.role_id = ?", 1).
+		Where("users.name LIKE ?", "%"+nameFilter+"%").
+		Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}

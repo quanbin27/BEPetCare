@@ -20,6 +20,9 @@ type UserStore interface {
 	CreateRole(ctx context.Context, userId int32, roleId int32) error
 	UpdateRole(ctx context.Context, userId int32, roleId int32) error
 	GetRole(ctx context.Context, userId int32) (int32, error)
+	GetAllCustomers(ctx context.Context) ([]User, error)
+	GetCustomersPaginated(ctx context.Context, page int32, pageSize int32) ([]User, int64, error)
+	GetCustomersByName(ctx context.Context, nameFilter string) ([]User, error)
 }
 
 // UserService defines the interface for business logic operations with internal types
@@ -33,6 +36,9 @@ type UserService interface {
 	VerifyEmail(ctx context.Context, token string) (int32, error)
 	ForgotPassword(ctx context.Context, email string) error
 	ResetPassword(ctx context.Context, userID int32, token, newPassword string) error
+	GetAllCustomers(ctx context.Context) ([]User, error)
+	GetCustomersPaginated(ctx context.Context, page int32, pageSize int32) ([]User, int64, error)
+	GetCustomersByName(ctx context.Context, nameFilter string) ([]User, error)
 }
 
 // User represents a user in the internal system

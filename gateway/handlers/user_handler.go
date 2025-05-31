@@ -36,6 +36,10 @@ func (h *UserHandler) RegisterRoutes(e *echo.Group) {
 	e.GET("/users/:id", h.GetUserInfo, auth.RoleMiddleware(1, 2, 3))
 	e.GET("/users/email", h.GetUserInfoByEmail, auth.RoleMiddleware(1, 2, 3))
 
+	e.GET("/customers", h.GetAllCustomers, auth.RoleMiddleware(2, 3))
+	e.GET("/customers/paginated", h.GetCustomersPaginated, auth.RoleMiddleware(2, 3))
+	e.GET("/customers/by-name", h.GetCustomersByName, auth.RoleMiddleware(2, 3))
+
 	e.GET("/hello-world", helloWorld)
 	e.Static("/swagger", "docs")
 }
@@ -489,4 +493,143 @@ func (h *UserHandler) ResetPassword(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "Password reset successfully"})
+}
+
+// GetAllCustomers retrieves all customers (role_id = 1)
+// @Summary Get all customers
+// @Description Retrieves a list of all users with role ID 1 (customers). Requires role 2 or 3.
+// @Tags Users
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} UserResponse "List of customers"
+// @Failure 401 {object} object{error=string} "Unauthorized or insufficient role"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /customers [get]
+func (h *UserHandler) GetAllCustomers(c echo.Context) error {
+	ctx := c.Request().Context()
+	resp, err := h.client.GetAllCustomers(ctx, &pb.GetAllCustomersRequest{})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			if grpcErr.Code() == codes.Internal {
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	users := make([]UserResponse, len(resp.Users))
+	for i, user := range resp.Users {
+		users[i] = UserResponse{
+			UserID:      user.ID,
+			Name:        user.Name,
+			Email:       user.Email,
+			PhoneNumber: user.PhoneNumber,
+			Address:     user.Address,
+		}
+	}
+	return c.JSON(http.StatusOK, users)
+}
+
+// GetCustomersPaginated retrieves customers with pagination
+// @Summary Get paginated customers
+// @Description Retrieves a paginated list of users with role ID 1 (customers). Requires role 2 or 3.
+// @Tags Users
+// @Produce json
+// @Security BearerAuth
+// @Param page query int true "Page number (1-based)"
+// @Param page_size query int true "Number of items per page"
+// @Success 200 {object} object{users=array,total=int64} "Paginated list of customers"
+// @Failure 400 {object} object{error=string} "Invalid pagination parameters"
+// @Failure 401 {object} object{error=string} "Unauthorized or insufficient role"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /customers/paginated [get]
+func (h *UserHandler) GetCustomersPaginated(c echo.Context) error {
+	pageStr := c.QueryParam("page")
+	pageSizeStr := c.QueryParam("page_size")
+
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page < 1 {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid page parameter"})
+	}
+	pageSize, err := strconv.Atoi(pageSizeStr)
+	if err != nil || pageSize < 1 {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid page_size parameter"})
+	}
+
+	ctx := c.Request().Context()
+	resp, err := h.client.GetCustomersPaginated(ctx, &pb.GetCustomersPaginatedRequest{
+		Page:     int32(page),
+		PageSize: int32(pageSize),
+	})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.InvalidArgument:
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": grpcErr.Message()})
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	users := make([]UserResponse, len(resp.Users))
+	for i, user := range resp.Users {
+		users[i] = UserResponse{
+			UserID:      user.ID,
+			Name:        user.Name,
+			Email:       user.Email,
+			PhoneNumber: user.PhoneNumber,
+			Address:     user.Address,
+		}
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"users": users,
+		"total": resp.Total,
+	})
+}
+
+// GetCustomersByName retrieves customers filtered by name
+// @Summary Get customers by name
+// @Description Retrieves a list of users with role ID 1 (customers) filtered by name. Requires role 2 or 3.
+// @Tags Users
+// @Produce json
+// @Security BearerAuth
+// @Param name_filter query string true "Name filter (partial match)"
+// @Success 200 {array} UserResponse "List of matching customers"
+// @Failure 400 {object} object{error=string} "Invalid or missing name filter"
+// @Failure 401 {object} object{error=string} "Unauthorized or insufficient role"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /customers/by-name [get]
+func (h *UserHandler) GetCustomersByName(c echo.Context) error {
+	nameFilter := c.QueryParam("name_filter")
+	if nameFilter == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Name filter is required"})
+	}
+
+	ctx := c.Request().Context()
+	resp, err := h.client.GetCustomersByName(ctx, &pb.GetCustomersByNameRequest{NameFilter: nameFilter})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.InvalidArgument:
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": grpcErr.Message()})
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	users := make([]UserResponse, len(resp.Users))
+	for i, user := range resp.Users {
+		users[i] = UserResponse{
+			UserID:      user.ID,
+			Name:        user.Name,
+			Email:       user.Email,
+			PhoneNumber: user.PhoneNumber,
+			Address:     user.Address,
+		}
+	}
+	return c.JSON(http.StatusOK, users)
 }

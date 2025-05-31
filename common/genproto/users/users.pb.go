@@ -970,6 +970,283 @@ func (x *ForgotPasswordResponse) GetStatus() string {
 	return ""
 }
 
+type GetAllCustomersRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *GetAllCustomersRequest) Reset() {
+	*x = GetAllCustomersRequest{}
+	mi := &file_users_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAllCustomersRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAllCustomersRequest) ProtoMessage() {}
+
+func (x *GetAllCustomersRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_users_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAllCustomersRequest.ProtoReflect.Descriptor instead.
+func (*GetAllCustomersRequest) Descriptor() ([]byte, []int) {
+	return file_users_proto_rawDescGZIP(), []int{17}
+}
+
+type GetAllCustomersResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Users []*User `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"`
+}
+
+func (x *GetAllCustomersResponse) Reset() {
+	*x = GetAllCustomersResponse{}
+	mi := &file_users_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAllCustomersResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAllCustomersResponse) ProtoMessage() {}
+
+func (x *GetAllCustomersResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_users_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAllCustomersResponse.ProtoReflect.Descriptor instead.
+func (*GetAllCustomersResponse) Descriptor() ([]byte, []int) {
+	return file_users_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GetAllCustomersResponse) GetUsers() []*User {
+	if x != nil {
+		return x.Users
+	}
+	return nil
+}
+
+type GetCustomersPaginatedRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Page     int32 `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize int32 `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+}
+
+func (x *GetCustomersPaginatedRequest) Reset() {
+	*x = GetCustomersPaginatedRequest{}
+	mi := &file_users_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCustomersPaginatedRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCustomersPaginatedRequest) ProtoMessage() {}
+
+func (x *GetCustomersPaginatedRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_users_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCustomersPaginatedRequest.ProtoReflect.Descriptor instead.
+func (*GetCustomersPaginatedRequest) Descriptor() ([]byte, []int) {
+	return file_users_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *GetCustomersPaginatedRequest) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *GetCustomersPaginatedRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+type GetCustomersPaginatedResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Users []*User `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"`
+	Total int64   `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+}
+
+func (x *GetCustomersPaginatedResponse) Reset() {
+	*x = GetCustomersPaginatedResponse{}
+	mi := &file_users_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCustomersPaginatedResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCustomersPaginatedResponse) ProtoMessage() {}
+
+func (x *GetCustomersPaginatedResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_users_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCustomersPaginatedResponse.ProtoReflect.Descriptor instead.
+func (*GetCustomersPaginatedResponse) Descriptor() ([]byte, []int) {
+	return file_users_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *GetCustomersPaginatedResponse) GetUsers() []*User {
+	if x != nil {
+		return x.Users
+	}
+	return nil
+}
+
+func (x *GetCustomersPaginatedResponse) GetTotal() int64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+type GetCustomersByNameRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	NameFilter string `protobuf:"bytes,1,opt,name=name_filter,json=nameFilter,proto3" json:"name_filter,omitempty"`
+}
+
+func (x *GetCustomersByNameRequest) Reset() {
+	*x = GetCustomersByNameRequest{}
+	mi := &file_users_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCustomersByNameRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCustomersByNameRequest) ProtoMessage() {}
+
+func (x *GetCustomersByNameRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_users_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCustomersByNameRequest.ProtoReflect.Descriptor instead.
+func (*GetCustomersByNameRequest) Descriptor() ([]byte, []int) {
+	return file_users_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *GetCustomersByNameRequest) GetNameFilter() string {
+	if x != nil {
+		return x.NameFilter
+	}
+	return ""
+}
+
+type GetCustomersByNameResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Users []*User `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"`
+}
+
+func (x *GetCustomersByNameResponse) Reset() {
+	*x = GetCustomersByNameResponse{}
+	mi := &file_users_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCustomersByNameResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCustomersByNameResponse) ProtoMessage() {}
+
+func (x *GetCustomersByNameResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_users_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCustomersByNameResponse.ProtoReflect.Descriptor instead.
+func (*GetCustomersByNameResponse) Descriptor() ([]byte, []int) {
+	return file_users_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *GetCustomersByNameResponse) GetUsers() []*User {
+	if x != nil {
+		return x.Users
+	}
+	return nil
+}
+
 var File_users_proto protoreflect.FileDescriptor
 
 var file_users_proto_rawDesc = []byte{
@@ -1061,8 +1338,31 @@ var file_users_proto_rawDesc = []byte{
 	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x30, 0x0a,
 	0x16, 0x46, 0x6f, 0x72, 0x67, 0x6f, 0x74, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x52,
 	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x53, 0x74, 0x61, 0x74, 0x75,
-	0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x32,
-	0x93, 0x04, 0x0a, 0x0b, 0x55, 0x73, 0x65, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12,
+	0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22,
+	0x18, 0x0a, 0x16, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x65,
+	0x72, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x36, 0x0a, 0x17, 0x47, 0x65, 0x74,
+	0x41, 0x6c, 0x6c, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x65, 0x72, 0x73, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1b, 0x0a, 0x05, 0x75, 0x73, 0x65, 0x72, 0x73, 0x18, 0x01, 0x20,
+	0x03, 0x28, 0x0b, 0x32, 0x05, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x52, 0x05, 0x75, 0x73, 0x65, 0x72,
+	0x73, 0x22, 0x4f, 0x0a, 0x1c, 0x47, 0x65, 0x74, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x65, 0x72,
+	0x73, 0x50, 0x61, 0x67, 0x69, 0x6e, 0x61, 0x74, 0x65, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52,
+	0x04, 0x70, 0x61, 0x67, 0x65, 0x12, 0x1b, 0x0a, 0x09, 0x70, 0x61, 0x67, 0x65, 0x5f, 0x73, 0x69,
+	0x7a, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x08, 0x70, 0x61, 0x67, 0x65, 0x53, 0x69,
+	0x7a, 0x65, 0x22, 0x52, 0x0a, 0x1d, 0x47, 0x65, 0x74, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x65,
+	0x72, 0x73, 0x50, 0x61, 0x67, 0x69, 0x6e, 0x61, 0x74, 0x65, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x1b, 0x0a, 0x05, 0x75, 0x73, 0x65, 0x72, 0x73, 0x18, 0x01, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x05, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x52, 0x05, 0x75, 0x73, 0x65, 0x72, 0x73,
+	0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52,
+	0x05, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x22, 0x3c, 0x0a, 0x19, 0x47, 0x65, 0x74, 0x43, 0x75, 0x73,
+	0x74, 0x6f, 0x6d, 0x65, 0x72, 0x73, 0x42, 0x79, 0x4e, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x6e, 0x61, 0x6d, 0x65, 0x5f, 0x66, 0x69, 0x6c, 0x74,
+	0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x6e, 0x61, 0x6d, 0x65, 0x46, 0x69,
+	0x6c, 0x74, 0x65, 0x72, 0x22, 0x39, 0x0a, 0x1a, 0x47, 0x65, 0x74, 0x43, 0x75, 0x73, 0x74, 0x6f,
+	0x6d, 0x65, 0x72, 0x73, 0x42, 0x79, 0x4e, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x1b, 0x0a, 0x05, 0x75, 0x73, 0x65, 0x72, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28,
+	0x0b, 0x32, 0x05, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x52, 0x05, 0x75, 0x73, 0x65, 0x72, 0x73, 0x32,
+	0x86, 0x06, 0x0a, 0x0b, 0x55, 0x73, 0x65, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12,
 	0x31, 0x0a, 0x08, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x12, 0x10, 0x2e, 0x52, 0x65,
 	0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x11, 0x2e,
 	0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
@@ -1095,10 +1395,25 @@ var file_users_proto_rawDesc = []byte{
 	0x77, 0x6f, 0x72, 0x64, 0x12, 0x15, 0x2e, 0x52, 0x65, 0x73, 0x65, 0x74, 0x50, 0x61, 0x73, 0x73,
 	0x77, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x52, 0x65,
 	0x73, 0x65, 0x74, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x2d, 0x5a, 0x2b, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
-	0x63, 0x6f, 0x6d, 0x2f, 0x71, 0x75, 0x61, 0x6e, 0x62, 0x69, 0x6e, 0x32, 0x37, 0x2f, 0x63, 0x6f,
-	0x6d, 0x6d, 0x6f, 0x6e, 0x73, 0x2f, 0x67, 0x65, 0x6e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x75,
-	0x73, 0x65, 0x72, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x46, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x43,
+	0x75, 0x73, 0x74, 0x6f, 0x6d, 0x65, 0x72, 0x73, 0x12, 0x17, 0x2e, 0x47, 0x65, 0x74, 0x41, 0x6c,
+	0x6c, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x65, 0x72, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x18, 0x2e, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d,
+	0x65, 0x72, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x58, 0x0a,
+	0x15, 0x47, 0x65, 0x74, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x65, 0x72, 0x73, 0x50, 0x61, 0x67,
+	0x69, 0x6e, 0x61, 0x74, 0x65, 0x64, 0x12, 0x1d, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x75, 0x73, 0x74,
+	0x6f, 0x6d, 0x65, 0x72, 0x73, 0x50, 0x61, 0x67, 0x69, 0x6e, 0x61, 0x74, 0x65, 0x64, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x75, 0x73, 0x74, 0x6f,
+	0x6d, 0x65, 0x72, 0x73, 0x50, 0x61, 0x67, 0x69, 0x6e, 0x61, 0x74, 0x65, 0x64, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x4f, 0x0a, 0x12, 0x47, 0x65, 0x74, 0x43, 0x75,
+	0x73, 0x74, 0x6f, 0x6d, 0x65, 0x72, 0x73, 0x42, 0x79, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x1a, 0x2e,
+	0x47, 0x65, 0x74, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x65, 0x72, 0x73, 0x42, 0x79, 0x4e, 0x61,
+	0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x47, 0x65, 0x74, 0x43,
+	0x75, 0x73, 0x74, 0x6f, 0x6d, 0x65, 0x72, 0x73, 0x42, 0x79, 0x4e, 0x61, 0x6d, 0x65, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x2d, 0x5a, 0x2b, 0x67, 0x69, 0x74, 0x68,
+	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x71, 0x75, 0x61, 0x6e, 0x62, 0x69, 0x6e, 0x32, 0x37,
+	0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x73, 0x2f, 0x67, 0x65, 0x6e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x2f, 0x75, 0x73, 0x65, 0x72, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1113,52 +1428,67 @@ func file_users_proto_rawDescGZIP() []byte {
 	return file_users_proto_rawDescData
 }
 
-var file_users_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_users_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_users_proto_goTypes = []any{
-	(*User)(nil),                      // 0: User
-	(*RegisterRequest)(nil),           // 1: RegisterRequest
-	(*RegisterResponse)(nil),          // 2: RegisterResponse
-	(*LoginRequest)(nil),              // 3: LoginRequest
-	(*LoginResponse)(nil),             // 4: LoginResponse
-	(*ChangeInfoRequest)(nil),         // 5: ChangeInfoRequest
-	(*ChangeInfoResponse)(nil),        // 6: ChangeInfoResponse
-	(*ChangePasswordRequest)(nil),     // 7: ChangePasswordRequest
-	(*ChangePasswordResponse)(nil),    // 8: ChangePasswordResponse
-	(*GetUserInfoRequest)(nil),        // 9: GetUserInfoRequest
-	(*GetUserInfoByEmailRequest)(nil), // 10: GetUserInfoByEmailRequest
-	(*VerifyEmailRequest)(nil),        // 11: VerifyEmailRequest
-	(*VerifyEmailResponse)(nil),       // 12: VerifyEmailResponse
-	(*ForgotPasswordRequest)(nil),     // 13: ForgotPasswordRequest
-	(*ResetPasswordRequest)(nil),      // 14: ResetPasswordRequest
-	(*ResetPasswordResponse)(nil),     // 15: ResetPasswordResponse
-	(*ForgotPasswordResponse)(nil),    // 16: ForgotPasswordResponse
-	(*timestamppb.Timestamp)(nil),     // 17: google.protobuf.Timestamp
+	(*User)(nil),                          // 0: User
+	(*RegisterRequest)(nil),               // 1: RegisterRequest
+	(*RegisterResponse)(nil),              // 2: RegisterResponse
+	(*LoginRequest)(nil),                  // 3: LoginRequest
+	(*LoginResponse)(nil),                 // 4: LoginResponse
+	(*ChangeInfoRequest)(nil),             // 5: ChangeInfoRequest
+	(*ChangeInfoResponse)(nil),            // 6: ChangeInfoResponse
+	(*ChangePasswordRequest)(nil),         // 7: ChangePasswordRequest
+	(*ChangePasswordResponse)(nil),        // 8: ChangePasswordResponse
+	(*GetUserInfoRequest)(nil),            // 9: GetUserInfoRequest
+	(*GetUserInfoByEmailRequest)(nil),     // 10: GetUserInfoByEmailRequest
+	(*VerifyEmailRequest)(nil),            // 11: VerifyEmailRequest
+	(*VerifyEmailResponse)(nil),           // 12: VerifyEmailResponse
+	(*ForgotPasswordRequest)(nil),         // 13: ForgotPasswordRequest
+	(*ResetPasswordRequest)(nil),          // 14: ResetPasswordRequest
+	(*ResetPasswordResponse)(nil),         // 15: ResetPasswordResponse
+	(*ForgotPasswordResponse)(nil),        // 16: ForgotPasswordResponse
+	(*GetAllCustomersRequest)(nil),        // 17: GetAllCustomersRequest
+	(*GetAllCustomersResponse)(nil),       // 18: GetAllCustomersResponse
+	(*GetCustomersPaginatedRequest)(nil),  // 19: GetCustomersPaginatedRequest
+	(*GetCustomersPaginatedResponse)(nil), // 20: GetCustomersPaginatedResponse
+	(*GetCustomersByNameRequest)(nil),     // 21: GetCustomersByNameRequest
+	(*GetCustomersByNameResponse)(nil),    // 22: GetCustomersByNameResponse
+	(*timestamppb.Timestamp)(nil),         // 23: google.protobuf.Timestamp
 }
 var file_users_proto_depIdxs = []int32{
-	17, // 0: User.CreatedAt:type_name -> google.protobuf.Timestamp
-	1,  // 1: UserService.Register:input_type -> RegisterRequest
-	3,  // 2: UserService.Login:input_type -> LoginRequest
-	5,  // 3: UserService.ChangeInfo:input_type -> ChangeInfoRequest
-	7,  // 4: UserService.ChangePassword:input_type -> ChangePasswordRequest
-	9,  // 5: UserService.GetUserInfo:input_type -> GetUserInfoRequest
-	10, // 6: UserService.GetUserInfoByEmail:input_type -> GetUserInfoByEmailRequest
-	11, // 7: UserService.VerifyEmail:input_type -> VerifyEmailRequest
-	13, // 8: UserService.ForgotPassword:input_type -> ForgotPasswordRequest
-	14, // 9: UserService.ResetPassword:input_type -> ResetPasswordRequest
-	2,  // 10: UserService.Register:output_type -> RegisterResponse
-	4,  // 11: UserService.Login:output_type -> LoginResponse
-	6,  // 12: UserService.ChangeInfo:output_type -> ChangeInfoResponse
-	8,  // 13: UserService.ChangePassword:output_type -> ChangePasswordResponse
-	0,  // 14: UserService.GetUserInfo:output_type -> User
-	0,  // 15: UserService.GetUserInfoByEmail:output_type -> User
-	12, // 16: UserService.VerifyEmail:output_type -> VerifyEmailResponse
-	16, // 17: UserService.ForgotPassword:output_type -> ForgotPasswordResponse
-	15, // 18: UserService.ResetPassword:output_type -> ResetPasswordResponse
-	10, // [10:19] is the sub-list for method output_type
-	1,  // [1:10] is the sub-list for method input_type
-	1,  // [1:1] is the sub-list for extension type_name
-	1,  // [1:1] is the sub-list for extension extendee
-	0,  // [0:1] is the sub-list for field type_name
+	23, // 0: User.CreatedAt:type_name -> google.protobuf.Timestamp
+	0,  // 1: GetAllCustomersResponse.users:type_name -> User
+	0,  // 2: GetCustomersPaginatedResponse.users:type_name -> User
+	0,  // 3: GetCustomersByNameResponse.users:type_name -> User
+	1,  // 4: UserService.Register:input_type -> RegisterRequest
+	3,  // 5: UserService.Login:input_type -> LoginRequest
+	5,  // 6: UserService.ChangeInfo:input_type -> ChangeInfoRequest
+	7,  // 7: UserService.ChangePassword:input_type -> ChangePasswordRequest
+	9,  // 8: UserService.GetUserInfo:input_type -> GetUserInfoRequest
+	10, // 9: UserService.GetUserInfoByEmail:input_type -> GetUserInfoByEmailRequest
+	11, // 10: UserService.VerifyEmail:input_type -> VerifyEmailRequest
+	13, // 11: UserService.ForgotPassword:input_type -> ForgotPasswordRequest
+	14, // 12: UserService.ResetPassword:input_type -> ResetPasswordRequest
+	17, // 13: UserService.GetAllCustomers:input_type -> GetAllCustomersRequest
+	19, // 14: UserService.GetCustomersPaginated:input_type -> GetCustomersPaginatedRequest
+	21, // 15: UserService.GetCustomersByName:input_type -> GetCustomersByNameRequest
+	2,  // 16: UserService.Register:output_type -> RegisterResponse
+	4,  // 17: UserService.Login:output_type -> LoginResponse
+	6,  // 18: UserService.ChangeInfo:output_type -> ChangeInfoResponse
+	8,  // 19: UserService.ChangePassword:output_type -> ChangePasswordResponse
+	0,  // 20: UserService.GetUserInfo:output_type -> User
+	0,  // 21: UserService.GetUserInfoByEmail:output_type -> User
+	12, // 22: UserService.VerifyEmail:output_type -> VerifyEmailResponse
+	16, // 23: UserService.ForgotPassword:output_type -> ForgotPasswordResponse
+	15, // 24: UserService.ResetPassword:output_type -> ResetPasswordResponse
+	18, // 25: UserService.GetAllCustomers:output_type -> GetAllCustomersResponse
+	20, // 26: UserService.GetCustomersPaginated:output_type -> GetCustomersPaginatedResponse
+	22, // 27: UserService.GetCustomersByName:output_type -> GetCustomersByNameResponse
+	16, // [16:28] is the sub-list for method output_type
+	4,  // [4:16] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_users_proto_init() }
@@ -1172,7 +1502,7 @@ func file_users_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_users_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   17,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

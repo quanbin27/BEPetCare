@@ -108,3 +108,44 @@ func (h *UsersGrpcHandler) ResetPassword(ctx context.Context, req *pb.ResetPassw
 	}
 	return &pb.ResetPasswordResponse{Status: "reset password success"}, nil
 }
+func (h *UsersGrpcHandler) GetAllCustomers(ctx context.Context, req *pb.GetAllCustomersRequest) (*pb.GetAllCustomersResponse, error) {
+	users, err := h.userService.GetAllCustomers(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	protoUsers := make([]*pb.User, len(users))
+	for i, user := range users {
+		protoUsers[i] = toProtoUser(&user)
+	}
+	return &pb.GetAllCustomersResponse{Users: protoUsers}, nil
+}
+
+func (h *UsersGrpcHandler) GetCustomersPaginated(ctx context.Context, req *pb.GetCustomersPaginatedRequest) (*pb.GetCustomersPaginatedResponse, error) {
+	users, total, err := h.userService.GetCustomersPaginated(ctx, req.Page, req.PageSize)
+	if err != nil {
+		if errors.Is(err, errors.New("invalid pagination parameters")) {
+			return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		}
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	protoUsers := make([]*pb.User, len(users))
+	for i, user := range users {
+		protoUsers[i] = toProtoUser(&user)
+	}
+	return &pb.GetCustomersPaginatedResponse{Users: protoUsers, Total: total}, nil
+}
+
+func (h *UsersGrpcHandler) GetCustomersByName(ctx context.Context, req *pb.GetCustomersByNameRequest) (*pb.GetCustomersByNameResponse, error) {
+	users, err := h.userService.GetCustomersByName(ctx, req.NameFilter)
+	if err != nil {
+		if errors.Is(err, errors.New("name filter cannot be empty")) {
+			return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		}
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	protoUsers := make([]*pb.User, len(users))
+	for i, user := range users {
+		protoUsers[i] = toProtoUser(&user)
+	}
+	return &pb.GetCustomersByNameResponse{Users: protoUsers}, nil
+}

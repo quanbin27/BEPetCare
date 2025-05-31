@@ -19,15 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_Register_FullMethodName           = "/UserService/Register"
-	UserService_Login_FullMethodName              = "/UserService/Login"
-	UserService_ChangeInfo_FullMethodName         = "/UserService/ChangeInfo"
-	UserService_ChangePassword_FullMethodName     = "/UserService/ChangePassword"
-	UserService_GetUserInfo_FullMethodName        = "/UserService/GetUserInfo"
-	UserService_GetUserInfoByEmail_FullMethodName = "/UserService/GetUserInfoByEmail"
-	UserService_VerifyEmail_FullMethodName        = "/UserService/VerifyEmail"
-	UserService_ForgotPassword_FullMethodName     = "/UserService/ForgotPassword"
-	UserService_ResetPassword_FullMethodName      = "/UserService/ResetPassword"
+	UserService_Register_FullMethodName              = "/UserService/Register"
+	UserService_Login_FullMethodName                 = "/UserService/Login"
+	UserService_ChangeInfo_FullMethodName            = "/UserService/ChangeInfo"
+	UserService_ChangePassword_FullMethodName        = "/UserService/ChangePassword"
+	UserService_GetUserInfo_FullMethodName           = "/UserService/GetUserInfo"
+	UserService_GetUserInfoByEmail_FullMethodName    = "/UserService/GetUserInfoByEmail"
+	UserService_VerifyEmail_FullMethodName           = "/UserService/VerifyEmail"
+	UserService_ForgotPassword_FullMethodName        = "/UserService/ForgotPassword"
+	UserService_ResetPassword_FullMethodName         = "/UserService/ResetPassword"
+	UserService_GetAllCustomers_FullMethodName       = "/UserService/GetAllCustomers"
+	UserService_GetCustomersPaginated_FullMethodName = "/UserService/GetCustomersPaginated"
+	UserService_GetCustomersByName_FullMethodName    = "/UserService/GetCustomersByName"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -43,6 +46,9 @@ type UserServiceClient interface {
 	VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error)
 	ForgotPassword(ctx context.Context, in *ForgotPasswordRequest, opts ...grpc.CallOption) (*ForgotPasswordResponse, error)
 	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error)
+	GetAllCustomers(ctx context.Context, in *GetAllCustomersRequest, opts ...grpc.CallOption) (*GetAllCustomersResponse, error)
+	GetCustomersPaginated(ctx context.Context, in *GetCustomersPaginatedRequest, opts ...grpc.CallOption) (*GetCustomersPaginatedResponse, error)
+	GetCustomersByName(ctx context.Context, in *GetCustomersByNameRequest, opts ...grpc.CallOption) (*GetCustomersByNameResponse, error)
 }
 
 type userServiceClient struct {
@@ -143,6 +149,36 @@ func (c *userServiceClient) ResetPassword(ctx context.Context, in *ResetPassword
 	return out, nil
 }
 
+func (c *userServiceClient) GetAllCustomers(ctx context.Context, in *GetAllCustomersRequest, opts ...grpc.CallOption) (*GetAllCustomersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAllCustomersResponse)
+	err := c.cc.Invoke(ctx, UserService_GetAllCustomers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetCustomersPaginated(ctx context.Context, in *GetCustomersPaginatedRequest, opts ...grpc.CallOption) (*GetCustomersPaginatedResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCustomersPaginatedResponse)
+	err := c.cc.Invoke(ctx, UserService_GetCustomersPaginated_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetCustomersByName(ctx context.Context, in *GetCustomersByNameRequest, opts ...grpc.CallOption) (*GetCustomersByNameResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCustomersByNameResponse)
+	err := c.cc.Invoke(ctx, UserService_GetCustomersByName_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -156,6 +192,9 @@ type UserServiceServer interface {
 	VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error)
 	ForgotPassword(context.Context, *ForgotPasswordRequest) (*ForgotPasswordResponse, error)
 	ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error)
+	GetAllCustomers(context.Context, *GetAllCustomersRequest) (*GetAllCustomersResponse, error)
+	GetCustomersPaginated(context.Context, *GetCustomersPaginatedRequest) (*GetCustomersPaginatedResponse, error)
+	GetCustomersByName(context.Context, *GetCustomersByNameRequest) (*GetCustomersByNameResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -192,6 +231,15 @@ func (UnimplementedUserServiceServer) ForgotPassword(context.Context, *ForgotPas
 }
 func (UnimplementedUserServiceServer) ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResetPassword not implemented")
+}
+func (UnimplementedUserServiceServer) GetAllCustomers(context.Context, *GetAllCustomersRequest) (*GetAllCustomersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllCustomers not implemented")
+}
+func (UnimplementedUserServiceServer) GetCustomersPaginated(context.Context, *GetCustomersPaginatedRequest) (*GetCustomersPaginatedResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCustomersPaginated not implemented")
+}
+func (UnimplementedUserServiceServer) GetCustomersByName(context.Context, *GetCustomersByNameRequest) (*GetCustomersByNameResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCustomersByName not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -376,6 +424,60 @@ func _UserService_ResetPassword_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetAllCustomers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllCustomersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetAllCustomers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetAllCustomers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetAllCustomers(ctx, req.(*GetAllCustomersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetCustomersPaginated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCustomersPaginatedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetCustomersPaginated(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetCustomersPaginated_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetCustomersPaginated(ctx, req.(*GetCustomersPaginatedRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetCustomersByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCustomersByNameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetCustomersByName(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetCustomersByName_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetCustomersByName(ctx, req.(*GetCustomersByNameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -418,6 +520,18 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ResetPassword",
 			Handler:    _UserService_ResetPassword_Handler,
+		},
+		{
+			MethodName: "GetAllCustomers",
+			Handler:    _UserService_GetAllCustomers_Handler,
+		},
+		{
+			MethodName: "GetCustomersPaginated",
+			Handler:    _UserService_GetCustomersPaginated_Handler,
+		},
+		{
+			MethodName: "GetCustomersByName",
+			Handler:    _UserService_GetCustomersByName_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
