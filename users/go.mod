@@ -6,7 +6,7 @@ toolchain go1.24.3
 
 require (
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/quanbin27/commons v0.0.0-20250520153201-468c1870654d
+	github.com/quanbin27/commons v0.0.0-20250531152625-ac2658474b90
 	google.golang.org/grpc v1.72.2
 	google.golang.org/protobuf v1.36.5
 	gorm.io/driver/mysql v1.5.7

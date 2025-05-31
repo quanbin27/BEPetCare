@@ -1,4 +1,4 @@
-FROM golang:1.22.5 AS builder
+FROM golang:1.23 AS builder
 
 WORKDIR /app/gateway
 COPY ./gateway/go.mod ./gateway/go.sum ./

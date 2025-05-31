@@ -1,4 +1,4 @@
-FROM golang:1.22.5 AS builder
+FROM golang:1.23 AS builder
 
 WORKDIR /app/payments
 COPY ./payments/go.mod ./payments/go.sum ./

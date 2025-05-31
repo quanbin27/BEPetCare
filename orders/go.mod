@@ -1,11 +1,13 @@
 module github.com/quanbin27/BEPetCare-orders
 
-go 1.22.5
+go 1.23
+
+toolchain go1.24.3
 
 require (
 	github.com/quanbin27/commons v0.0.0-20250511124218-3e10d6de4d39
 	github.com/segmentio/kafka-go v0.4.47
-	google.golang.org/grpc v1.71.0
+	google.golang.org/grpc v1.72.2
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gorm v1.25.12
 )
@@ -18,9 +20,9 @@ require (
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/lpernett/godotenv v0.0.0-20230527005122-0de1d4c5ef5e // indirect
 	github.com/pierrec/lz4/v4 v4.1.15 // indirect
-	golang.org/x/net v0.34.0 // indirect
-	golang.org/x/sys v0.29.0 // indirect
+	golang.org/x/net v0.35.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
-	google.golang.org/protobuf v1.36.4 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250218202821-56aae31c358a // indirect
+	google.golang.org/protobuf v1.36.5 // indirect
 )
