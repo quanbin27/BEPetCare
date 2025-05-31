@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
+	"time"
+
 	"google.golang.org/grpc"
-
-	pb "github.com/quanbin27/commons/genproto/records"
-
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	pb "github.com/quanbin27/commons/genproto/records"
 )
 
 type GRPCHandler struct {
@@ -15,18 +16,18 @@ type GRPCHandler struct {
 	service RecordsService
 }
 
-func NewGrpcHandler(grpc *grpc.Server, service RecordsService) {
+func NewGrpcHandler(grpcServer *grpc.Server, service RecordsService) {
 	grpcHandler := &GRPCHandler{
 		service: service,
 	}
-	pb.RegisterPetRecordServiceServer(grpc, grpcHandler)
+	pb.RegisterPetRecordServiceServer(grpcServer, grpcHandler)
 }
 
 // --- Pet Methods ---
 func (h *GRPCHandler) CreatePet(ctx context.Context, req *pb.CreatePetRequest) (*pb.CreatePetResponse, error) {
 	id, err := h.service.CreatePet(ctx, req.Name, req.Species, req.Age, req.OwnerId, req.Color, req.Weight, req.Size)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to create pet: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "failed to create pet: %v", err)
 	}
 	return &pb.CreatePetResponse{Id: id}, nil
 }
@@ -53,7 +54,7 @@ func (h *GRPCHandler) GetPet(ctx context.Context, req *pb.GetPetRequest) (*pb.Ge
 func (h *GRPCHandler) UpdatePet(ctx context.Context, req *pb.UpdatePetRequest) (*pb.UpdatePetResponse, error) {
 	pet, err := h.service.UpdatePet(ctx, req.Id, req.Name, req.Species, req.Age, req.OwnerId, req.Color, req.Weight, req.Size)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to update pet: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "failed to update pet: %v", err)
 	}
 	return &pb.UpdatePetResponse{
 		Pet: &pb.Pet{
@@ -126,7 +127,7 @@ func (h *GRPCHandler) GetExamination(ctx context.Context, req *pb.GetExamination
 func (h *GRPCHandler) UpdateExamination(ctx context.Context, req *pb.UpdateExaminationRequest) (*pb.UpdateExaminationResponse, error) {
 	exam, err := h.service.UpdateExamination(ctx, req.Id, req.PetId, req.Date, req.VetId, req.Diagnosis, req.Notes)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to update examination: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "failed to update examination: %v", err)
 	}
 	return &pb.UpdateExaminationResponse{
 		Examination: &pb.Examination{
@@ -168,7 +169,7 @@ func (h *GRPCHandler) ListExaminations(ctx context.Context, req *pb.ListExaminat
 
 // --- Vaccination Methods ---
 func (h *GRPCHandler) CreateVaccination(ctx context.Context, req *pb.CreateVaccinationRequest) (*pb.CreateVaccinationResponse, error) {
-	id, err := h.service.CreateVaccination(ctx, req.PetId, req.VaccineName, req.Date, req.VetId)
+	id, err := h.service.CreateVaccination(ctx, req.PetId, req.VaccineName, req.Date, req.NextDose, req.VetId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "failed to create vaccination: %v", err)
 	}
@@ -180,21 +181,30 @@ func (h *GRPCHandler) GetVaccination(ctx context.Context, req *pb.GetVaccination
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "vaccination not found: %v", err)
 	}
+	var nextDose string
+	if !vacc.NextDose.IsZero() {
+		nextDose = vacc.NextDose.Format("2006-01-02")
+	}
 	return &pb.GetVaccinationResponse{
 		Vaccination: &pb.Vaccination{
 			Id:          vacc.ID.Hex(),
 			PetId:       vacc.PetID,
 			VaccineName: vacc.VaccineName,
 			Date:        vacc.Date.Format("2006-01-02"),
+			NextDose:    nextDose,
 			VetId:       vacc.VetID,
 		},
 	}, nil
 }
 
 func (h *GRPCHandler) UpdateVaccination(ctx context.Context, req *pb.UpdateVaccinationRequest) (*pb.UpdateVaccinationResponse, error) {
-	vacc, err := h.service.UpdateVaccination(ctx, req.Id, req.PetId, req.VaccineName, req.Date, req.VetId)
+	vacc, err := h.service.UpdateVaccination(ctx, req.Id, req.PetId, req.VaccineName, req.Date, req.NextDose, req.VetId)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to update vaccination: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "failed to update vaccination: %v", err)
+	}
+	var nextDose string
+	if !vacc.NextDose.IsZero() {
+		nextDose = vacc.NextDose.Format("2006-01-02")
 	}
 	return &pb.UpdateVaccinationResponse{
 		Vaccination: &pb.Vaccination{
@@ -202,6 +212,7 @@ func (h *GRPCHandler) UpdateVaccination(ctx context.Context, req *pb.UpdateVacci
 			PetId:       vacc.PetID,
 			VaccineName: vacc.VaccineName,
 			Date:        vacc.Date.Format("2006-01-02"),
+			NextDose:    nextDose,
 			VetId:       vacc.VetID,
 		},
 	}, nil
@@ -221,11 +232,16 @@ func (h *GRPCHandler) ListVaccinations(ctx context.Context, req *pb.ListVaccinat
 	}
 	resp := &pb.ListVaccinationsResponse{}
 	for _, vacc := range vaccs {
+		var nextDose string
+		if !vacc.NextDose.IsZero() {
+			nextDose = vacc.NextDose.Format("2006-01-02")
+		}
 		resp.Vaccinations = append(resp.Vaccinations, &pb.Vaccination{
 			Id:          vacc.ID.Hex(),
 			PetId:       vacc.PetID,
 			VaccineName: vacc.VaccineName,
 			Date:        vacc.Date.Format("2006-01-02"),
+			NextDose:    nextDose,
 			VetId:       vacc.VetID,
 		})
 	}
@@ -234,7 +250,24 @@ func (h *GRPCHandler) ListVaccinations(ctx context.Context, req *pb.ListVaccinat
 
 // --- Prescription Methods ---
 func (h *GRPCHandler) CreatePrescription(ctx context.Context, req *pb.CreatePrescriptionRequest) (*pb.CreatePrescriptionResponse, error) {
-	id, err := h.service.CreatePrescription(ctx, req.PetId, req.Medication, req.Dosage, req.StartDate, req.EndDate)
+	medications := make([]Medication, len(req.Medications))
+	for i, med := range req.Medications {
+		startDate, err := time.Parse("2006-01-02", med.StartDate)
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "invalid start date for medication at index %d: %v", i, err)
+		}
+		endDate, err := time.Parse("2006-01-02", med.EndDate)
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "invalid end date for medication at index %d: %v", i, err)
+		}
+		medications[i] = Medication{
+			Name:      med.Name,
+			Dosage:    med.Dosage,
+			StartDate: startDate,
+			EndDate:   endDate,
+		}
+	}
+	id, err := h.service.CreatePrescription(ctx, req.ExaminationId, medications)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "failed to create prescription: %v", err)
 	}
@@ -246,31 +279,60 @@ func (h *GRPCHandler) GetPrescription(ctx context.Context, req *pb.GetPrescripti
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "prescription not found: %v", err)
 	}
+	pbMedications := make([]*pb.Medication, len(presc.Medications))
+	for i, med := range presc.Medications {
+		pbMedications[i] = &pb.Medication{
+			Name:      med.Name,
+			Dosage:    med.Dosage,
+			StartDate: med.StartDate.Format("2006-01-02"),
+			EndDate:   med.EndDate.Format("2006-01-02"),
+		}
+	}
 	return &pb.GetPrescriptionResponse{
 		Prescription: &pb.Prescription{
-			Id:         presc.ID.Hex(),
-			PetId:      presc.PetID,
-			Medication: presc.Medication,
-			Dosage:     presc.Dosage,
-			StartDate:  presc.StartDate.Format("2006-01-02"),
-			EndDate:    presc.EndDate.Format("2006-01-02"),
+			Id:            presc.ID.Hex(),
+			ExaminationId: presc.ExaminationID,
+			Medications:   pbMedications,
 		},
 	}, nil
 }
 
 func (h *GRPCHandler) UpdatePrescription(ctx context.Context, req *pb.UpdatePrescriptionRequest) (*pb.UpdatePrescriptionResponse, error) {
-	presc, err := h.service.UpdatePrescription(ctx, req.Id, req.PetId, req.Medication, req.Dosage, req.StartDate, req.EndDate)
+	medications := make([]Medication, len(req.Medications))
+	for i, med := range req.Medications {
+		startDate, err := time.Parse("2006-01-02", med.StartDate)
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "invalid start date for medication at index %d: %v", i, err)
+		}
+		endDate, err := time.Parse("2006-01-02", med.EndDate)
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "invalid end date for medication at index %d: %v", i, err)
+		}
+		medications[i] = Medication{
+			Name:      med.Name,
+			Dosage:    med.Dosage,
+			StartDate: startDate,
+			EndDate:   endDate,
+		}
+	}
+	presc, err := h.service.UpdatePrescription(ctx, req.Id, req.ExaminationId, medications)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to update prescription: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "failed to update prescription: %v", err)
+	}
+	pbMedications := make([]*pb.Medication, len(presc.Medications))
+	for i, med := range presc.Medications {
+		pbMedications[i] = &pb.Medication{
+			Name:      med.Name,
+			Dosage:    med.Dosage,
+			StartDate: med.StartDate.Format("2006-01-02"),
+			EndDate:   med.EndDate.Format("2006-01-02"),
+		}
 	}
 	return &pb.UpdatePrescriptionResponse{
 		Prescription: &pb.Prescription{
-			Id:         presc.ID.Hex(),
-			PetId:      presc.PetID,
-			Medication: presc.Medication,
-			Dosage:     presc.Dosage,
-			StartDate:  presc.StartDate.Format("2006-01-02"),
-			EndDate:    presc.EndDate.Format("2006-01-02"),
+			Id:            presc.ID.Hex(),
+			ExaminationId: presc.ExaminationID,
+			Medications:   pbMedications,
 		},
 	}, nil
 }
@@ -283,19 +345,25 @@ func (h *GRPCHandler) DeletePrescription(ctx context.Context, req *pb.DeletePres
 }
 
 func (h *GRPCHandler) ListPrescriptions(ctx context.Context, req *pb.ListPrescriptionsRequest) (*pb.ListPrescriptionsResponse, error) {
-	prescs, err := h.service.ListPrescriptions(ctx, req.PetId)
+	prescs, err := h.service.ListPrescriptions(ctx, req.ExaminationId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to list prescriptions: %v", err)
 	}
 	resp := &pb.ListPrescriptionsResponse{}
 	for _, presc := range prescs {
+		pbMedications := make([]*pb.Medication, len(presc.Medications))
+		for i, med := range presc.Medications {
+			pbMedications[i] = &pb.Medication{
+				Name:      med.Name,
+				Dosage:    med.Dosage,
+				StartDate: med.StartDate.Format("2006-01-02"),
+				EndDate:   med.EndDate.Format("2006-01-02"),
+			}
+		}
 		resp.Prescriptions = append(resp.Prescriptions, &pb.Prescription{
-			Id:         presc.ID.Hex(),
-			PetId:      presc.PetID,
-			Medication: presc.Medication,
-			Dosage:     presc.Dosage,
-			StartDate:  presc.StartDate.Format("2006-01-02"),
-			EndDate:    presc.EndDate.Format("2006-01-02"),
+			Id:            presc.ID.Hex(),
+			ExaminationId: presc.ExaminationID,
+			Medications:   pbMedications,
 		})
 	}
 	return resp, nil

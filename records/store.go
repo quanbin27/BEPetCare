@@ -2,16 +2,17 @@ package main
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+// MongoStore implements the RecordsStore interface
 type MongoStore struct {
 	client     *mongo.Client
 	database   *mongo.Database
@@ -22,23 +23,19 @@ type MongoStore struct {
 }
 
 func NewMongoStore(dsn string) (RecordsStore, error) {
-	// Kết nối tới MongoDB
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(dsn))
 	if err != nil {
 		return nil, err
 	}
 
-	// Kiểm tra kết nối
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := client.Ping(ctx, readpref.Primary()); err != nil {
 		return nil, err
 	}
 
-	// Chọn database
 	db := client.Database("petrecord_db")
 
-	// Khởi tạo collections
 	store := &MongoStore{
 		client:     client,
 		database:   db,
@@ -48,7 +45,6 @@ func NewMongoStore(dsn string) (RecordsStore, error) {
 		prescripts: db.Collection("prescriptions"),
 	}
 
-	// Tạo index cho các collection (tùy chọn)
 	if err := store.initIndexes(ctx); err != nil {
 		return nil, err
 	}
@@ -56,9 +52,8 @@ func NewMongoStore(dsn string) (RecordsStore, error) {
 	return store, nil
 }
 
-// initIndexes tạo các index để tối ưu hóa truy vấn
 func (s *MongoStore) initIndexes(ctx context.Context) error {
-	// Index cho pets.owner_id
+	// Index for pets.owner_id
 	_, err := s.pets.Indexes().CreateOne(ctx, mongo.IndexModel{
 		Keys: bson.D{{Key: "owner_id", Value: 1}},
 	})
@@ -67,7 +62,7 @@ func (s *MongoStore) initIndexes(ctx context.Context) error {
 		return err
 	}
 
-	// Index cho examinations.pet_id
+	// Index for examinations.pet_id
 	_, err = s.exams.Indexes().CreateOne(ctx, mongo.IndexModel{
 		Keys: bson.D{{Key: "pet_id", Value: 1}},
 	})
@@ -76,7 +71,7 @@ func (s *MongoStore) initIndexes(ctx context.Context) error {
 		return err
 	}
 
-	// Index cho vaccinations.pet_id
+	// Index for vaccinations.pet_id
 	_, err = s.vaccs.Indexes().CreateOne(ctx, mongo.IndexModel{
 		Keys: bson.D{{Key: "pet_id", Value: 1}},
 	})
@@ -85,12 +80,12 @@ func (s *MongoStore) initIndexes(ctx context.Context) error {
 		return err
 	}
 
-	// Index cho prescriptions.pet_id
+	// Index for prescriptions.examination_id
 	_, err = s.prescripts.Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys: bson.D{{Key: "pet_id", Value: 1}},
+		Keys: bson.D{{Key: "examination_id", Value: 1}},
 	})
 	if err != nil {
-		log.Printf("Failed to create index for prescriptions.pet_id: %v", err)
+		log.Printf("Failed to create index for prescriptions.examination_id: %v", err)
 		return err
 	}
 
@@ -303,8 +298,8 @@ func (s *MongoStore) DeletePrescription(ctx context.Context, id string) error {
 	return err
 }
 
-func (s *MongoStore) ListPrescriptions(ctx context.Context, petID string) ([]*Prescription, error) {
-	cursor, err := s.prescripts.Find(ctx, bson.M{"pet_id": petID})
+func (s *MongoStore) ListPrescriptions(ctx context.Context, examinationID string) ([]*Prescription, error) {
+	cursor, err := s.prescripts.Find(ctx, bson.M{"examination_id": examinationID})
 	if err != nil {
 		return nil, err
 	}

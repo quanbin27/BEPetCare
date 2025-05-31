@@ -1,4 +1,24 @@
 basePath: /api/v1
+definitions:
+  handlers.UserResponse:
+    description: User information
+    properties:
+      address:
+        example: 123 Main St, City
+        type: string
+      email:
+        example: johndoe@example.com
+        type: string
+      name:
+        example: John Doe
+        type: string
+      phoneNumber:
+        example: "+84912345678"
+        type: string
+      userId:
+        example: 1001
+        type: integer
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -155,6 +175,58 @@ paths:
                 type: string
             type: object
       summary: Get appointment details
+      tags:
+      - Appointments
+  /appointments/branch/{branch_id}:
+    get:
+      description: Retrieves a list of appointment records for a specific branch ID
+      parameters:
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of appointments
+          schema:
+            items:
+              properties:
+                branch_id:
+                  type: integer
+                customer_address:
+                  type: string
+                customer_id:
+                  type: integer
+                employee_id:
+                  type: integer
+                id:
+                  type: integer
+                note:
+                  type: string
+                scheduled_time:
+                  type: string
+                status:
+                  type: string
+              type: object
+            type: array
+        "400":
+          description: Branch ID is required or invalid format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get appointments by branch
       tags:
       - Appointments
   /appointments/customer/{customer_id}:
@@ -731,6 +803,136 @@ paths:
       summary: Update branch inventory
       tags:
       - Inventory
+  /customers:
+    get:
+      description: Retrieves a list of all users with role ID 1 (customers). Requires
+        role 2 or 3.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of customers
+          schema:
+            items:
+              $ref: '#/definitions/handlers.UserResponse'
+            type: array
+        "401":
+          description: Unauthorized or insufficient role
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all customers
+      tags:
+      - Users
+  /customers/by-name:
+    get:
+      description: Retrieves a list of users with role ID 1 (customers) filtered by
+        name. Requires role 2 or 3.
+      parameters:
+      - description: Name filter (partial match)
+        in: query
+        name: name_filter
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of matching customers
+          schema:
+            items:
+              $ref: '#/definitions/handlers.UserResponse'
+            type: array
+        "400":
+          description: Invalid or missing name filter
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "401":
+          description: Unauthorized or insufficient role
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get customers by name
+      tags:
+      - Users
+  /customers/paginated:
+    get:
+      description: Retrieves a paginated list of users with role ID 1 (customers).
+        Requires role 2 or 3.
+      parameters:
+      - description: Page number (1-based)
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Paginated list of customers
+          schema:
+            properties:
+              total:
+                type: integer
+              users:
+                type: array
+            type: object
+        "400":
+          description: Invalid pagination parameters
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "401":
+          description: Unauthorized or insufficient role
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get paginated customers
+      tags:
+      - Users
   /examinations:
     post:
       consumes:
@@ -1600,8 +1802,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: Creates a new prescription record for a pet with details like pet
-        ID, medication, dosage, start date, and end date
+      description: Creates a new prescription record associated with an examination,
+        including a list of medications
       parameters:
       - description: Prescription details
         in: body
@@ -1609,16 +1811,21 @@ paths:
         required: true
         schema:
           properties:
-            dosage:
+            examination_id:
               type: string
-            end_date:
-              type: string
-            medication:
-              type: string
-            pet_id:
-              type: string
-            start_date:
-              type: string
+            medications:
+              items:
+                properties:
+                  dosage:
+                    type: string
+                  end_date:
+                    type: string
+                  name:
+                    type: string
+                  start_date:
+                    type: string
+                type: object
+              type: array
           type: object
       produces:
       - application/json
@@ -1650,8 +1857,8 @@ paths:
     put:
       consumes:
       - application/json
-      description: Updates a prescription record with details like pet ID, medication,
-        dosage, start date, and end date
+      description: Updates a prescription record with details like examination ID
+        and a list of medications
       parameters:
       - description: Updated prescription details
         in: body
@@ -1659,18 +1866,23 @@ paths:
         required: true
         schema:
           properties:
-            dosage:
-              type: string
-            end_date:
+            examination_id:
               type: string
             id:
               type: string
-            medication:
-              type: string
-            pet_id:
-              type: string
-            start_date:
-              type: string
+            medications:
+              items:
+                properties:
+                  dosage:
+                    type: string
+                  end_date:
+                    type: string
+                  name:
+                    type: string
+                  start_date:
+                    type: string
+                type: object
+              type: array
           type: object
       produces:
       - application/json
@@ -1679,18 +1891,23 @@ paths:
           description: Prescription updated successfully
           schema:
             properties:
-              dosage:
-                type: string
-              end_date:
+              examination_id:
                 type: string
               id:
                 type: string
-              medication:
-                type: string
-              pet_id:
-                type: string
-              start_date:
-                type: string
+              medications:
+                items:
+                  properties:
+                    dosage:
+                      type: string
+                    end_date:
+                      type: string
+                    name:
+                      type: string
+                    start_date:
+                      type: string
+                  type: object
+                type: array
             type: object
         "400":
           description: Invalid request, ID is required, or invalid date format
@@ -1760,18 +1977,23 @@ paths:
           description: Prescription details
           schema:
             properties:
-              dosage:
-                type: string
-              end_date:
+              examination_id:
                 type: string
               id:
                 type: string
-              medication:
-                type: string
-              pet_id:
-                type: string
-              start_date:
-                type: string
+              medications:
+                items:
+                  properties:
+                    dosage:
+                      type: string
+                    end_date:
+                      type: string
+                    name:
+                      type: string
+                    start_date:
+                      type: string
+                  type: object
+                type: array
             type: object
         "400":
           description: ID is required
@@ -1797,13 +2019,14 @@ paths:
       summary: Get prescription by ID
       tags:
       - Prescriptions
-  /prescriptions/pet/{pet_id}:
+  /prescriptions/examination/{examination_id}:
     get:
-      description: Retrieves a list of prescription records for a specific pet ID
+      description: Retrieves a list of prescription records for a specific examination
+        ID
       parameters:
-      - description: Pet ID
+      - description: Examination ID
         in: path
-        name: pet_id
+        name: examination_id
         required: true
         type: string
       produces:
@@ -1814,22 +2037,27 @@ paths:
           schema:
             items:
               properties:
-                dosage:
-                  type: string
-                end_date:
+                examination_id:
                   type: string
                 id:
                   type: string
-                medication:
-                  type: string
-                pet_id:
-                  type: string
-                start_date:
-                  type: string
+                medications:
+                  items:
+                    properties:
+                      dosage:
+                        type: string
+                      end_date:
+                        type: string
+                      name:
+                        type: string
+                      start_date:
+                        type: string
+                    type: object
+                  type: array
               type: object
             type: array
         "400":
-          description: Pet ID is required
+          description: Examination ID is required
           schema:
             properties:
               error:
@@ -1842,7 +2070,7 @@ paths:
               error:
                 type: string
             type: object
-      summary: List prescriptions by pet
+      summary: List prescriptions by examination
       tags:
       - Prescriptions
   /products:
@@ -2996,7 +3224,7 @@ paths:
       consumes:
       - application/json
       description: Creates a new vaccination record for a pet with details like pet
-        ID, vaccine name, date, and vet ID
+        ID, vaccine name, date, next dose, and vet ID
       parameters:
       - description: Vaccination details
         in: body
@@ -3005,6 +3233,8 @@ paths:
         schema:
           properties:
             date:
+              type: string
+            next_dose:
               type: string
             pet_id:
               type: string
@@ -3044,7 +3274,7 @@ paths:
       consumes:
       - application/json
       description: Updates a vaccination record with details like pet ID, vaccine
-        name, date, and vet ID
+        name, date, next dose date, and vet ID
       parameters:
       - description: Updated vaccination details
         in: body
@@ -3055,6 +3285,8 @@ paths:
             date:
               type: string
             id:
+              type: string
+            next_dose:
               type: string
             pet_id:
               type: string
@@ -3073,6 +3305,8 @@ paths:
               date:
                 type: string
               id:
+                type: string
+              next_dose:
                 type: string
               pet_id:
                 type: string
@@ -3153,6 +3387,8 @@ paths:
                 type: string
               id:
                 type: string
+              next_dose:
+                type: string
               pet_id:
                 type: string
               vaccine_name:
@@ -3204,6 +3440,8 @@ paths:
                 date:
                   type: string
                 id:
+                  type: string
+                next_dose:
                   type: string
                 pet_id:
                   type: string

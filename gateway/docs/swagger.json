@@ -136,6 +136,86 @@
                 }
             }
         },
+        "/appointments/branch/{branch_id}": {
+            "get": {
+                "description": "Retrieves a list of appointment records for a specific branch ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Get appointments by branch",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Branch ID",
+                        "name": "branch_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of appointments",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "branch_id": {
+                                        "type": "integer"
+                                    },
+                                    "customer_address": {
+                                        "type": "string"
+                                    },
+                                    "customer_id": {
+                                        "type": "integer"
+                                    },
+                                    "employee_id": {
+                                        "type": "integer"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "note": {
+                                        "type": "string"
+                                    },
+                                    "scheduled_time": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Branch ID is required or invalid format",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/appointments/customer/{customer_id}": {
             "get": {
                 "description": "Retrieves a list of appointment records for a specific customer ID",
@@ -1105,6 +1185,208 @@
                     },
                     "404": {
                         "description": "Branch not found",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/customers": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieves a list of all users with role ID 1 (customers). Requires role 2 or 3.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get all customers",
+                "responses": {
+                    "200": {
+                        "description": "List of customers",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.UserResponse"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized or insufficient role",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/customers/by-name": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieves a list of users with role ID 1 (customers) filtered by name. Requires role 2 or 3.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get customers by name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Name filter (partial match)",
+                        "name": "name_filter",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of matching customers",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.UserResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid or missing name filter",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized or insufficient role",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/customers/paginated": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieves a paginated list of users with role ID 1 (customers). Requires role 2 or 3.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get paginated customers",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number (1-based)",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "page_size",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of customers",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "total": {
+                                    "type": "integer"
+                                },
+                                "users": {
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid pagination parameters",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized or insufficient role",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -2458,7 +2740,7 @@
         },
         "/prescriptions": {
             "put": {
-                "description": "Updates a prescription record with details like pet ID, medication, dosage, start date, and end date",
+                "description": "Updates a prescription record with details like examination ID and a list of medications",
                 "consumes": [
                     "application/json"
                 ],
@@ -2478,23 +2760,31 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "dosage": {
-                                    "type": "string"
-                                },
-                                "end_date": {
+                                "examination_id": {
                                     "type": "string"
                                 },
                                 "id": {
                                     "type": "string"
                                 },
-                                "medication": {
-                                    "type": "string"
-                                },
-                                "pet_id": {
-                                    "type": "string"
-                                },
-                                "start_date": {
-                                    "type": "string"
+                                "medications": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "dosage": {
+                                                "type": "string"
+                                            },
+                                            "end_date": {
+                                                "type": "string"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "start_date": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -2506,23 +2796,31 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "dosage": {
-                                    "type": "string"
-                                },
-                                "end_date": {
+                                "examination_id": {
                                     "type": "string"
                                 },
                                 "id": {
                                     "type": "string"
                                 },
-                                "medication": {
-                                    "type": "string"
-                                },
-                                "pet_id": {
-                                    "type": "string"
-                                },
-                                "start_date": {
-                                    "type": "string"
+                                "medications": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "dosage": {
+                                                "type": "string"
+                                            },
+                                            "end_date": {
+                                                "type": "string"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "start_date": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -2552,7 +2850,7 @@
                 }
             },
             "post": {
-                "description": "Creates a new prescription record for a pet with details like pet ID, medication, dosage, start date, and end date",
+                "description": "Creates a new prescription record associated with an examination, including a list of medications",
                 "consumes": [
                     "application/json"
                 ],
@@ -2572,20 +2870,28 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "dosage": {
+                                "examination_id": {
                                     "type": "string"
                                 },
-                                "end_date": {
-                                    "type": "string"
-                                },
-                                "medication": {
-                                    "type": "string"
-                                },
-                                "pet_id": {
-                                    "type": "string"
-                                },
-                                "start_date": {
-                                    "type": "string"
+                                "medications": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "dosage": {
+                                                "type": "string"
+                                            },
+                                            "end_date": {
+                                                "type": "string"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "start_date": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -2628,21 +2934,21 @@
                 }
             }
         },
-        "/prescriptions/pet/{pet_id}": {
+        "/prescriptions/examination/{examination_id}": {
             "get": {
-                "description": "Retrieves a list of prescription records for a specific pet ID",
+                "description": "Retrieves a list of prescription records for a specific examination ID",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Prescriptions"
                 ],
-                "summary": "List prescriptions by pet",
+                "summary": "List prescriptions by examination",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Pet ID",
-                        "name": "pet_id",
+                        "description": "Examination ID",
+                        "name": "examination_id",
                         "in": "path",
                         "required": true
                     }
@@ -2655,30 +2961,38 @@
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "dosage": {
-                                        "type": "string"
-                                    },
-                                    "end_date": {
+                                    "examination_id": {
                                         "type": "string"
                                     },
                                     "id": {
                                         "type": "string"
                                     },
-                                    "medication": {
-                                        "type": "string"
-                                    },
-                                    "pet_id": {
-                                        "type": "string"
-                                    },
-                                    "start_date": {
-                                        "type": "string"
+                                    "medications": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "dosage": {
+                                                    "type": "string"
+                                                },
+                                                "end_date": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "start_date": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
                     },
                     "400": {
-                        "description": "Pet ID is required",
+                        "description": "Examination ID is required",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -2727,23 +3041,31 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "dosage": {
-                                    "type": "string"
-                                },
-                                "end_date": {
+                                "examination_id": {
                                     "type": "string"
                                 },
                                 "id": {
                                     "type": "string"
                                 },
-                                "medication": {
-                                    "type": "string"
-                                },
-                                "pet_id": {
-                                    "type": "string"
-                                },
-                                "start_date": {
-                                    "type": "string"
+                                "medications": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "dosage": {
+                                                "type": "string"
+                                            },
+                                            "end_date": {
+                                                "type": "string"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "start_date": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -4607,7 +4929,7 @@
         },
         "/vaccinations": {
             "put": {
-                "description": "Updates a vaccination record with details like pet ID, vaccine name, date, and vet ID",
+                "description": "Updates a vaccination record with details like pet ID, vaccine name, date, next dose date, and vet ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -4633,6 +4955,9 @@
                                 "id": {
                                     "type": "string"
                                 },
+                                "next_dose": {
+                                    "type": "string"
+                                },
                                 "pet_id": {
                                     "type": "string"
                                 },
@@ -4656,6 +4981,9 @@
                                     "type": "string"
                                 },
                                 "id": {
+                                    "type": "string"
+                                },
+                                "next_dose": {
                                     "type": "string"
                                 },
                                 "pet_id": {
@@ -4695,7 +5023,7 @@
                 }
             },
             "post": {
-                "description": "Creates a new vaccination record for a pet with details like pet ID, vaccine name, date, and vet ID",
+                "description": "Creates a new vaccination record for a pet with details like pet ID, vaccine name, date, next dose, and vet ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -4716,6 +5044,9 @@
                             "type": "object",
                             "properties": {
                                 "date": {
+                                    "type": "string"
+                                },
+                                "next_dose": {
                                     "type": "string"
                                 },
                                 "pet_id": {
@@ -4801,6 +5132,9 @@
                                     "id": {
                                         "type": "string"
                                     },
+                                    "next_dose": {
+                                        "type": "string"
+                                    },
                                     "pet_id": {
                                         "type": "string"
                                     },
@@ -4868,6 +5202,9 @@
                                     "type": "string"
                                 },
                                 "id": {
+                                    "type": "string"
+                                },
+                                "next_dose": {
                                     "type": "string"
                                 },
                                 "pet_id": {
@@ -4969,6 +5306,34 @@
                             }
                         }
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handlers.UserResponse": {
+            "description": "User information",
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "123 Main St, City"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "johndoe@example.com"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "phoneNumber": {
+                    "type": "string",
+                    "example": "+84912345678"
+                },
+                "userId": {
+                    "type": "integer",
+                    "example": 1001
                 }
             }
         }

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -16,6 +17,9 @@ func NewPetRecordService(store RecordsStore) RecordsService {
 
 // --- Pet Methods ---
 func (s *PetRecordService) CreatePet(ctx context.Context, name, species string, age int32, ownerID, color string, weight float32, size string) (string, error) {
+	if name == "" || species == "" || ownerID == "" {
+		return "", errors.New("name, species, and ownerID are required")
+	}
 	pet := &Pet{
 		Name:    name,
 		Species: species,
@@ -33,6 +37,9 @@ func (s *PetRecordService) GetPet(ctx context.Context, id string) (*Pet, error) 
 }
 
 func (s *PetRecordService) UpdatePet(ctx context.Context, id, name, species string, age int32, ownerID, color string, weight float32, size string) (*Pet, error) {
+	if name == "" || species == "" || ownerID == "" {
+		return nil, errors.New("name, species, and ownerID are required")
+	}
 	pet, err := s.store.GetPet(ctx, id)
 	if err != nil {
 		return nil, err
@@ -60,6 +67,9 @@ func (s *PetRecordService) ListPets(ctx context.Context, ownerID string) ([]*Pet
 
 // --- Examination Methods ---
 func (s *PetRecordService) CreateExamination(ctx context.Context, petID, dateStr, vetID, diagnosis, notes string) (string, error) {
+	if petID == "" || vetID == "" {
+		return "", errors.New("petID and vetID are required")
+	}
 	date, err := time.Parse("2006-01-02", dateStr)
 	if err != nil {
 		return "", errors.New("invalid date format")
@@ -79,6 +89,9 @@ func (s *PetRecordService) GetExamination(ctx context.Context, id string) (*Exam
 }
 
 func (s *PetRecordService) UpdateExamination(ctx context.Context, id, petID, dateStr, vetID, diagnosis, notes string) (*Examination, error) {
+	if petID == "" || vetID == "" {
+		return nil, errors.New("petID and vetID are required")
+	}
 	exam, err := s.store.GetExamination(ctx, id)
 	if err != nil {
 		return nil, err
@@ -107,15 +120,26 @@ func (s *PetRecordService) ListExaminations(ctx context.Context, petID string) (
 }
 
 // --- Vaccination Methods ---
-func (s *PetRecordService) CreateVaccination(ctx context.Context, petID, vaccineName, dateStr, vetID string) (string, error) {
+func (s *PetRecordService) CreateVaccination(ctx context.Context, petID, vaccineName, dateStr, nextDoseStr, vetID string) (string, error) {
+	if petID == "" || vaccineName == "" || vetID == "" {
+		return "", errors.New("petID, vaccineName, and vetID are required")
+	}
 	date, err := time.Parse("2006-01-02", dateStr)
 	if err != nil {
 		return "", errors.New("invalid date format")
+	}
+	var nextDose time.Time
+	if nextDoseStr != "" {
+		nextDose, err = time.Parse("2006-01-02", nextDoseStr)
+		if err != nil {
+			return "", errors.New("invalid next dose date format")
+		}
 	}
 	vacc := &Vaccination{
 		PetID:       petID,
 		VaccineName: vaccineName,
 		Date:        date,
+		NextDose:    nextDose,
 		VetID:       vetID,
 	}
 	return s.store.CreateVaccination(ctx, vacc)
@@ -125,7 +149,10 @@ func (s *PetRecordService) GetVaccination(ctx context.Context, id string) (*Vacc
 	return s.store.GetVaccination(ctx, id)
 }
 
-func (s *PetRecordService) UpdateVaccination(ctx context.Context, id, petID, vaccineName, dateStr, vetID string) (*Vaccination, error) {
+func (s *PetRecordService) UpdateVaccination(ctx context.Context, id, petID, vaccineName, dateStr, nextDoseStr, vetID string) (*Vaccination, error) {
+	if petID == "" || vaccineName == "" || vetID == "" {
+		return nil, errors.New("petID, vaccineName, and vetID are required")
+	}
 	vacc, err := s.store.GetVaccination(ctx, id)
 	if err != nil {
 		return nil, err
@@ -134,9 +161,17 @@ func (s *PetRecordService) UpdateVaccination(ctx context.Context, id, petID, vac
 	if err != nil {
 		return nil, errors.New("invalid date format")
 	}
+	var nextDose time.Time
+	if nextDoseStr != "" {
+		nextDose, err = time.Parse("2006-01-02", nextDoseStr)
+		if err != nil {
+			return nil, errors.New("invalid next dose date format")
+		}
+	}
 	vacc.PetID = petID
 	vacc.VaccineName = vaccineName
 	vacc.Date = date
+	vacc.NextDose = nextDose
 	vacc.VetID = vetID
 	if err := s.store.UpdateVaccination(ctx, vacc); err != nil {
 		return nil, err
@@ -153,21 +188,27 @@ func (s *PetRecordService) ListVaccinations(ctx context.Context, petID string) (
 }
 
 // --- Prescription Methods ---
-func (s *PetRecordService) CreatePrescription(ctx context.Context, petID, medication, dosage, startDateStr, endDateStr string) (string, error) {
-	startDate, err := time.Parse("2006-01-02", startDateStr)
-	if err != nil {
-		return "", errors.New("invalid start date format")
+func (s *PetRecordService) CreatePrescription(ctx context.Context, examinationID string, medications []Medication) (string, error) {
+	if examinationID == "" {
+		return "", errors.New("examinationID is required")
 	}
-	endDate, err := time.Parse("2006-01-02", endDateStr)
-	if err != nil {
-		return "", errors.New("invalid end date format")
+	if len(medications) == 0 {
+		return "", errors.New("medications list cannot be empty")
+	}
+	for i, med := range medications {
+		if med.Name == "" || med.Dosage == "" {
+			return "", fmt.Errorf("medication at index %d has empty name or dosage", i)
+		}
+		if med.StartDate.IsZero() || med.EndDate.IsZero() {
+			return "", fmt.Errorf("medication at index %d has invalid start or end date", i)
+		}
+		if med.EndDate.Before(med.StartDate) {
+			return "", fmt.Errorf("medication at index %d has end date before start date", i)
+		}
 	}
 	presc := &Prescription{
-		PetID:      petID,
-		Medication: medication,
-		Dosage:     dosage,
-		StartDate:  startDate,
-		EndDate:    endDate,
+		ExaminationID: examinationID,
+		Medications:   medications,
 	}
 	return s.store.CreatePrescription(ctx, presc)
 }
@@ -176,24 +217,30 @@ func (s *PetRecordService) GetPrescription(ctx context.Context, id string) (*Pre
 	return s.store.GetPrescription(ctx, id)
 }
 
-func (s *PetRecordService) UpdatePrescription(ctx context.Context, id, petID, medication, dosage, startDateStr, endDateStr string) (*Prescription, error) {
+func (s *PetRecordService) UpdatePrescription(ctx context.Context, id, examinationID string, medications []Medication) (*Prescription, error) {
+	if examinationID == "" {
+		return nil, errors.New("examinationID is required")
+	}
+	if len(medications) == 0 {
+		return nil, errors.New("medications list cannot be empty")
+	}
+	for i, med := range medications {
+		if med.Name == "" || med.Dosage == "" {
+			return nil, fmt.Errorf("medication at index %d has empty name or dosage", i)
+		}
+		if med.StartDate.IsZero() || med.EndDate.IsZero() {
+			return nil, fmt.Errorf("medication at index %d has invalid start or end date", i)
+		}
+		if med.EndDate.Before(med.StartDate) {
+			return nil, fmt.Errorf("medication at index %d has end date before start date", i)
+		}
+	}
 	presc, err := s.store.GetPrescription(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	startDate, err := time.Parse("2006-01-02", startDateStr)
-	if err != nil {
-		return nil, errors.New("invalid start date format")
-	}
-	endDate, err := time.Parse("2006-01-02", endDateStr)
-	if err != nil {
-		return nil, errors.New("invalid end date format")
-	}
-	presc.PetID = petID
-	presc.Medication = medication
-	presc.Dosage = dosage
-	presc.StartDate = startDate
-	presc.EndDate = endDate
+	presc.ExaminationID = examinationID
+	presc.Medications = medications
 	if err := s.store.UpdatePrescription(ctx, presc); err != nil {
 		return nil, err
 	}
@@ -204,6 +251,6 @@ func (s *PetRecordService) DeletePrescription(ctx context.Context, id string) er
 	return s.store.DeletePrescription(ctx, id)
 }
 
-func (s *PetRecordService) ListPrescriptions(ctx context.Context, petID string) ([]*Prescription, error) {
-	return s.store.ListPrescriptions(ctx, petID)
+func (s *PetRecordService) ListPrescriptions(ctx context.Context, examinationID string) ([]*Prescription, error) {
+	return s.store.ListPrescriptions(ctx, examinationID)
 }

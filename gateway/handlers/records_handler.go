@@ -46,8 +46,10 @@ func (h *RecordsHandler) RegisterRoutes(e *echo.Group) {
 	e.GET("/prescriptions/:id", h.GetPrescription)
 	e.PUT("/prescriptions", h.UpdatePrescription)
 	e.DELETE("/prescriptions/:id", h.DeletePrescription)
-	e.GET("/prescriptions/pet/:pet_id", h.ListPrescriptions)
+	e.GET("/prescriptions/examination/:examination_id", h.ListPrescriptions)
 }
+
+// --- Pet Methods ---
 
 // CreatePet creates a new pet record
 // @Summary Create a new pet
@@ -92,6 +94,8 @@ func (h *RecordsHandler) CreatePet(c echo.Context) error {
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
 			switch grpcErr.Code() {
+			case codes.InvalidArgument:
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": grpcErr.Message()})
 			case codes.Internal:
 				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error"})
 			}
@@ -180,6 +184,8 @@ func (h *RecordsHandler) UpdatePet(c echo.Context) error {
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
 			switch grpcErr.Code() {
+			case codes.InvalidArgument:
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": grpcErr.Message()})
 			case codes.Internal:
 				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error"})
 			}
@@ -253,6 +259,7 @@ func (h *RecordsHandler) ListPets(c echo.Context) error {
 }
 
 // --- Examination Methods ---
+
 // CreateExamination creates a new examination record
 // @Summary Create a new examination
 // @Description Creates a new examination record for a pet with details like pet ID, date, vet ID, diagnosis, and notes
@@ -298,7 +305,7 @@ func (h *RecordsHandler) CreateExamination(c echo.Context) error {
 		if grpcErr, ok := status.FromError(err); ok {
 			switch grpcErr.Code() {
 			case codes.InvalidArgument:
-				return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid arguments"})
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": grpcErr.Message()})
 			case codes.Internal:
 				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error"})
 			}
@@ -391,6 +398,8 @@ func (h *RecordsHandler) UpdateExamination(c echo.Context) error {
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
 			switch grpcErr.Code() {
+			case codes.InvalidArgument:
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": grpcErr.Message()})
 			case codes.Internal:
 				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error"})
 			}
@@ -464,13 +473,14 @@ func (h *RecordsHandler) ListExaminations(c echo.Context) error {
 }
 
 // --- Vaccination Methods ---
+
 // CreateVaccination creates a new vaccination record
 // @Summary Create a new vaccination
-// @Description Creates a new vaccination record for a pet with details like pet ID, vaccine name, date, and vet ID
+// @Description Creates a new vaccination record for a pet with details like pet ID, vaccine name, date, next dose, and vet ID
 // @Tags Vaccinations
 // @Accept json
 // @Produce json
-// @Param request body object{pet_id=string,vaccine_name=string,date=string,vet_id=string} true "Vaccination details"
+// @Param request body object{pet_id=string,vaccine_name=string,date=string,next_dose=string,vet_id=string} true "Vaccination details"
 // @Success 200 {object} object{id=string} "Vaccination created successfully"
 // @Failure 400 {object} object{error=string} "Invalid request, missing required fields, or invalid date format"
 // @Failure 500 {object} object{error=string} "Internal server error"
@@ -479,7 +489,8 @@ func (h *RecordsHandler) CreateVaccination(c echo.Context) error {
 	var req struct {
 		PetID       string `json:"pet_id"`
 		VaccineName string `json:"vaccine_name"`
-		Date        string `json:"date"` // Format: "2006-01-02"
+		Date        string `json:"date"`      // Format: "2006-01-02"
+		NextDose    string `json:"next_dose"` // Format: "2006-01-02"
 		VetID       string `json:"vet_id"`
 	}
 	if err := c.Bind(&req); err != nil {
@@ -495,19 +506,27 @@ func (h *RecordsHandler) CreateVaccination(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid date format, must be YYYY-MM-DD"})
 	}
+	// Parse next_dose if provided
+	if req.NextDose != "" {
+		_, err := time.Parse("2006-01-02", req.NextDose)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid next_dose format, must be YYYY-MM-DD"})
+		}
+	}
 
 	ctx := c.Request().Context()
 	resp, err := h.client.CreateVaccination(ctx, &pb.CreateVaccinationRequest{
 		PetId:       req.PetID,
 		VaccineName: req.VaccineName,
 		Date:        req.Date,
+		NextDose:    req.NextDose,
 		VetId:       req.VetID,
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
 			switch grpcErr.Code() {
 			case codes.InvalidArgument:
-				return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid arguments"})
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": grpcErr.Message()})
 			case codes.Internal:
 				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error"})
 			}
@@ -524,7 +543,7 @@ func (h *RecordsHandler) CreateVaccination(c echo.Context) error {
 // @Tags Vaccinations
 // @Produce json
 // @Param id path string true "Vaccination ID"
-// @Success 200 {object} object{id=string,pet_id=string,vaccine_name=string,date=string,vet_id=string} "Vaccination details"
+// @Success 200 {object} object{id=string,pet_id=string,vaccine_name=string,date=string,next_dose=string,vet_id=string} "Vaccination details"
 // @Failure 400 {object} object{error=string} "ID is required"
 // @Failure 404 {object} object{error=string} "Vaccination not found"
 // @Failure 500 {object} object{error=string} "Internal server error"
@@ -552,14 +571,14 @@ func (h *RecordsHandler) GetVaccination(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp.Vaccination)
 }
 
-// UpdateVaccination updates an existing vaccination record
+// UpdateVaccination updates an existing Série record
 // @Summary Update a vaccination
-// @Description Updates a vaccination record with details like pet ID, vaccine name, date, and vet ID
+// @Description Updates a vaccination record with details like pet ID, vaccine name, date, next dose date, and vet ID
 // @Tags Vaccinations
 // @Accept json
 // @Produce json
-// @Param request body object{id=string,pet_id=string,vaccine_name=string,date=string,vet_id=string} true "Updated vaccination details"
-// @Success 200 {object} object{id=string,pet_id=string,vaccine_name=string,date=string,vet_id=string} "Vaccination updated successfully"
+// @Param request body object{id=string,pet_id=string,vaccine_name=string,date=string,next_dose=string,vet_id=string} true "Updated vaccination details"
+// @Success 200 {object} object{id=string,pet_id=string,vaccine_name=string,date=string,next_dose=string,vet_id=string} "Vaccination updated successfully"
 // @Failure 400 {object} object{error=string} "Invalid request, ID is required, or invalid date format"
 // @Failure 500 {object} object{error=string} "Internal server error"
 // @Router /vaccinations [put]
@@ -568,7 +587,8 @@ func (h *RecordsHandler) UpdateVaccination(c echo.Context) error {
 		ID          string `json:"id"`
 		PetID       string `json:"pet_id"`
 		VaccineName string `json:"vaccine_name"`
-		Date        string `json:"date"` // Format: "2006-01-02"
+		Date        string `json:"date"`      // Format: "2006-01-02"
+		NextDose    string `json:"next_dose"` // Format: "2006-01-02"
 		VetID       string `json:"vet_id"`
 	}
 	if err := c.Bind(&req); err != nil {
@@ -586,6 +606,13 @@ func (h *RecordsHandler) UpdateVaccination(c echo.Context) error {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid date format, must be YYYY-MM-DD"})
 		}
 	}
+	// Parse date
+	if req.NextDose != "" {
+		_, err := time.Parse("2006-01-02", req.NextDose)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid next_dose format, must be YYYY-MM-DD"})
+		}
+	}
 
 	ctx := c.Request().Context()
 	resp, err := h.client.UpdateVaccination(ctx, &pb.UpdateVaccinationRequest{
@@ -593,11 +620,14 @@ func (h *RecordsHandler) UpdateVaccination(c echo.Context) error {
 		PetId:       req.PetID,
 		VaccineName: req.VaccineName,
 		Date:        req.Date,
+		NextDose:    req.NextDose,
 		VetId:       req.VetID,
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
 			switch grpcErr.Code() {
+			case codes.InvalidArgument:
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": grpcErr.Message()})
 			case codes.Internal:
 				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error"})
 			}
@@ -645,7 +675,7 @@ func (h *RecordsHandler) DeleteVaccination(c echo.Context) error {
 // @Tags Vaccinations
 // @Produce json
 // @Param pet_id path string true "Pet ID"
-// @Success 200 {array} object{id=string,pet_id=string,vaccine_name=string,date=string,vet_id=string} "List of vaccinations"
+// @Success 200 {array} object{id=string,pet_id=string,vaccine_name=string,date=string,next_dose=string,vet_id=string} "List of vaccinations"
 // @Failure 400 {object} object{error=string} "Pet ID is required"
 // @Failure 500 {object} object{error=string} "Internal server error"
 // @Router /vaccinations/pet/{pet_id} [get]
@@ -671,56 +701,68 @@ func (h *RecordsHandler) ListVaccinations(c echo.Context) error {
 }
 
 // --- Prescription Methods ---
+
 // CreatePrescription creates a new prescription record
 // @Summary Create a new prescription
-// @Description Creates a new prescription record for a pet with details like pet ID, medication, dosage, start date, and end date
+// @Description Creates a new prescription record associated with an examination, including a list of medications
 // @Tags Prescriptions
 // @Accept json
 // @Produce json
-// @Param request body object{pet_id=string,medication=string,dosage=string,start_date=string,end_date=string} true "Prescription details"
+// @Param request body object{examination_id=string,medications=[]object{name=string,dosage=string,start_date=string,end_date=string}} true "Prescription details"
 // @Success 200 {object} object{id=string} "Prescription created successfully"
 // @Failure 400 {object} object{error=string} "Invalid request, missing required fields, or invalid date format"
 // @Failure 500 {object} object{error=string} "Internal server error"
 // @Router /prescriptions [post]
 func (h *RecordsHandler) CreatePrescription(c echo.Context) error {
 	var req struct {
-		PetID      string `json:"pet_id"`
-		Medication string `json:"medication"`
-		Dosage     string `json:"dosage"`
-		StartDate  string `json:"start_date"` // Format: "2006-01-02"
-		EndDate    string `json:"end_date"`   // Format: "2006-01-02"
+		ExaminationID string `json:"examination_id"`
+		Medications   []struct {
+			Name      string `json:"name"`
+			Dosage    string `json:"dosage"`
+			StartDate string `json:"start_date"` // Format: "2006-01-02"
+			EndDate   string `json:"end_date"`   // Format: "2006-01-02"
+		} `json:"medications"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
-	if req.PetID == "" || req.Medication == "" || req.Dosage == "" || req.StartDate == "" || req.EndDate == "" {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Pet ID, medication, dosage, start_date, and end_date are required"})
+	if req.ExaminationID == "" || len(req.Medications) == 0 {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Examination ID and at least one medication are required"})
 	}
 
-	// Parse dates
-	_, err := time.Parse("2006-01-02", req.StartDate)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid start_date format, must be YYYY-MM-DD"})
-	}
-	_, err = time.Parse("2006-01-02", req.EndDate)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid end_date format, must be YYYY-MM-DD"})
+	// Validate medications
+	medications := make([]*pb.Medication, len(req.Medications))
+	for i, med := range req.Medications {
+		if med.Name == "" || med.Dosage == "" || med.StartDate == "" || med.EndDate == "" {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Medication name, dosage, start_date, and end_date are required"})
+		}
+		_, err := time.Parse("2006-01-02", med.StartDate)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid start_date format, must be YYYY-MM-DD"})
+		}
+		_, err = time.Parse("2006-01-02", med.EndDate)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid end_date format, must be YYYY-MM-DD"})
+		}
+		medications[i] = &pb.Medication{
+			Name:      med.Name,
+			Dosage:    med.Dosage,
+			StartDate: med.StartDate,
+			EndDate:   med.EndDate,
+		}
 	}
 
 	ctx := c.Request().Context()
 	resp, err := h.client.CreatePrescription(ctx, &pb.CreatePrescriptionRequest{
-		PetId:      req.PetID,
-		Medication: req.Medication,
-		Dosage:     req.Dosage,
-		StartDate:  req.StartDate,
-		EndDate:    req.EndDate,
+		ExaminationId: req.ExaminationID,
+		Medications:   medications,
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
 			switch grpcErr.Code() {
 			case codes.InvalidArgument:
-				return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid arguments"})
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": grpcErr.Message()})
 			case codes.Internal:
 				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error"})
 			}
@@ -737,7 +779,7 @@ func (h *RecordsHandler) CreatePrescription(c echo.Context) error {
 // @Tags Prescriptions
 // @Produce json
 // @Param id path string true "Prescription ID"
-// @Success 200 {object} object{id=string,pet_id=string,medication=string,dosage=string,start_date=string,end_date=string} "Prescription details"
+// @Success 200 {object} object{id=string,examination_id=string,medications=[]object{name=string,dosage=string,start_date=string,end_date=string}} "Prescription details"
 // @Failure 400 {object} object{error=string} "ID is required"
 // @Failure 404 {object} object{error=string} "Prescription not found"
 // @Failure 500 {object} object{error=string} "Internal server error"
@@ -767,23 +809,25 @@ func (h *RecordsHandler) GetPrescription(c echo.Context) error {
 
 // UpdatePrescription updates an existing prescription record
 // @Summary Update a prescription
-// @Description Updates a prescription record with details like pet ID, medication, dosage, start date, and end date
+// @Description Updates a prescription record with details like examination ID and a list of medications
 // @Tags Prescriptions
 // @Accept json
 // @Produce json
-// @Param request body object{id=string,pet_id=string,medication=string,dosage=string,start_date=string,end_date=string} true "Updated prescription details"
-// @Success 200 {object} object{id=string,pet_id=string,medication=string,dosage=string,start_date=string,end_date=string} "Prescription updated successfully"
+// @Param request body object{id=string,examination_id=string,medications=[]object{name=string,dosage=string,start_date=string,end_date=string}} true "Updated prescription details"
+// @Success 200 {object} object{id=string,examination_id=string,medications=[]object{name=string,dosage=string,start_date=string,end_date=string}} "Prescription updated successfully"
 // @Failure 400 {object} object{error=string} "Invalid request, ID is required, or invalid date format"
 // @Failure 500 {object} object{error=string} "Internal server error"
 // @Router /prescriptions [put]
 func (h *RecordsHandler) UpdatePrescription(c echo.Context) error {
 	var req struct {
-		ID         string `json:"id"`
-		PetID      string `json:"pet_id"`
-		Medication string `json:"medication"`
-		Dosage     string `json:"dosage"`
-		StartDate  string `json:"start_date"` // Format: "2006-01-02"
-		EndDate    string `json:"end_date"`   // Format: "2006-01-02"
+		ID            string `json:"id"`
+		ExaminationID string `json:"examination_id"`
+		Medications   []struct {
+			Name      string `json:"name"`
+			Dosage    string `json:"dosage"`
+			StartDate string `json:"start_date"` // Format: "2006-01-02"
+			EndDate   string `json:"end_date"`   // Format: "2006-01-02"
+		} `json:"medications"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
@@ -793,32 +837,39 @@ func (h *RecordsHandler) UpdatePrescription(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "ID is required"})
 	}
 
-	// Parse dates
-	if req.StartDate != "" {
-		_, err := time.Parse("2006-01-02", req.StartDate)
+	// Validate medications
+	medications := make([]*pb.Medication, len(req.Medications))
+	for i, med := range req.Medications {
+		if med.Name == "" || med.Dosage == "" || med.StartDate == "" || med.EndDate == "" {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Medication name, dosage, start_date, and end_date are required"})
+		}
+		_, err := time.Parse("2006-01-02", med.StartDate)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid start_date format, must be YYYY-MM-DD"})
 		}
-	}
-	if req.EndDate != "" {
-		_, err := time.Parse("2006-01-02", req.EndDate)
+		_, err = time.Parse("2006-01-02", med.EndDate)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid end_date format, must be YYYY-MM-DD"})
+		}
+		medications[i] = &pb.Medication{
+			Name:      med.Name,
+			Dosage:    med.Dosage,
+			StartDate: med.StartDate,
+			EndDate:   med.EndDate,
 		}
 	}
 
 	ctx := c.Request().Context()
 	resp, err := h.client.UpdatePrescription(ctx, &pb.UpdatePrescriptionRequest{
-		Id:         req.ID,
-		PetId:      req.PetID,
-		Medication: req.Medication,
-		Dosage:     req.Dosage,
-		StartDate:  req.StartDate,
-		EndDate:    req.EndDate,
+		Id:            req.ID,
+		ExaminationId: req.ExaminationID,
+		Medications:   medications,
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
 			switch grpcErr.Code() {
+			case codes.InvalidArgument:
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": grpcErr.Message()})
 			case codes.Internal:
 				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error"})
 			}
@@ -860,24 +911,24 @@ func (h *RecordsHandler) DeletePrescription(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]bool{"success": resp.Success})
 }
 
-// ListPrescriptions lists all prescriptions for a given pet
-// @Summary List prescriptions by pet
-// @Description Retrieves a list of prescription records for a specific pet ID
+// ListPrescriptions lists all prescriptions for a given examination
+// @Summary List prescriptions by examination
+// @Description Retrieves a list of prescription records for a specific examination ID
 // @Tags Prescriptions
 // @Produce json
-// @Param pet_id path string true "Pet ID"
-// @Success 200 {array} object{id=string,pet_id=string,medication=string,dosage=string,start_date=string,end_date=string} "List of prescriptions"
-// @Failure 400 {object} object{error=string} "Pet ID is required"
+// @Param examination_id path string true "Examination ID"
+// @Success 200 {array} object{id=string,examination_id=string,medications=[]object{name=string,dosage=string,start_date=string,end_date=string}} "List of prescriptions"
+// @Failure 400 {object} object{error=string} "Examination ID is required"
 // @Failure 500 {object} object{error=string} "Internal server error"
-// @Router /prescriptions/pet/{pet_id} [get]
+// @Router /prescriptions/examination/{examination_id} [get]
 func (h *RecordsHandler) ListPrescriptions(c echo.Context) error {
-	petID := c.Param("pet_id")
-	if petID == "" {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Pet ID is required"})
+	examinationID := c.Param("examination_id")
+	if examinationID == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Examination ID is required"})
 	}
 
 	ctx := c.Request().Context()
-	resp, err := h.client.ListPrescriptions(ctx, &pb.ListPrescriptionsRequest{PetId: petID})
+	resp, err := h.client.ListPrescriptions(ctx, &pb.ListPrescriptionsRequest{ExaminationId: examinationID})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
 			switch grpcErr.Code() {

@@ -3,7 +3,6 @@ syntax = "proto3";
 package petrecord;
 
 option go_package = "./proto";
-
 // Pet message
 message Pet {
   string id = 1;
@@ -31,18 +30,25 @@ message Vaccination {
   string id = 1;
   string pet_id = 2;
   string vaccine_name = 3;
-  string date = 4;           // ISO 8601 format
-  string vet_id = 5;
+  string date = 4;           // ISO 8601 format, e.g., "2025-03-02"
+  string next_dose = 5;      // ISO 8601 format, e.g., "2025-06-10"
+  string vet_id = 6;
+}
+
+// Medication message
+message Medication {
+  string name = 1;
+  string dosage = 2;
+  string start_date = 3;     // ISO 8601 format, e.g., "2025-03-02"
+  string end_date = 4;       // ISO 8601 format, e.g., "2025-03-09"
 }
 
 // Prescription message
 message Prescription {
   string id = 1;
-  string pet_id = 2;
-  string medication = 3;
-  string dosage = 4;
-  string start_date = 5;     // ISO 8601 format
-  string end_date = 6;       // ISO 8601 format
+  string examination_id = 2;
+  // List of medications
+  repeated Medication medications = 3;
 }
 
 // --- Pet CRUD ---
@@ -50,9 +56,11 @@ message CreatePetRequest {
   string name = 1;
   string species = 2;
   int32 age = 3;
+  // Use int32 for Go compatibility
   string owner_id = 4;
   string color = 5;
   float weight = 6;
+  // Float for weight
   string size = 7;
 }
 
@@ -101,7 +109,7 @@ message ListPetsResponse {
 
 // --- Examination CRUD ---
 message CreateExaminationRequest {
-  string pet_id = 1;
+  string pet_id =1;
   string date = 2;
   string vet_id = 3;
   string diagnosis = 4;
@@ -154,7 +162,8 @@ message CreateVaccinationRequest {
   string pet_id = 1;
   string vaccine_name = 2;
   string date = 3;
-  string vet_id = 4;
+  string next_dose = 4;
+  string vet_id = 5;
 }
 
 message CreateVaccinationResponse {
@@ -174,7 +183,8 @@ message UpdateVaccinationRequest {
   string pet_id = 2;
   string vaccine_name = 3;
   string date = 4;
-  string vet_id = 5;
+  string next_dose = 5;
+  string vet_id = 6;
 }
 
 message UpdateVaccinationResponse {
@@ -199,11 +209,8 @@ message ListVaccinationsResponse {
 
 // --- Prescription CRUD ---
 message CreatePrescriptionRequest {
-  string pet_id = 1;
-  string medication = 2;
-  string dosage = 3;
-  string start_date = 4;
-  string end_date = 5;
+  string examination_id = 1;
+  repeated Medication medications = 2;
 }
 
 message CreatePrescriptionResponse {
@@ -220,11 +227,8 @@ message GetPrescriptionResponse {
 
 message UpdatePrescriptionRequest {
   string id = 1;
-  string pet_id = 2;
-  string medication = 3;
-  string dosage = 4;
-  string start_date = 5;
-  string end_date = 6;
+  string examination_id = 2;
+  repeated Medication medications = 3;
 }
 
 message UpdatePrescriptionResponse {
@@ -240,7 +244,7 @@ message DeletePrescriptionResponse {
 }
 
 message ListPrescriptionsRequest {
-  string pet_id = 1;
+  string examination_id = 1;
 }
 
 message ListPrescriptionsResponse {
