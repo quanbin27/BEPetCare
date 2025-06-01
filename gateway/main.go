@@ -98,7 +98,7 @@ func main() {
 	httpAddr := config.Envs.HTTP_ADDR
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://26.199.48.182:3000", "http://26.30.229.237:8080"},
+		AllowOrigins: []string{"*"},
 		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE},
 		AllowHeaders: []string{
 			echo.HeaderOrigin,
@@ -106,7 +106,7 @@ func main() {
 			echo.HeaderAccept,
 			echo.HeaderAuthorization, // Thêm dòng này để cho phép Authorization
 		},
-		AllowCredentials: true,
+		AllowCredentials: false,
 	}))
 
 	subrouter := e.Group("/api/v1")

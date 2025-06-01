@@ -19,6 +19,13 @@ definitions:
         example: 1001
         type: integer
     type: object
+  handlers.VerifyEmailRequest:
+    description: Request to verify email
+    properties:
+      token:
+        example: abc123def456
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -595,15 +602,18 @@ paths:
       tags:
       - Users
   /auth/verify:
-    get:
+    post:
+      consumes:
+      - application/json
       description: Verifies a user's email using a token sent in the verification
         email
       parameters:
-      - description: Verification token
-        in: query
-        name: token
+      - description: Verification token in request body
+        in: body
+        name: request
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/handlers.VerifyEmailRequest'
       produces:
       - application/json
       responses:

@@ -892,8 +892,11 @@ const docTemplate = `{
             }
         },
         "/auth/verify": {
-            "get": {
+            "post": {
                 "description": "Verifies a user's email using a token sent in the verification email",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -903,11 +906,13 @@ const docTemplate = `{
                 "summary": "Verify user email",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Verification token",
-                        "name": "token",
-                        "in": "query",
-                        "required": true
+                        "description": "Verification token in request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.VerifyEmailRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -5337,6 +5342,16 @@ const docTemplate = `{
                 "userId": {
                     "type": "integer",
                     "example": 1001
+                }
+            }
+        },
+        "handlers.VerifyEmailRequest": {
+            "description": "Request to verify email",
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string",
+                    "example": "abc123def456"
                 }
             }
         }

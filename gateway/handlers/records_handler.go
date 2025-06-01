@@ -255,7 +255,12 @@ func (h *RecordsHandler) ListPets(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, resp.Pets)
+	pets := resp.Pets
+	if pets == nil {
+		pets = []*pb.Pet{} // trả về mảng rỗng thay vì null
+	}
+
+	return c.JSON(http.StatusOK, pets)
 }
 
 // --- Examination Methods ---

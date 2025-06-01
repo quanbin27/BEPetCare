@@ -108,12 +108,13 @@ func (h *UserHandler) Register(c echo.Context) error {
 // @Summary Verify user email
 // @Description Verifies a user's email using a token sent in the verification email
 // @Tags Users
+// @Accept json
 // @Produce json
-// @Param token query string true "Verification token"
+// @Param request body VerifyEmailRequest true "Verification token in request body"
 // @Success 200 {object} object{id=int32} "User ID"
 // @Failure 400 {object} object{error=string} "Token is required or invalid"
 // @Failure 500 {object} object{error=string} "Internal server error"
-// @Router /auth/verify [get]
+// @Router /auth/verify [post]
 func (h *UserHandler) VerifyEmail(c echo.Context) error {
 	var req VerifyEmailRequest
 	if err := c.Bind(&req); err != nil {
