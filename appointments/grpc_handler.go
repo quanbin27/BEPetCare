@@ -67,7 +67,7 @@ func (h *AppointmentGrpcHandler) GetAppointmentsByEmployee(ctx context.Context, 
 	return &pb.GetAppointmentsResponse{Appointments: pbAppointments}, nil
 }
 func (h *AppointmentGrpcHandler) GetAppointmentsByBranch(ctx context.Context, req *pb.GetAppointmentsByBranchRequest) (*pb.GetAppointmentsResponse, error) {
-	appointments, err := h.appointmentService.GetAppointmentsByEmployee(ctx, req.BranchId)
+	appointments, err := h.appointmentService.GetAppointmentsByBranch(ctx, req.BranchId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}

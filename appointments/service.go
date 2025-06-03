@@ -7,11 +7,45 @@ import (
 )
 
 type AppService struct {
-	store AppointmentStore
+	store         AppointmentStore
+	priceStrategy PriceCalculationStrategy
 }
 
-func NewAppointmentService(store AppointmentStore) AppointmentService {
-	return &AppService{store: store}
+func NewAppointmentService(store AppointmentStore, strategy PriceCalculationStrategy) AppointmentService {
+	return &AppService{store: store, priceStrategy: strategy}
+}
+
+type PriceCalculationStrategy interface {
+	CalculateTotal(services []AppointmentDetail, servicePriceMap map[int32]float32) (float32, error)
+}
+type StandardPriceStrategy struct{}
+
+func (s *StandardPriceStrategy) CalculateTotal(services []AppointmentDetail, servicePriceMap map[int32]float32) (float32, error) {
+	var total float32
+	for _, item := range services {
+		price, exists := servicePriceMap[item.ServiceID]
+		if !exists {
+			return 0, fmt.Errorf("service ID %d not found", item.ServiceID)
+		}
+		total += float32(item.Quantity) * price
+	}
+	return total, nil
+}
+
+type DiscountPriceStrategy struct {
+	discount float32
+}
+
+func (s *DiscountPriceStrategy) CalculateTotal(services []AppointmentDetail, servicePriceMap map[int32]float32) (float32, error) {
+	var total float32
+	for _, item := range services {
+		price, exists := servicePriceMap[item.ServiceID]
+		if !exists {
+			return 0, fmt.Errorf("service ID %d not found", item.ServiceID)
+		}
+		total += float32(item.Quantity) * price
+	}
+	return total * (1 - s.discount), nil
 }
 
 // --- LỊCH HẸN ---
@@ -35,16 +69,7 @@ func (s *AppService) CreateAppointment(ctx context.Context, customerID int32, cu
 		servicePriceMap[svc.ID] = svc.Price
 	}
 
-	// Tính lại total dựa trên giá từ database
-	var total float32 = 0
-	for i, item := range services {
-		price, exists := servicePriceMap[item.ServiceID]
-		if !exists {
-			return 0, "Failed", fmt.Errorf("service ID %d not found", item.ServiceID)
-		}
-		services[i].ServicePrice = price // Gán giá từ database vào struct
-		total += float32(item.Quantity) * price
-	}
+	total, err := s.priceStrategy.CalculateTotal(services, servicePriceMap)
 
 	// Gọi Store để tạo lịch hẹn
 	id, err := s.store.CreateAppointment(ctx, customerID, customerAddress, scheduledTime, services, total, note, branchID)
@@ -67,7 +92,7 @@ func (s *AppService) GetAppointmentsByEmployee(ctx context.Context, employeeID i
 
 // Lấy lịch hẹn theo nhân viên
 func (s *AppService) GetAppointmentsByBranch(ctx context.Context, branchID int32) ([]Appointment, error) {
-	return s.store.GetAppointmentsByEmployee(ctx, branchID)
+	return s.store.GetAppointmentsByBranch(ctx, branchID)
 }
 
 // Cập nhật trạng thái lịch hẹn

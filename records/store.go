@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -202,7 +203,10 @@ func (s *MongoStore) ListExaminations(ctx context.Context, petID string) ([]*Exa
 			return nil, err
 		}
 		exams = append(exams, &exam)
+		fmt.Printf("Exam: %+v\n", exam)
+
 	}
+
 	return exams, nil
 }
 
@@ -298,20 +302,14 @@ func (s *MongoStore) DeletePrescription(ctx context.Context, id string) error {
 	return err
 }
 
-func (s *MongoStore) ListPrescriptions(ctx context.Context, examinationID string) ([]*Prescription, error) {
-	cursor, err := s.prescripts.Find(ctx, bson.M{"examination_id": examinationID})
+func (s *MongoStore) GetPrescriptionByExaminationID(ctx context.Context, examinationID string) (*Prescription, error) {
+	var presc Prescription
+	err := s.prescripts.FindOne(ctx, bson.M{"examination_id": examinationID}).Decode(&presc)
 	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil // không có đơn thuốc
+		}
 		return nil, err
 	}
-	defer cursor.Close(ctx)
-
-	var prescs []*Prescription
-	for cursor.Next(ctx) {
-		var presc Prescription
-		if err := cursor.Decode(&presc); err != nil {
-			return nil, err
-		}
-		prescs = append(prescs, &presc)
-	}
-	return prescs, nil
+	return &presc, nil
 }

@@ -66,7 +66,7 @@ func (s *PetRecordService) ListPets(ctx context.Context, ownerID string) ([]*Pet
 }
 
 // --- Examination Methods ---
-func (s *PetRecordService) CreateExamination(ctx context.Context, petID, dateStr, vetID, diagnosis, notes string) (string, error) {
+func (s *PetRecordService) CreateExamination(ctx context.Context, petID, dateStr, vetID, diagnosis, notes, vetName string) (string, error) {
 	if petID == "" || vetID == "" {
 		return "", errors.New("petID and vetID are required")
 	}
@@ -80,6 +80,7 @@ func (s *PetRecordService) CreateExamination(ctx context.Context, petID, dateStr
 		VetID:     vetID,
 		Diagnosis: diagnosis,
 		Notes:     notes,
+		VetName:   vetName,
 	}
 	return s.store.CreateExamination(ctx, exam)
 }
@@ -88,7 +89,7 @@ func (s *PetRecordService) GetExamination(ctx context.Context, id string) (*Exam
 	return s.store.GetExamination(ctx, id)
 }
 
-func (s *PetRecordService) UpdateExamination(ctx context.Context, id, petID, dateStr, vetID, diagnosis, notes string) (*Examination, error) {
+func (s *PetRecordService) UpdateExamination(ctx context.Context, id, petID, dateStr, vetID, diagnosis, notes, vetName string) (*Examination, error) {
 	if petID == "" || vetID == "" {
 		return nil, errors.New("petID and vetID are required")
 	}
@@ -105,6 +106,7 @@ func (s *PetRecordService) UpdateExamination(ctx context.Context, id, petID, dat
 	exam.VetID = vetID
 	exam.Diagnosis = diagnosis
 	exam.Notes = notes
+	exam.VetName = vetName
 	if err := s.store.UpdateExamination(ctx, exam); err != nil {
 		return nil, err
 	}
@@ -120,7 +122,7 @@ func (s *PetRecordService) ListExaminations(ctx context.Context, petID string) (
 }
 
 // --- Vaccination Methods ---
-func (s *PetRecordService) CreateVaccination(ctx context.Context, petID, vaccineName, dateStr, nextDoseStr, vetID string) (string, error) {
+func (s *PetRecordService) CreateVaccination(ctx context.Context, petID, vaccineName, dateStr, nextDoseStr, vetID, vetName string) (string, error) {
 	if petID == "" || vaccineName == "" || vetID == "" {
 		return "", errors.New("petID, vaccineName, and vetID are required")
 	}
@@ -141,6 +143,7 @@ func (s *PetRecordService) CreateVaccination(ctx context.Context, petID, vaccine
 		Date:        date,
 		NextDose:    nextDose,
 		VetID:       vetID,
+		VetName:     vetName,
 	}
 	return s.store.CreateVaccination(ctx, vacc)
 }
@@ -149,7 +152,7 @@ func (s *PetRecordService) GetVaccination(ctx context.Context, id string) (*Vacc
 	return s.store.GetVaccination(ctx, id)
 }
 
-func (s *PetRecordService) UpdateVaccination(ctx context.Context, id, petID, vaccineName, dateStr, nextDoseStr, vetID string) (*Vaccination, error) {
+func (s *PetRecordService) UpdateVaccination(ctx context.Context, id, petID, vaccineName, dateStr, nextDoseStr, vetID, vetName string) (*Vaccination, error) {
 	if petID == "" || vaccineName == "" || vetID == "" {
 		return nil, errors.New("petID, vaccineName, and vetID are required")
 	}
@@ -173,6 +176,7 @@ func (s *PetRecordService) UpdateVaccination(ctx context.Context, id, petID, vac
 	vacc.Date = date
 	vacc.NextDose = nextDose
 	vacc.VetID = vetID
+	vacc.VetName = vetName
 	if err := s.store.UpdateVaccination(ctx, vacc); err != nil {
 		return nil, err
 	}
@@ -251,6 +255,6 @@ func (s *PetRecordService) DeletePrescription(ctx context.Context, id string) er
 	return s.store.DeletePrescription(ctx, id)
 }
 
-func (s *PetRecordService) ListPrescriptions(ctx context.Context, examinationID string) ([]*Prescription, error) {
-	return s.store.ListPrescriptions(ctx, examinationID)
+func (s *PetRecordService) GetPrescriptionByExaminationID(ctx context.Context, examinationID string) (*Prescription, error) {
+	return s.store.GetPrescriptionByExaminationID(ctx, examinationID)
 }

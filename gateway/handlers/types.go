@@ -114,6 +114,22 @@ type VerifyEmailRequest struct {
 	Token string `json:"token" example:"abc123def456" description:"Verification token sent to the user's email"`
 }
 
+// MedicationResponse represents a medication item in the prescription.
+type MedicationResponse struct {
+	Name       string `json:"name"`
+	Dosage     string `json:"dosage"`
+	StartDate  string `json:"start_date"`
+	EndDate    string `json:"end_date"`
+	MedicineID string `json:"medicine_id"`
+}
+
+// PrescriptionResponse represents the structure of the prescription returned in the API.
+type PrescriptionResponse struct {
+	ID            string               `json:"id"`
+	ExaminationID string               `json:"examination_id"`
+	Medications   []MedicationResponse `json:"medications"`
+}
+
 func toAppointmentResponse(pbApp *pb.Appointment) AppointmentResponse {
 	return AppointmentResponse{
 		ID:              pbApp.Id,

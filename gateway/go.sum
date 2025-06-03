@@ -63,6 +63,14 @@ github.com/quanbin27/commons v0.0.0-20250520153201-468c1870654d h1:wian9rrUodkNl
 github.com/quanbin27/commons v0.0.0-20250520153201-468c1870654d/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
 github.com/quanbin27/commons v0.0.0-20250531152625-ac2658474b90 h1:MsLYrSQ9ugAAmxoBxcopCP63NtLxWCpj9zUhoppQqJM=
 github.com/quanbin27/commons v0.0.0-20250531152625-ac2658474b90/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
+github.com/quanbin27/commons v0.0.0-20250601034642-7972ff552c20 h1:iKn79HC1FO1OynvRBcTiatPEJSm/zcR2z/4xlc7bjOA=
+github.com/quanbin27/commons v0.0.0-20250601034642-7972ff552c20/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
+github.com/quanbin27/commons v0.0.0-20250601040102-816e2c77fe3d h1:jI6NkcCdEx2d9upCiOQHSL/n3i1dlec2rKZR8Ig1FBI=
+github.com/quanbin27/commons v0.0.0-20250601040102-816e2c77fe3d/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
+github.com/quanbin27/commons v0.0.0-20250601101912-bec0f575a99d h1:l00vOeKbwqrzrRcppPq9oIOzI+BZ5DRZStA/y+StLQo=
+github.com/quanbin27/commons v0.0.0-20250601101912-bec0f575a99d/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
+github.com/quanbin27/commons v0.0.0-20250601103330-b63eb2c62d05 h1:IvTo5RBSAXvD2AeXZgRpbVn1L3vg7EsNGU09/IU9/TE=
+github.com/quanbin27/commons v0.0.0-20250601103330-b63eb2c62d05/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=

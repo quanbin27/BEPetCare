@@ -1,5 +1,29 @@
 basePath: /api/v1
 definitions:
+  handlers.MedicationResponse:
+    properties:
+      dosage:
+        type: string
+      end_date:
+        type: string
+      medicine_id:
+        type: string
+      name:
+        type: string
+      start_date:
+        type: string
+    type: object
+  handlers.PrescriptionResponse:
+    properties:
+      examination_id:
+        type: string
+      id:
+        type: string
+      medications:
+        items:
+          $ref: '#/definitions/handlers.MedicationResponse'
+        type: array
+    type: object
   handlers.UserResponse:
     description: User information
     properties:
@@ -966,6 +990,8 @@ paths:
               type: string
             vet_id:
               type: string
+            vet_name:
+              type: string
           type: object
       produces:
       - application/json
@@ -1017,6 +1043,8 @@ paths:
             pet_id:
               type: string
             vet_id:
+              type: string
+            vet_name:
               type: string
           type: object
       produces:
@@ -1830,6 +1858,8 @@ paths:
                     type: string
                   end_date:
                     type: string
+                  medicine_id:
+                    type: string
                   name:
                     type: string
                   start_date:
@@ -1887,6 +1917,8 @@ paths:
                     type: string
                   end_date:
                     type: string
+                  medicine_id:
+                    type: string
                   name:
                     type: string
                   start_date:
@@ -1911,6 +1943,8 @@ paths:
                     dosage:
                       type: string
                     end_date:
+                      type: string
+                    medicine_id:
                       type: string
                     name:
                       type: string
@@ -1998,6 +2032,8 @@ paths:
                       type: string
                     end_date:
                       type: string
+                    medicine_id:
+                      type: string
                     name:
                       type: string
                     start_date:
@@ -2031,8 +2067,8 @@ paths:
       - Prescriptions
   /prescriptions/examination/{examination_id}:
     get:
-      description: Retrieves a list of prescription records for a specific examination
-        ID
+      description: Retrieves the prescription associated with the specified examination
+        ID. Returns an empty object if not found.
       parameters:
       - description: Examination ID
         in: path
@@ -2043,44 +2079,22 @@ paths:
       - application/json
       responses:
         "200":
-          description: List of prescriptions
+          description: Prescription object or empty if not found
           schema:
-            items:
-              properties:
-                examination_id:
-                  type: string
-                id:
-                  type: string
-                medications:
-                  items:
-                    properties:
-                      dosage:
-                        type: string
-                      end_date:
-                        type: string
-                      name:
-                        type: string
-                      start_date:
-                        type: string
-                    type: object
-                  type: array
-              type: object
-            type: array
+            $ref: '#/definitions/handlers.PrescriptionResponse'
         "400":
-          description: Examination ID is required
+          description: 'Bad Request: Examination ID is required'
           schema:
-            properties:
-              error:
-                type: string
+            additionalProperties:
+              type: string
             type: object
         "500":
-          description: Internal server error
+          description: Internal Server Error
           schema:
-            properties:
-              error:
-                type: string
+            additionalProperties:
+              type: string
             type: object
-      summary: List prescriptions by examination
+      summary: Get prescription by examination ID
       tags:
       - Prescriptions
   /products:
@@ -3252,6 +3266,8 @@ paths:
               type: string
             vet_id:
               type: string
+            vet_name:
+              type: string
           type: object
       produces:
       - application/json
@@ -3303,6 +3319,8 @@ paths:
             vaccine_name:
               type: string
             vet_id:
+              type: string
+            vet_name:
               type: string
           type: object
       produces:

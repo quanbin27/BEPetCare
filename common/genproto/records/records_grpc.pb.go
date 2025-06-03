@@ -19,26 +19,26 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PetRecordService_CreatePet_FullMethodName          = "/petrecord.PetRecordService/CreatePet"
-	PetRecordService_GetPet_FullMethodName             = "/petrecord.PetRecordService/GetPet"
-	PetRecordService_UpdatePet_FullMethodName          = "/petrecord.PetRecordService/UpdatePet"
-	PetRecordService_DeletePet_FullMethodName          = "/petrecord.PetRecordService/DeletePet"
-	PetRecordService_ListPets_FullMethodName           = "/petrecord.PetRecordService/ListPets"
-	PetRecordService_CreateExamination_FullMethodName  = "/petrecord.PetRecordService/CreateExamination"
-	PetRecordService_GetExamination_FullMethodName     = "/petrecord.PetRecordService/GetExamination"
-	PetRecordService_UpdateExamination_FullMethodName  = "/petrecord.PetRecordService/UpdateExamination"
-	PetRecordService_DeleteExamination_FullMethodName  = "/petrecord.PetRecordService/DeleteExamination"
-	PetRecordService_ListExaminations_FullMethodName   = "/petrecord.PetRecordService/ListExaminations"
-	PetRecordService_CreateVaccination_FullMethodName  = "/petrecord.PetRecordService/CreateVaccination"
-	PetRecordService_GetVaccination_FullMethodName     = "/petrecord.PetRecordService/GetVaccination"
-	PetRecordService_UpdateVaccination_FullMethodName  = "/petrecord.PetRecordService/UpdateVaccination"
-	PetRecordService_DeleteVaccination_FullMethodName  = "/petrecord.PetRecordService/DeleteVaccination"
-	PetRecordService_ListVaccinations_FullMethodName   = "/petrecord.PetRecordService/ListVaccinations"
-	PetRecordService_CreatePrescription_FullMethodName = "/petrecord.PetRecordService/CreatePrescription"
-	PetRecordService_GetPrescription_FullMethodName    = "/petrecord.PetRecordService/GetPrescription"
-	PetRecordService_UpdatePrescription_FullMethodName = "/petrecord.PetRecordService/UpdatePrescription"
-	PetRecordService_DeletePrescription_FullMethodName = "/petrecord.PetRecordService/DeletePrescription"
-	PetRecordService_ListPrescriptions_FullMethodName  = "/petrecord.PetRecordService/ListPrescriptions"
+	PetRecordService_CreatePet_FullMethodName                      = "/petrecord.PetRecordService/CreatePet"
+	PetRecordService_GetPet_FullMethodName                         = "/petrecord.PetRecordService/GetPet"
+	PetRecordService_UpdatePet_FullMethodName                      = "/petrecord.PetRecordService/UpdatePet"
+	PetRecordService_DeletePet_FullMethodName                      = "/petrecord.PetRecordService/DeletePet"
+	PetRecordService_ListPets_FullMethodName                       = "/petrecord.PetRecordService/ListPets"
+	PetRecordService_CreateExamination_FullMethodName              = "/petrecord.PetRecordService/CreateExamination"
+	PetRecordService_GetExamination_FullMethodName                 = "/petrecord.PetRecordService/GetExamination"
+	PetRecordService_UpdateExamination_FullMethodName              = "/petrecord.PetRecordService/UpdateExamination"
+	PetRecordService_DeleteExamination_FullMethodName              = "/petrecord.PetRecordService/DeleteExamination"
+	PetRecordService_ListExaminations_FullMethodName               = "/petrecord.PetRecordService/ListExaminations"
+	PetRecordService_CreateVaccination_FullMethodName              = "/petrecord.PetRecordService/CreateVaccination"
+	PetRecordService_GetVaccination_FullMethodName                 = "/petrecord.PetRecordService/GetVaccination"
+	PetRecordService_UpdateVaccination_FullMethodName              = "/petrecord.PetRecordService/UpdateVaccination"
+	PetRecordService_DeleteVaccination_FullMethodName              = "/petrecord.PetRecordService/DeleteVaccination"
+	PetRecordService_ListVaccinations_FullMethodName               = "/petrecord.PetRecordService/ListVaccinations"
+	PetRecordService_CreatePrescription_FullMethodName             = "/petrecord.PetRecordService/CreatePrescription"
+	PetRecordService_GetPrescription_FullMethodName                = "/petrecord.PetRecordService/GetPrescription"
+	PetRecordService_UpdatePrescription_FullMethodName             = "/petrecord.PetRecordService/UpdatePrescription"
+	PetRecordService_DeletePrescription_FullMethodName             = "/petrecord.PetRecordService/DeletePrescription"
+	PetRecordService_GetPrescriptionByExaminationID_FullMethodName = "/petrecord.PetRecordService/GetPrescriptionByExaminationID"
 )
 
 // PetRecordServiceClient is the client API for PetRecordService service.
@@ -70,7 +70,7 @@ type PetRecordServiceClient interface {
 	GetPrescription(ctx context.Context, in *GetPrescriptionRequest, opts ...grpc.CallOption) (*GetPrescriptionResponse, error)
 	UpdatePrescription(ctx context.Context, in *UpdatePrescriptionRequest, opts ...grpc.CallOption) (*UpdatePrescriptionResponse, error)
 	DeletePrescription(ctx context.Context, in *DeletePrescriptionRequest, opts ...grpc.CallOption) (*DeletePrescriptionResponse, error)
-	ListPrescriptions(ctx context.Context, in *ListPrescriptionsRequest, opts ...grpc.CallOption) (*ListPrescriptionsResponse, error)
+	GetPrescriptionByExaminationID(ctx context.Context, in *GetPrescriptionByExaminationIDRequest, opts ...grpc.CallOption) (*GetPrescriptionByExaminationIDResponse, error)
 }
 
 type petRecordServiceClient struct {
@@ -271,10 +271,10 @@ func (c *petRecordServiceClient) DeletePrescription(ctx context.Context, in *Del
 	return out, nil
 }
 
-func (c *petRecordServiceClient) ListPrescriptions(ctx context.Context, in *ListPrescriptionsRequest, opts ...grpc.CallOption) (*ListPrescriptionsResponse, error) {
+func (c *petRecordServiceClient) GetPrescriptionByExaminationID(ctx context.Context, in *GetPrescriptionByExaminationIDRequest, opts ...grpc.CallOption) (*GetPrescriptionByExaminationIDResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListPrescriptionsResponse)
-	err := c.cc.Invoke(ctx, PetRecordService_ListPrescriptions_FullMethodName, in, out, cOpts...)
+	out := new(GetPrescriptionByExaminationIDResponse)
+	err := c.cc.Invoke(ctx, PetRecordService_GetPrescriptionByExaminationID_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -310,7 +310,7 @@ type PetRecordServiceServer interface {
 	GetPrescription(context.Context, *GetPrescriptionRequest) (*GetPrescriptionResponse, error)
 	UpdatePrescription(context.Context, *UpdatePrescriptionRequest) (*UpdatePrescriptionResponse, error)
 	DeletePrescription(context.Context, *DeletePrescriptionRequest) (*DeletePrescriptionResponse, error)
-	ListPrescriptions(context.Context, *ListPrescriptionsRequest) (*ListPrescriptionsResponse, error)
+	GetPrescriptionByExaminationID(context.Context, *GetPrescriptionByExaminationIDRequest) (*GetPrescriptionByExaminationIDResponse, error)
 	mustEmbedUnimplementedPetRecordServiceServer()
 }
 
@@ -378,8 +378,8 @@ func (UnimplementedPetRecordServiceServer) UpdatePrescription(context.Context, *
 func (UnimplementedPetRecordServiceServer) DeletePrescription(context.Context, *DeletePrescriptionRequest) (*DeletePrescriptionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePrescription not implemented")
 }
-func (UnimplementedPetRecordServiceServer) ListPrescriptions(context.Context, *ListPrescriptionsRequest) (*ListPrescriptionsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListPrescriptions not implemented")
+func (UnimplementedPetRecordServiceServer) GetPrescriptionByExaminationID(context.Context, *GetPrescriptionByExaminationIDRequest) (*GetPrescriptionByExaminationIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPrescriptionByExaminationID not implemented")
 }
 func (UnimplementedPetRecordServiceServer) mustEmbedUnimplementedPetRecordServiceServer() {}
 func (UnimplementedPetRecordServiceServer) testEmbeddedByValue()                          {}
@@ -744,20 +744,20 @@ func _PetRecordService_DeletePrescription_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PetRecordService_ListPrescriptions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListPrescriptionsRequest)
+func _PetRecordService_GetPrescriptionByExaminationID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPrescriptionByExaminationIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PetRecordServiceServer).ListPrescriptions(ctx, in)
+		return srv.(PetRecordServiceServer).GetPrescriptionByExaminationID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PetRecordService_ListPrescriptions_FullMethodName,
+		FullMethod: PetRecordService_GetPrescriptionByExaminationID_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PetRecordServiceServer).ListPrescriptions(ctx, req.(*ListPrescriptionsRequest))
+		return srv.(PetRecordServiceServer).GetPrescriptionByExaminationID(ctx, req.(*GetPrescriptionByExaminationIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -846,8 +846,8 @@ var PetRecordService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _PetRecordService_DeletePrescription_Handler,
 		},
 		{
-			MethodName: "ListPrescriptions",
-			Handler:    _PetRecordService_ListPrescriptions_Handler,
+			MethodName: "GetPrescriptionByExaminationID",
+			Handler:    _PetRecordService_GetPrescriptionByExaminationID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

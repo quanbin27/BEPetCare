@@ -26,6 +26,7 @@ type Examination struct {
 	VetID     string             `bson:"vet_id"`
 	Diagnosis string             `bson:"diagnosis"`
 	Notes     string             `bson:"notes"`
+	VetName   string             `bson:"vet_name"`
 }
 
 type Vaccination struct {
@@ -35,14 +36,16 @@ type Vaccination struct {
 	Date        time.Time          `bson:"date"`
 	NextDose    time.Time          `bson:"next_dose,omitempty"`
 	VetID       string             `bson:"vet_id"`
+	VetName     string             `bson:"vet_name"`
 }
 
 // Medication represents a single medication in a prescription
 type Medication struct {
-	Name      string    `bson:"name"`
-	Dosage    string    `bson:"dosage"`
-	StartDate time.Time `bson:"start_date"` // Moved to Medication
-	EndDate   time.Time `bson:"end_date"`   // Moved to Medication
+	MedicineID string    `bson:"medicine_id"`
+	Name       string    `bson:"name"`
+	Dosage     string    `bson:"dosage"`
+	StartDate  time.Time `bson:"start_date"` // Moved to Medication
+	EndDate    time.Time `bson:"end_date"`   // Moved to Medication
 }
 
 // Prescription represents a prescription record, linked to an examination
@@ -78,7 +81,7 @@ type RecordsStore interface {
 	GetPrescription(ctx context.Context, id string) (*Prescription, error)
 	UpdatePrescription(ctx context.Context, presc *Prescription) error
 	DeletePrescription(ctx context.Context, id string) error
-	ListPrescriptions(ctx context.Context, examinationID string) ([]*Prescription, error)
+	GetPrescriptionByExaminationID(ctx context.Context, examinationID string) (*Prescription, error)
 }
 
 // RecordsService defines the interface for business logic operations
@@ -90,15 +93,15 @@ type RecordsService interface {
 	DeletePet(ctx context.Context, id string) error
 	ListPets(ctx context.Context, ownerID string) ([]*Pet, error)
 
-	CreateExamination(ctx context.Context, petID, dateStr, vetID, diagnosis, notes string) (string, error)
+	CreateExamination(ctx context.Context, petID, dateStr, vetID, diagnosis, notes, vetName string) (string, error)
 	GetExamination(ctx context.Context, id string) (*Examination, error)
-	UpdateExamination(ctx context.Context, id, petID, dateStr, vetID, diagnosis, notes string) (*Examination, error)
+	UpdateExamination(ctx context.Context, id, petID, dateStr, vetID, diagnosis, notes, vetName string) (*Examination, error)
 	DeleteExamination(ctx context.Context, id string) error
 	ListExaminations(ctx context.Context, petID string) ([]*Examination, error)
 
-	CreateVaccination(ctx context.Context, petID, vaccineName, dateStr, nextDoseStr, vetID string) (string, error)
+	CreateVaccination(ctx context.Context, petID, vaccineName, dateStr, nextDoseStr, vetID, vetName string) (string, error)
 	GetVaccination(ctx context.Context, id string) (*Vaccination, error)
-	UpdateVaccination(ctx context.Context, id, petID, vaccineName, dateStr, nextDoseStr, vetID string) (*Vaccination, error)
+	UpdateVaccination(ctx context.Context, id, petID, vaccineName, dateStr, nextDoseStr, vetID, vetName string) (*Vaccination, error)
 	DeleteVaccination(ctx context.Context, id string) error
 	ListVaccinations(ctx context.Context, petID string) ([]*Vaccination, error)
 
@@ -107,5 +110,5 @@ type RecordsService interface {
 	GetPrescription(ctx context.Context, id string) (*Prescription, error)
 	UpdatePrescription(ctx context.Context, id, examinationID string, medications []Medication) (*Prescription, error)
 	DeletePrescription(ctx context.Context, id string) error
-	ListPrescriptions(ctx context.Context, examinationID string) ([]*Prescription, error)
+	GetPrescriptionByExaminationID(ctx context.Context, examinationID string) (*Prescription, error)
 }

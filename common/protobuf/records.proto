@@ -23,6 +23,7 @@ message Examination {
   string vet_id = 4;
   string diagnosis = 5;
   string notes = 6;
+  string vet_name=7;
 }
 
 // Vaccination message
@@ -33,14 +34,17 @@ message Vaccination {
   string date = 4;           // ISO 8601 format, e.g., "2025-03-02"
   string next_dose = 5;      // ISO 8601 format, e.g., "2025-06-10"
   string vet_id = 6;
+  string vet_name=7;
 }
 
 // Medication message
 message Medication {
+
   string name = 1;
   string dosage = 2;
   string start_date = 3;     // ISO 8601 format, e.g., "2025-03-02"
   string end_date = 4;       // ISO 8601 format, e.g., "2025-03-09"
+  string medicine_id=5;
 }
 
 // Prescription message
@@ -114,6 +118,7 @@ message CreateExaminationRequest {
   string vet_id = 3;
   string diagnosis = 4;
   string notes = 5;
+  string vet_name=6;
 }
 
 message CreateExaminationResponse {
@@ -135,6 +140,7 @@ message UpdateExaminationRequest {
   string vet_id = 4;
   string diagnosis = 5;
   string notes = 6;
+  string vet_name=7;
 }
 
 message UpdateExaminationResponse {
@@ -164,6 +170,7 @@ message CreateVaccinationRequest {
   string date = 3;
   string next_dose = 4;
   string vet_id = 5;
+  string vet_name=6;
 }
 
 message CreateVaccinationResponse {
@@ -185,6 +192,7 @@ message UpdateVaccinationRequest {
   string date = 4;
   string next_dose = 5;
   string vet_id = 6;
+  string vet_name=7;
 }
 
 message UpdateVaccinationResponse {
@@ -243,12 +251,12 @@ message DeletePrescriptionResponse {
   bool success = 1;
 }
 
-message ListPrescriptionsRequest {
+message GetPrescriptionByExaminationIDRequest {
   string examination_id = 1;
 }
 
-message ListPrescriptionsResponse {
-  repeated Prescription prescriptions = 1;
+message GetPrescriptionByExaminationIDResponse {
+  Prescription prescriptions = 1;
 }
 
 // Service definition
@@ -279,5 +287,5 @@ service PetRecordService {
   rpc GetPrescription(GetPrescriptionRequest) returns (GetPrescriptionResponse) {}
   rpc UpdatePrescription(UpdatePrescriptionRequest) returns (UpdatePrescriptionResponse) {}
   rpc DeletePrescription(DeletePrescriptionRequest) returns (DeletePrescriptionResponse) {}
-  rpc ListPrescriptions(ListPrescriptionsRequest) returns (ListPrescriptionsResponse) {}
+  rpc GetPrescriptionByExaminationID(GetPrescriptionByExaminationIDRequest) returns (GetPrescriptionByExaminationIDResponse) {}
 }

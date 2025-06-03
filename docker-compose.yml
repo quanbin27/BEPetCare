@@ -149,6 +149,21 @@ services:
       retries: 5
       start_period: 20s
       timeout: 5s
+  mongo:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      retries: 5
+      start_period: 20s
+      timeout: 5s
 
   redis:
     image: redis:latest
@@ -196,3 +211,4 @@ networks:
 
 volumes:
   mysql_data:
+  mongo_data:

@@ -16,6 +16,28 @@ type EmailNotification struct {
 	Status    string    `gorm:"type:varchar(50);not null"`
 }
 
+// For later update
+//type Notification struct {
+//	ID        primitive.ObjectID `bson:"_id,omitempty"`        // MongoDB ObjectID
+//	UserID    string             `bson:"user_id"`              // Người nhận
+//	Type      string             `bson:"type"`                 // "email", "push", "sms"
+//	Email     *EmailContent      `bson:"email,omitempty"`      // Chỉ có nếu là email
+//	Push      *PushContent       `bson:"push,omitempty"`       // Chỉ có nếu là push
+//	Status    string             `bson:"status"`               // pending, sent, read, failed
+//	CreatedAt time.Time          `bson:"created_at"`           // Tự gán khi insert
+//	UpdatedAt time.Time          `bson:"updated_at,omitempty"` // Tự cập nhật khi update
+//}
+//type EmailContent struct {
+//	To      string `bson:"to"`      // Email address
+//	Subject string `bson:"subject"` // Tiêu đề
+//	Body    string `bson:"body"`    // Nội dung
+//}
+//type PushContent struct {
+//	Title   string `bson:"title"`   // Tiêu đề push
+//	Message string `bson:"message"` // Nội dung push
+//	Token   string `bson:"token"`   // Firebase device token
+//}
+
 // NotificationStore interface
 type NotificationStore interface {
 	SaveNotification(ctx context.Context, notification *EmailNotification) error

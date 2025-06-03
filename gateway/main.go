@@ -108,7 +108,7 @@ func main() {
 		},
 		AllowCredentials: false,
 	}))
-
+	e.Use(middleware.Logger())
 	subrouter := e.Group("/api/v1")
 	subrouter.GET("/swagger/*", echoSwagger.WrapHandler)
 	gateway, err := NewGateway()

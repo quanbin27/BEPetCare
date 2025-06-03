@@ -46,7 +46,7 @@ func (h *RecordsHandler) RegisterRoutes(e *echo.Group) {
 	e.GET("/prescriptions/:id", h.GetPrescription)
 	e.PUT("/prescriptions", h.UpdatePrescription)
 	e.DELETE("/prescriptions/:id", h.DeletePrescription)
-	e.GET("/prescriptions/examination/:examination_id", h.ListPrescriptions)
+	e.GET("/prescriptions/examination/:examination_id", h.GetPrescriptionByExaminationID)
 }
 
 // --- Pet Methods ---
@@ -271,7 +271,7 @@ func (h *RecordsHandler) ListPets(c echo.Context) error {
 // @Tags Examinations
 // @Accept json
 // @Produce json
-// @Param request body object{pet_id=string,date=string,vet_id=string,diagnosis=string,notes=string} true "Examination details"
+// @Param request body object{pet_id=string,date=string,vet_id=string,diagnosis=string,notes=string,vet_name=string} true "Examination details"
 // @Success 200 {object} object{id=string} "Examination created successfully"
 // @Failure 400 {object} object{error=string} "Invalid request, missing required fields, or invalid date format"
 // @Failure 500 {object} object{error=string} "Internal server error"
@@ -283,6 +283,7 @@ func (h *RecordsHandler) CreateExamination(c echo.Context) error {
 		VetID     string `json:"vet_id"`
 		Diagnosis string `json:"diagnosis"`
 		Notes     string `json:"notes"`
+		VetName   string `json:"vet_name"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
@@ -305,6 +306,7 @@ func (h *RecordsHandler) CreateExamination(c echo.Context) error {
 		VetId:     req.VetID,
 		Diagnosis: req.Diagnosis,
 		Notes:     req.Notes,
+		VetName:   req.VetName,
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
@@ -361,7 +363,7 @@ func (h *RecordsHandler) GetExamination(c echo.Context) error {
 // @Tags Examinations
 // @Accept json
 // @Produce json
-// @Param request body object{id=string,pet_id=string,date=string,vet_id=string,diagnosis=string,notes=string} true "Updated examination details"
+// @Param request body object{id=string,pet_id=string,date=string,vet_id=string,diagnosis=string,notes=string,vet_name=string} true "Updated examination details"
 // @Success 200 {object} object{id=string,pet_id=string,date=string,vet_id=string,diagnosis=string,notes=string} "Examination updated successfully"
 // @Failure 400 {object} object{error=string} "Invalid request, ID is required, or invalid date format"
 // @Failure 500 {object} object{error=string} "Internal server error"
@@ -374,6 +376,7 @@ func (h *RecordsHandler) UpdateExamination(c echo.Context) error {
 		VetID     string `json:"vet_id"`
 		Diagnosis string `json:"diagnosis"`
 		Notes     string `json:"notes"`
+		VetName   string `json:"vet_name"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
@@ -399,6 +402,7 @@ func (h *RecordsHandler) UpdateExamination(c echo.Context) error {
 		VetId:     req.VetID,
 		Diagnosis: req.Diagnosis,
 		Notes:     req.Notes,
+		VetName:   req.VetName,
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
@@ -485,7 +489,7 @@ func (h *RecordsHandler) ListExaminations(c echo.Context) error {
 // @Tags Vaccinations
 // @Accept json
 // @Produce json
-// @Param request body object{pet_id=string,vaccine_name=string,date=string,next_dose=string,vet_id=string} true "Vaccination details"
+// @Param request body object{pet_id=string,vaccine_name=string,date=string,next_dose=string,vet_id=string,vet_name=string} true "Vaccination details"
 // @Success 200 {object} object{id=string} "Vaccination created successfully"
 // @Failure 400 {object} object{error=string} "Invalid request, missing required fields, or invalid date format"
 // @Failure 500 {object} object{error=string} "Internal server error"
@@ -497,6 +501,7 @@ func (h *RecordsHandler) CreateVaccination(c echo.Context) error {
 		Date        string `json:"date"`      // Format: "2006-01-02"
 		NextDose    string `json:"next_dose"` // Format: "2006-01-02"
 		VetID       string `json:"vet_id"`
+		VetName     string `json:"vet_name"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
@@ -526,6 +531,7 @@ func (h *RecordsHandler) CreateVaccination(c echo.Context) error {
 		Date:        req.Date,
 		NextDose:    req.NextDose,
 		VetId:       req.VetID,
+		VetName:     req.VetName,
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
@@ -582,7 +588,7 @@ func (h *RecordsHandler) GetVaccination(c echo.Context) error {
 // @Tags Vaccinations
 // @Accept json
 // @Produce json
-// @Param request body object{id=string,pet_id=string,vaccine_name=string,date=string,next_dose=string,vet_id=string} true "Updated vaccination details"
+// @Param request body object{id=string,pet_id=string,vaccine_name=string,date=string,next_dose=string,vet_id=string,vet_name=string} true "Updated vaccination details"
 // @Success 200 {object} object{id=string,pet_id=string,vaccine_name=string,date=string,next_dose=string,vet_id=string} "Vaccination updated successfully"
 // @Failure 400 {object} object{error=string} "Invalid request, ID is required, or invalid date format"
 // @Failure 500 {object} object{error=string} "Internal server error"
@@ -595,6 +601,7 @@ func (h *RecordsHandler) UpdateVaccination(c echo.Context) error {
 		Date        string `json:"date"`      // Format: "2006-01-02"
 		NextDose    string `json:"next_dose"` // Format: "2006-01-02"
 		VetID       string `json:"vet_id"`
+		VetName     string `json:"vet_name"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
@@ -627,6 +634,7 @@ func (h *RecordsHandler) UpdateVaccination(c echo.Context) error {
 		Date:        req.Date,
 		NextDose:    req.NextDose,
 		VetId:       req.VetID,
+		VetName:     req.VetName,
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
@@ -713,7 +721,7 @@ func (h *RecordsHandler) ListVaccinations(c echo.Context) error {
 // @Tags Prescriptions
 // @Accept json
 // @Produce json
-// @Param request body object{examination_id=string,medications=[]object{name=string,dosage=string,start_date=string,end_date=string}} true "Prescription details"
+// @Param request body object{examination_id=string,medications=[]object{name=string,dosage=string,start_date=string,end_date=string,medicine_id=string}} true "Prescription details"
 // @Success 200 {object} object{id=string} "Prescription created successfully"
 // @Failure 400 {object} object{error=string} "Invalid request, missing required fields, or invalid date format"
 // @Failure 500 {object} object{error=string} "Internal server error"
@@ -722,10 +730,11 @@ func (h *RecordsHandler) CreatePrescription(c echo.Context) error {
 	var req struct {
 		ExaminationID string `json:"examination_id"`
 		Medications   []struct {
-			Name      string `json:"name"`
-			Dosage    string `json:"dosage"`
-			StartDate string `json:"start_date"` // Format: "2006-01-02"
-			EndDate   string `json:"end_date"`   // Format: "2006-01-02"
+			Name       string `json:"name"`
+			Dosage     string `json:"dosage"`
+			StartDate  string `json:"start_date"` // Format: "2006-01-02"
+			EndDate    string `json:"end_date"`   // Format: "2006-01-02"
+			MedicineID string `json:"medicine_id"`
 		} `json:"medications"`
 	}
 	if err := c.Bind(&req); err != nil {
@@ -751,10 +760,11 @@ func (h *RecordsHandler) CreatePrescription(c echo.Context) error {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid end_date format, must be YYYY-MM-DD"})
 		}
 		medications[i] = &pb.Medication{
-			Name:      med.Name,
-			Dosage:    med.Dosage,
-			StartDate: med.StartDate,
-			EndDate:   med.EndDate,
+			Name:       med.Name,
+			Dosage:     med.Dosage,
+			StartDate:  med.StartDate,
+			EndDate:    med.EndDate,
+			MedicineId: med.MedicineID,
 		}
 	}
 
@@ -784,7 +794,7 @@ func (h *RecordsHandler) CreatePrescription(c echo.Context) error {
 // @Tags Prescriptions
 // @Produce json
 // @Param id path string true "Prescription ID"
-// @Success 200 {object} object{id=string,examination_id=string,medications=[]object{name=string,dosage=string,start_date=string,end_date=string}} "Prescription details"
+// @Success 200 {object} object{id=string,examination_id=string,medications=[]object{name=string,dosage=string,start_date=string,end_date=string,medicine_id=string}} "Prescription details"
 // @Failure 400 {object} object{error=string} "ID is required"
 // @Failure 404 {object} object{error=string} "Prescription not found"
 // @Failure 500 {object} object{error=string} "Internal server error"
@@ -818,8 +828,8 @@ func (h *RecordsHandler) GetPrescription(c echo.Context) error {
 // @Tags Prescriptions
 // @Accept json
 // @Produce json
-// @Param request body object{id=string,examination_id=string,medications=[]object{name=string,dosage=string,start_date=string,end_date=string}} true "Updated prescription details"
-// @Success 200 {object} object{id=string,examination_id=string,medications=[]object{name=string,dosage=string,start_date=string,end_date=string}} "Prescription updated successfully"
+// @Param request body object{id=string,examination_id=string,medications=[]object{name=string,dosage=string,start_date=string,end_date=string,medicine_id=string}} true "Updated prescription details"
+// @Success 200 {object} object{id=string,examination_id=string,medications=[]object{name=string,dosage=string,start_date=string,end_date=string,medicine_id=string}} "Prescription updated successfully"
 // @Failure 400 {object} object{error=string} "Invalid request, ID is required, or invalid date format"
 // @Failure 500 {object} object{error=string} "Internal server error"
 // @Router /prescriptions [put]
@@ -828,10 +838,11 @@ func (h *RecordsHandler) UpdatePrescription(c echo.Context) error {
 		ID            string `json:"id"`
 		ExaminationID string `json:"examination_id"`
 		Medications   []struct {
-			Name      string `json:"name"`
-			Dosage    string `json:"dosage"`
-			StartDate string `json:"start_date"` // Format: "2006-01-02"
-			EndDate   string `json:"end_date"`   // Format: "2006-01-02"
+			Name       string `json:"name"`
+			Dosage     string `json:"dosage"`
+			StartDate  string `json:"start_date"` // Format: "2006-01-02"
+			EndDate    string `json:"end_date"`   // Format: "2006-01-02"
+			MedicineID string `json:"medicine_id"`
 		} `json:"medications"`
 	}
 	if err := c.Bind(&req); err != nil {
@@ -857,10 +868,11 @@ func (h *RecordsHandler) UpdatePrescription(c echo.Context) error {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid end_date format, must be YYYY-MM-DD"})
 		}
 		medications[i] = &pb.Medication{
-			Name:      med.Name,
-			Dosage:    med.Dosage,
-			StartDate: med.StartDate,
-			EndDate:   med.EndDate,
+			Name:       med.Name,
+			Dosage:     med.Dosage,
+			StartDate:  med.StartDate,
+			EndDate:    med.EndDate,
+			MedicineId: med.MedicineID,
 		}
 	}
 
@@ -916,24 +928,24 @@ func (h *RecordsHandler) DeletePrescription(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]bool{"success": resp.Success})
 }
 
-// ListPrescriptions lists all prescriptions for a given examination
-// @Summary List prescriptions by examination
-// @Description Retrieves a list of prescription records for a specific examination ID
+// GetPrescriptionByExaminationID retrieves the prescription for a given examination ID
+// @Summary Get prescription by examination ID
+// @Description Retrieves the prescription associated with the specified examination ID. Returns an empty object if not found.
 // @Tags Prescriptions
 // @Produce json
 // @Param examination_id path string true "Examination ID"
-// @Success 200 {array} object{id=string,examination_id=string,medications=[]object{name=string,dosage=string,start_date=string,end_date=string}} "List of prescriptions"
-// @Failure 400 {object} object{error=string} "Examination ID is required"
-// @Failure 500 {object} object{error=string} "Internal server error"
+// @Success 200 {object} PrescriptionResponse "Prescription object or empty if not found"
+// @Failure 400 {object} map[string]string "Bad Request: Examination ID is required"
+// @Failure 500 {object} map[string]string "Internal Server Error"
 // @Router /prescriptions/examination/{examination_id} [get]
-func (h *RecordsHandler) ListPrescriptions(c echo.Context) error {
+func (h *RecordsHandler) GetPrescriptionByExaminationID(c echo.Context) error {
 	examinationID := c.Param("examination_id")
 	if examinationID == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Examination ID is required"})
 	}
 
 	ctx := c.Request().Context()
-	resp, err := h.client.ListPrescriptions(ctx, &pb.ListPrescriptionsRequest{ExaminationId: examinationID})
+	resp, err := h.client.GetPrescriptionByExaminationID(ctx, &pb.GetPrescriptionByExaminationIDRequest{ExaminationId: examinationID})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
 			switch grpcErr.Code() {

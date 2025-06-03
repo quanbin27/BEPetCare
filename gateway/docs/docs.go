@@ -1457,6 +1457,9 @@ const docTemplate = `{
                                 },
                                 "vet_id": {
                                     "type": "string"
+                                },
+                                "vet_name": {
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1547,6 +1550,9 @@ const docTemplate = `{
                                     "type": "string"
                                 },
                                 "vet_id": {
+                                    "type": "string"
+                                },
+                                "vet_name": {
                                     "type": "string"
                                 }
                             }
@@ -2785,6 +2791,9 @@ const docTemplate = `{
                                             "end_date": {
                                                 "type": "string"
                                             },
+                                            "medicine_id": {
+                                                "type": "string"
+                                            },
                                             "name": {
                                                 "type": "string"
                                             },
@@ -2819,6 +2828,9 @@ const docTemplate = `{
                                                 "type": "string"
                                             },
                                             "end_date": {
+                                                "type": "string"
+                                            },
+                                            "medicine_id": {
                                                 "type": "string"
                                             },
                                             "name": {
@@ -2892,6 +2904,9 @@ const docTemplate = `{
                                             "end_date": {
                                                 "type": "string"
                                             },
+                                            "medicine_id": {
+                                                "type": "string"
+                                            },
                                             "name": {
                                                 "type": "string"
                                             },
@@ -2944,14 +2959,14 @@ const docTemplate = `{
         },
         "/prescriptions/examination/{examination_id}": {
             "get": {
-                "description": "Retrieves a list of prescription records for a specific examination ID",
+                "description": "Retrieves the prescription associated with the specified examination ID. Returns an empty object if not found.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Prescriptions"
                 ],
-                "summary": "List prescriptions by examination",
+                "summary": "Get prescription by examination ID",
                 "parameters": [
                     {
                         "type": "string",
@@ -2963,61 +2978,26 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of prescriptions",
+                        "description": "Prescription object or empty if not found",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "examination_id": {
-                                        "type": "string"
-                                    },
-                                    "id": {
-                                        "type": "string"
-                                    },
-                                    "medications": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "object",
-                                            "properties": {
-                                                "dosage": {
-                                                    "type": "string"
-                                                },
-                                                "end_date": {
-                                                    "type": "string"
-                                                },
-                                                "name": {
-                                                    "type": "string"
-                                                },
-                                                "start_date": {
-                                                    "type": "string"
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            "$ref": "#/definitions/handlers.PrescriptionResponse"
                         }
                     },
                     "400": {
-                        "description": "Examination ID is required",
+                        "description": "Bad Request: Examination ID is required",
                         "schema": {
                             "type": "object",
-                            "properties": {
-                                "error": {
-                                    "type": "string"
-                                }
+                            "additionalProperties": {
+                                "type": "string"
                             }
                         }
                     },
                     "500": {
-                        "description": "Internal server error",
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
-                            "properties": {
-                                "error": {
-                                    "type": "string"
-                                }
+                            "additionalProperties": {
+                                "type": "string"
                             }
                         }
                     }
@@ -3064,6 +3044,9 @@ const docTemplate = `{
                                                 "type": "string"
                                             },
                                             "end_date": {
+                                                "type": "string"
+                                            },
+                                            "medicine_id": {
                                                 "type": "string"
                                             },
                                             "name": {
@@ -4974,6 +4957,9 @@ const docTemplate = `{
                                 },
                                 "vet_id": {
                                     "type": "string"
+                                },
+                                "vet_name": {
+                                    "type": "string"
                                 }
                             }
                         }
@@ -5064,6 +5050,9 @@ const docTemplate = `{
                                     "type": "string"
                                 },
                                 "vet_id": {
+                                    "type": "string"
+                                },
+                                "vet_name": {
                                     "type": "string"
                                 }
                             }
@@ -5319,6 +5308,43 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "handlers.MedicationResponse": {
+            "type": "object",
+            "properties": {
+                "dosage": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "medicine_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.PrescriptionResponse": {
+            "type": "object",
+            "properties": {
+                "examination_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "medications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.MedicationResponse"
+                    }
+                }
+            }
+        },
         "handlers.UserResponse": {
             "description": "User information",
             "type": "object",

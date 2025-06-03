@@ -44,7 +44,8 @@ func main() {
 	}
 	defer l.Close()
 	appointmentStore := NewStore(db)
-	appointmentService := NewAppointmentService(appointmentStore)
+	standardPriceStrategy := &StandardPriceStrategy{}
+	appointmentService := NewAppointmentService(appointmentStore, standardPriceStrategy)
 	NewAppointmentGrpcHandler(grpcServer, appointmentService)
 	log.Println("Appointment Service Listening on", grpcAddr)
 	grpcServer.Serve(l)
