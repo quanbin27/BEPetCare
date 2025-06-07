@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"google.golang.org/grpc"
@@ -35,6 +36,7 @@ func (h *GRPCHandler) CreatePet(ctx context.Context, req *pb.CreatePetRequest) (
 
 func (h *GRPCHandler) GetPet(ctx context.Context, req *pb.GetPetRequest) (*pb.GetPetResponse, error) {
 	pet, err := h.service.GetPet(ctx, req.Id)
+	log.Println("Get Pet Response:", pet, "Error:", err)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "pet not found: %v", err)
 	}
@@ -47,7 +49,7 @@ func (h *GRPCHandler) GetPet(ctx context.Context, req *pb.GetPetRequest) (*pb.Ge
 			OwnerId:      pet.OwnerID,
 			Color:        pet.Color,
 			Weight:       pet.Weight,
-			IdentityMark: pet.identityMark,
+			IdentityMark: pet.IdentityMark,
 		},
 	}, nil
 }
@@ -66,7 +68,7 @@ func (h *GRPCHandler) UpdatePet(ctx context.Context, req *pb.UpdatePetRequest) (
 			OwnerId:      pet.OwnerID,
 			Color:        pet.Color,
 			Weight:       pet.Weight,
-			IdentityMark: pet.identityMark,
+			IdentityMark: pet.IdentityMark,
 		},
 	}, nil
 }
@@ -93,7 +95,7 @@ func (h *GRPCHandler) ListPets(ctx context.Context, req *pb.ListPetsRequest) (*p
 			OwnerId:      pet.OwnerID,
 			Color:        pet.Color,
 			Weight:       pet.Weight,
-			IdentityMark: pet.identityMark,
+			IdentityMark: pet.IdentityMark,
 		})
 	}
 	return resp, nil

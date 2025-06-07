@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -136,7 +137,7 @@ func (h *RecordsHandler) GetPet(c echo.Context) error {
 		}
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-
+	log.Println("GetPet response:", resp.Pet)
 	return c.JSON(http.StatusOK, resp.Pet)
 }
 

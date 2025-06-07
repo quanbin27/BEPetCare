@@ -27,7 +27,7 @@ func (s *PetRecordService) CreatePet(ctx context.Context, name, species string, 
 		OwnerID:      ownerID,
 		Color:        color,
 		Weight:       weight,
-		identityMark: identityMark,
+		IdentityMark: identityMark,
 	}
 	return s.store.CreatePet(ctx, pet)
 }
@@ -50,7 +50,7 @@ func (s *PetRecordService) UpdatePet(ctx context.Context, id, name, species stri
 	pet.OwnerID = ownerID
 	pet.Color = color
 	pet.Weight = weight
-	pet.identityMark = identityMark
+	pet.IdentityMark = identityMark
 	if err := s.store.UpdatePet(ctx, pet); err != nil {
 		return nil, err
 	}

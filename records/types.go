@@ -16,7 +16,7 @@ type Pet struct {
 	OwnerID      string             `bson:"owner_id"`
 	Color        string             `bson:"color"`
 	Weight       float32            `bson:"weight"`
-	identityMark string             `bson:"identity_mark"`
+	IdentityMark string             `bson:"identity_mark"`
 }
 
 type Examination struct {
