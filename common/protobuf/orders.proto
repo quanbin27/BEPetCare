@@ -8,6 +8,7 @@ service OrderService {
   rpc UpdateOrderStatus(UpdateOrderStatusRequest) returns (UpdateOrderStatusResponse);
   rpc GetOrderItems(GetOrderItemsRequest) returns (GetOrderItemsResponse);
   rpc GetOrderByAppointmentID(GetOrderByAppointmentIDRequest) returns (GetOrderByAppointmentIDResponse);
+  rpc GetOrdersByCustomerID(GetOrdersByCustomerIDRequest) returns (GetOrdersByCustomerIDResponse);
 }
 message Order {
   int32 id = 1;
@@ -82,4 +83,10 @@ message GetOrderByAppointmentIDRequest {
 
 message GetOrderByAppointmentIDResponse {
   Order order = 1;
+}
+message GetOrdersByCustomerIDRequest {
+  int32 customer_id = 1;
+}
+message GetOrdersByCustomerIDResponse {
+  repeated Order orders = 1;
 }

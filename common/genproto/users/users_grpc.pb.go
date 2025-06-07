@@ -31,6 +31,7 @@ const (
 	UserService_GetAllCustomers_FullMethodName       = "/UserService/GetAllCustomers"
 	UserService_GetCustomersPaginated_FullMethodName = "/UserService/GetCustomersPaginated"
 	UserService_GetCustomersByName_FullMethodName    = "/UserService/GetCustomersByName"
+	UserService_GetBranchByEmployeeID_FullMethodName = "/UserService/GetBranchByEmployeeID"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -49,6 +50,7 @@ type UserServiceClient interface {
 	GetAllCustomers(ctx context.Context, in *GetAllCustomersRequest, opts ...grpc.CallOption) (*GetAllCustomersResponse, error)
 	GetCustomersPaginated(ctx context.Context, in *GetCustomersPaginatedRequest, opts ...grpc.CallOption) (*GetCustomersPaginatedResponse, error)
 	GetCustomersByName(ctx context.Context, in *GetCustomersByNameRequest, opts ...grpc.CallOption) (*GetCustomersByNameResponse, error)
+	GetBranchByEmployeeID(ctx context.Context, in *GetBranchByEmployeeIDRequest, opts ...grpc.CallOption) (*GetBranchByEmployeeIDResponse, error)
 }
 
 type userServiceClient struct {
@@ -179,6 +181,16 @@ func (c *userServiceClient) GetCustomersByName(ctx context.Context, in *GetCusto
 	return out, nil
 }
 
+func (c *userServiceClient) GetBranchByEmployeeID(ctx context.Context, in *GetBranchByEmployeeIDRequest, opts ...grpc.CallOption) (*GetBranchByEmployeeIDResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBranchByEmployeeIDResponse)
+	err := c.cc.Invoke(ctx, UserService_GetBranchByEmployeeID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -195,6 +207,7 @@ type UserServiceServer interface {
 	GetAllCustomers(context.Context, *GetAllCustomersRequest) (*GetAllCustomersResponse, error)
 	GetCustomersPaginated(context.Context, *GetCustomersPaginatedRequest) (*GetCustomersPaginatedResponse, error)
 	GetCustomersByName(context.Context, *GetCustomersByNameRequest) (*GetCustomersByNameResponse, error)
+	GetBranchByEmployeeID(context.Context, *GetBranchByEmployeeIDRequest) (*GetBranchByEmployeeIDResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -240,6 +253,9 @@ func (UnimplementedUserServiceServer) GetCustomersPaginated(context.Context, *Ge
 }
 func (UnimplementedUserServiceServer) GetCustomersByName(context.Context, *GetCustomersByNameRequest) (*GetCustomersByNameResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCustomersByName not implemented")
+}
+func (UnimplementedUserServiceServer) GetBranchByEmployeeID(context.Context, *GetBranchByEmployeeIDRequest) (*GetBranchByEmployeeIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBranchByEmployeeID not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -478,6 +494,24 @@ func _UserService_GetCustomersByName_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetBranchByEmployeeID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBranchByEmployeeIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetBranchByEmployeeID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetBranchByEmployeeID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetBranchByEmployeeID(ctx, req.(*GetBranchByEmployeeIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -532,6 +566,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCustomersByName",
 			Handler:    _UserService_GetCustomersByName_Handler,
+		},
+		{
+			MethodName: "GetBranchByEmployeeID",
+			Handler:    _UserService_GetBranchByEmployeeID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

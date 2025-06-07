@@ -23,6 +23,7 @@ type UserResponse struct {
 	Email       string `json:"email" example:"johndoe@example.com" description:"Email address of the user"`
 	PhoneNumber string `json:"phoneNumber" example:"+84912345678" description:"Phone number of the user"`
 	Address     string `json:"address" example:"123 Main St, City" description:"Address of the user"`
+	BranchID    int32  `json:"branchId" example:"301" description:"ID of the branch associated with the user"`
 }
 
 // AllProductResponse represents a product with type information

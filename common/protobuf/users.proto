@@ -14,6 +14,7 @@ service UserService{
   rpc GetAllCustomers(GetAllCustomersRequest) returns (GetAllCustomersResponse) {}
   rpc GetCustomersPaginated(GetCustomersPaginatedRequest) returns (GetCustomersPaginatedResponse) {}
   rpc GetCustomersByName(GetCustomersByNameRequest) returns (GetCustomersByNameResponse) {}
+  rpc GetBranchByEmployeeID(GetBranchByEmployeeIDRequest) returns (GetBranchByEmployeeIDResponse) {}
 }
 message User{
   int32 ID = 1;
@@ -114,4 +115,10 @@ message GetCustomersByNameRequest {
 
 message GetCustomersByNameResponse {
   repeated User users = 1;
+}
+message GetBranchByEmployeeIDRequest {
+  int32 employee_id = 1;
+}
+message GetBranchByEmployeeIDResponse {
+  int32 branch_id = 1;
 }

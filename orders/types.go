@@ -47,6 +47,7 @@ type OrderStore interface {
 	UpdateOrderStatus(ctx context.Context, orderID int32, status OrderStatus) error
 	GetOrderItems(ctx context.Context, orderID int32) ([]OrderItem, error)
 	GetOrderByAppointmentID(ctx context.Context, appointmentID int32) (*Order, error)
+	GetOrdersByCustomerID(ctx context.Context, customerID int32) ([]Order, error)
 }
 
 // OrderService interface cho logic xử lý với dữ liệu nội bộ
@@ -56,6 +57,7 @@ type OrderService interface {
 	UpdateOrderStatus(ctx context.Context, orderID int32, status OrderStatus) (string, error) // Trả về status
 	GetOrderItems(ctx context.Context, orderID int32) ([]OrderItem, error)
 	GetOrderByAppointmentID(ctx context.Context, appointmentId int32) (*Order, error)
+	GetOrdersByCustomerID(ctx context.Context, customerID int32) ([]Order, error)
 }
 
 // Helper functions to convert between internal types and protobuf types

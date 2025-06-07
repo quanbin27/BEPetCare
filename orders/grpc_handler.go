@@ -123,3 +123,14 @@ func (h *OrderGrpcHandler) GetOrderItems(ctx context.Context, req *pb.GetOrderIt
 	}
 	return &pb.GetOrderItemsResponse{Items: pbItems}, nil
 }
+func (h *OrderGrpcHandler) GetOrdersByCustomerID(ctx context.Context, req *pb.GetOrdersByCustomerIDRequest) (*pb.GetOrdersByCustomerIDResponse, error) {
+	orders, err := h.orderService.GetOrdersByCustomerID(ctx, req.CustomerId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	pbOrders := make([]*pb.Order, len(orders))
+	for i, order := range orders {
+		pbOrders[i] = toPbOrder(&order)
+	}
+	return &pb.GetOrdersByCustomerIDResponse{Orders: pbOrders}, nil
+}

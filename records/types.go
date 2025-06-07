@@ -9,14 +9,14 @@ import (
 
 // Pet, Examination, and Vaccination structs remain unchanged
 type Pet struct {
-	ID      primitive.ObjectID `bson:"_id,omitempty"`
-	Name    string             `bson:"name"`
-	Species string             `bson:"species"`
-	Age     int32              `bson:"age"`
-	OwnerID string             `bson:"owner_id"`
-	Color   string             `bson:"color"`
-	Weight  float32            `bson:"weight"`
-	Size    string             `bson:"size"`
+	ID           primitive.ObjectID `bson:"_id,omitempty"`
+	Name         string             `bson:"name"`
+	Species      string             `bson:"species"`
+	Dob          string             `bson:"dob"`
+	OwnerID      string             `bson:"owner_id"`
+	Color        string             `bson:"color"`
+	Weight       float32            `bson:"weight"`
+	identityMark string             `bson:"identity_mark"`
 }
 
 type Examination struct {
@@ -87,9 +87,9 @@ type RecordsStore interface {
 // RecordsService defines the interface for business logic operations
 type RecordsService interface {
 	// Pet, Examination, and Vaccination methods remain unchanged
-	CreatePet(ctx context.Context, name, species string, age int32, ownerID, color string, weight float32, size string) (string, error)
+	CreatePet(ctx context.Context, name, species string, dob string, ownerID, color string, weight float32, identityMark string) (string, error)
 	GetPet(ctx context.Context, id string) (*Pet, error)
-	UpdatePet(ctx context.Context, id, name, species string, age int32, ownerID, color string, weight float32, size string) (*Pet, error)
+	UpdatePet(ctx context.Context, id, name, species string, dob string, ownerID, color string, weight float32, identityMark string) (*Pet, error)
 	DeletePet(ctx context.Context, id string) error
 	ListPets(ctx context.Context, ownerID string) ([]*Pet, error)
 

@@ -24,6 +24,7 @@ const (
 	OrderService_UpdateOrderStatus_FullMethodName       = "/orders.OrderService/UpdateOrderStatus"
 	OrderService_GetOrderItems_FullMethodName           = "/orders.OrderService/GetOrderItems"
 	OrderService_GetOrderByAppointmentID_FullMethodName = "/orders.OrderService/GetOrderByAppointmentID"
+	OrderService_GetOrdersByCustomerID_FullMethodName   = "/orders.OrderService/GetOrdersByCustomerID"
 )
 
 // OrderServiceClient is the client API for OrderService service.
@@ -35,6 +36,7 @@ type OrderServiceClient interface {
 	UpdateOrderStatus(ctx context.Context, in *UpdateOrderStatusRequest, opts ...grpc.CallOption) (*UpdateOrderStatusResponse, error)
 	GetOrderItems(ctx context.Context, in *GetOrderItemsRequest, opts ...grpc.CallOption) (*GetOrderItemsResponse, error)
 	GetOrderByAppointmentID(ctx context.Context, in *GetOrderByAppointmentIDRequest, opts ...grpc.CallOption) (*GetOrderByAppointmentIDResponse, error)
+	GetOrdersByCustomerID(ctx context.Context, in *GetOrdersByCustomerIDRequest, opts ...grpc.CallOption) (*GetOrdersByCustomerIDResponse, error)
 }
 
 type orderServiceClient struct {
@@ -95,6 +97,16 @@ func (c *orderServiceClient) GetOrderByAppointmentID(ctx context.Context, in *Ge
 	return out, nil
 }
 
+func (c *orderServiceClient) GetOrdersByCustomerID(ctx context.Context, in *GetOrdersByCustomerIDRequest, opts ...grpc.CallOption) (*GetOrdersByCustomerIDResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetOrdersByCustomerIDResponse)
+	err := c.cc.Invoke(ctx, OrderService_GetOrdersByCustomerID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrderServiceServer is the server API for OrderService service.
 // All implementations must embed UnimplementedOrderServiceServer
 // for forward compatibility.
@@ -104,6 +116,7 @@ type OrderServiceServer interface {
 	UpdateOrderStatus(context.Context, *UpdateOrderStatusRequest) (*UpdateOrderStatusResponse, error)
 	GetOrderItems(context.Context, *GetOrderItemsRequest) (*GetOrderItemsResponse, error)
 	GetOrderByAppointmentID(context.Context, *GetOrderByAppointmentIDRequest) (*GetOrderByAppointmentIDResponse, error)
+	GetOrdersByCustomerID(context.Context, *GetOrdersByCustomerIDRequest) (*GetOrdersByCustomerIDResponse, error)
 	mustEmbedUnimplementedOrderServiceServer()
 }
 
@@ -128,6 +141,9 @@ func (UnimplementedOrderServiceServer) GetOrderItems(context.Context, *GetOrderI
 }
 func (UnimplementedOrderServiceServer) GetOrderByAppointmentID(context.Context, *GetOrderByAppointmentIDRequest) (*GetOrderByAppointmentIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrderByAppointmentID not implemented")
+}
+func (UnimplementedOrderServiceServer) GetOrdersByCustomerID(context.Context, *GetOrdersByCustomerIDRequest) (*GetOrdersByCustomerIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOrdersByCustomerID not implemented")
 }
 func (UnimplementedOrderServiceServer) mustEmbedUnimplementedOrderServiceServer() {}
 func (UnimplementedOrderServiceServer) testEmbeddedByValue()                      {}
@@ -240,6 +256,24 @@ func _OrderService_GetOrderByAppointmentID_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OrderService_GetOrdersByCustomerID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOrdersByCustomerIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServiceServer).GetOrdersByCustomerID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: OrderService_GetOrdersByCustomerID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServiceServer).GetOrdersByCustomerID(ctx, req.(*GetOrdersByCustomerIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // OrderService_ServiceDesc is the grpc.ServiceDesc for OrderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -266,6 +300,10 @@ var OrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetOrderByAppointmentID",
 			Handler:    _OrderService_GetOrderByAppointmentID_Handler,
+		},
+		{
+			MethodName: "GetOrdersByCustomerID",
+			Handler:    _OrderService_GetOrdersByCustomerID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

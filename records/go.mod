@@ -5,7 +5,7 @@ go 1.23
 toolchain go1.24.3
 
 require (
-	github.com/quanbin27/commons v0.0.0-20250601103330-b63eb2c62d05
+	github.com/quanbin27/commons v0.0.0-20250607075331-d658fbbaffba
 	go.mongodb.org/mongo-driver v1.17.3
 	google.golang.org/grpc v1.72.2
 )

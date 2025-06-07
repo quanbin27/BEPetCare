@@ -8,11 +8,11 @@ message Pet {
   string id = 1;
   string name = 2;
   string species = 3;
-  int32 age = 4;
+  string Dob = 4;
   string owner_id = 5;
-  string color = 6;         // Màu sắc
-  float weight = 7;         // Cân nặng (kg)
-  string size = 8;          // Kích thước (e.g., "small", "medium", "large")
+  string color = 6;
+  float weight = 7;
+  string identity_mark = 8;
 }
 
 // Examination message
@@ -59,13 +59,13 @@ message Prescription {
 message CreatePetRequest {
   string name = 1;
   string species = 2;
-  int32 age = 3;
+  string dob = 3;
   // Use int32 for Go compatibility
   string owner_id = 4;
   string color = 5;
   float weight = 6;
   // Float for weight
-  string size = 7;
+  string identity_mark = 7;
 }
 
 message CreatePetResponse {
@@ -84,11 +84,11 @@ message UpdatePetRequest {
   string id = 1;
   string name = 2;
   string species = 3;
-  int32 age = 4;
+  string dob = 4;
   string owner_id = 5;
   string color = 6;
   float weight = 7;
-  string size = 8;
+  string identity_mark = 8;
 }
 
 message UpdatePetResponse {

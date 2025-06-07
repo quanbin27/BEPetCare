@@ -72,3 +72,10 @@ func (s *Service) UpdateOrderStatus(ctx context.Context, orderID int32, status O
 func (s *Service) GetOrderItems(ctx context.Context, orderID int32) ([]OrderItem, error) {
 	return s.store.GetOrderItems(ctx, orderID)
 }
+func (s *Service) GetOrdersByCustomerID(ctx context.Context, customerID int32) ([]Order, error) {
+	orders, err := s.store.GetOrdersByCustomerID(ctx, customerID)
+	if err != nil {
+		return nil, err
+	}
+	return orders, nil
+}

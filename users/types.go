@@ -23,6 +23,7 @@ type UserStore interface {
 	GetAllCustomers(ctx context.Context) ([]User, error)
 	GetCustomersPaginated(ctx context.Context, page int32, pageSize int32) ([]User, int64, error)
 	GetCustomersByName(ctx context.Context, nameFilter string) ([]User, error)
+	GetBranchByEmployeeID(ctx context.Context, userID int32) (int32, error)
 }
 
 // UserService defines the interface for business logic operations with internal types
@@ -39,6 +40,7 @@ type UserService interface {
 	GetAllCustomers(ctx context.Context) ([]User, error)
 	GetCustomersPaginated(ctx context.Context, page int32, pageSize int32) ([]User, int64, error)
 	GetCustomersByName(ctx context.Context, nameFilter string) ([]User, error)
+	GetBranchByEmployeeID(ctx context.Context, employeeID int32) (int32, error)
 }
 
 // User represents a user in the internal system

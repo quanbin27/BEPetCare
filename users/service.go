@@ -323,6 +323,13 @@ func (s *Service) GetAllCustomers(ctx context.Context) ([]User, error) {
 	}
 	return users, nil
 }
+func (s *Service) GetBranchByEmployeeID(ctx context.Context, employeeID int32) (int32, error) {
+	branchID, err := s.userStore.GetBranchByEmployeeID(ctx, employeeID)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get branch for employee: %w", err)
+	}
+	return branchID, nil
+}
 
 // GetCustomersPaginated retrieves customers with pagination
 func (s *Service) GetCustomersPaginated(ctx context.Context, page int32, pageSize int32) ([]User, int64, error) {

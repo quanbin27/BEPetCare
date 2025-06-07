@@ -338,7 +338,7 @@ func (h *UserHandler) GetUserInfo(c echo.Context) error {
 // @Tags Users
 // @Produce json
 // @Security BearerAuth
-// @Success 200 {object} object{id=int32,name=string,email=string,phoneNumber=string,address=string} "User info"
+// @Success 200 {object} object{id=int32,name=string,email=string,phoneNumber=string,address=string,branchId=int32} "User info"
 // @Failure 400 {object} object{error=string} "Invalid request"
 // @Failure 404 {object} object{error=string} "User not found"
 // @Failure 500 {object} object{error=string} "Internal server error"
@@ -362,12 +362,20 @@ func (h *UserHandler) GetMyInfo(c echo.Context) error {
 		}
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
+	var branchID int32
+	branchResp, err := h.client.GetBranchByEmployeeID(ctx, &pb.GetBranchByEmployeeIDRequest{EmployeeId: id})
+	if err != nil {
+		branchID = -1 // If no branch is found, set branchID to 0
+	} else {
+		branchID = branchResp.BranchId
+	}
 	response := UserResponse{
 		UserID:      resp.ID,
 		Name:        resp.Name,
 		Email:       resp.Email,
 		PhoneNumber: resp.PhoneNumber,
 		Address:     resp.Address,
+		BranchID:    branchID,
 	}
 
 	return c.JSON(http.StatusOK, response)

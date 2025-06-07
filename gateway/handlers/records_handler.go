@@ -53,24 +53,24 @@ func (h *RecordsHandler) RegisterRoutes(e *echo.Group) {
 
 // CreatePet creates a new pet record
 // @Summary Create a new pet
-// @Description Creates a new pet record with details like name, species, age, owner ID, etc.
+// @Description Creates a new pet record with details like name, species, dob, owner ID, etc.
 // @Tags Pets
 // @Accept json
 // @Produce json
-// @Param request body object{name=string,species=string,age=integer,owner_id=string,color=string,weight=number,size=string} true "Pet details"
+// @Param request body object{name=string,species=string,dob=string,owner_id=string,color=string,weight=number,identity_mark=string} true "Pet details"
 // @Success 200 {object} object{id=string} "Pet created successfully"
 // @Failure 400 {object} object{error=string} "Invalid request or missing fields"
 // @Failure 500 {object} object{error=string} "Internal server error"
 // @Router /pets [post]
 func (h *RecordsHandler) CreatePet(c echo.Context) error {
 	var req struct {
-		Name    string  `json:"name"`
-		Species string  `json:"species"`
-		Age     int32   `json:"age"`
-		OwnerID string  `json:"owner_id"`
-		Color   string  `json:"color"`
-		Weight  float32 `json:"weight"`
-		Size    string  `json:"size"`
+		Name         string  `json:"name"`
+		Species      string  `json:"species"`
+		Dob          string  `json:"dob"`
+		OwnerID      string  `json:"owner_id"`
+		Color        string  `json:"color"`
+		Weight       float32 `json:"weight"`
+		IdentityMark string  `json:"identity_mark"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
@@ -83,13 +83,13 @@ func (h *RecordsHandler) CreatePet(c echo.Context) error {
 
 	ctx := c.Request().Context()
 	resp, err := h.client.CreatePet(ctx, &pb.CreatePetRequest{
-		Name:    req.Name,
-		Species: req.Species,
-		Age:     req.Age,
-		OwnerId: req.OwnerID,
-		Color:   req.Color,
-		Weight:  req.Weight,
-		Size:    req.Size,
+		Name:         req.Name,
+		Species:      req.Species,
+		Dob:          req.Dob,
+		OwnerId:      req.OwnerID,
+		Color:        req.Color,
+		Weight:       req.Weight,
+		IdentityMark: req.IdentityMark,
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
@@ -112,7 +112,7 @@ func (h *RecordsHandler) CreatePet(c echo.Context) error {
 // @Tags Pets
 // @Produce json
 // @Param id path string true "Pet ID"
-// @Success 200 {object} object{id=string,name=string,species=string,age=integer,owner_id=string,color=string,weight=number,size=string} "Pet details"
+// @Success 200 {object} object{id=string,name=string,species=string,dob=string,owner_id=string,color=string,weight=number,identity_mark=string} "Pet details"
 // @Failure 400 {object} object{error=string} "ID is required"
 // @Failure 404 {object} object{error=string} "Pet not found"
 // @Failure 500 {object} object{error=string} "Internal server error"
@@ -142,25 +142,25 @@ func (h *RecordsHandler) GetPet(c echo.Context) error {
 
 // UpdatePet updates an existing pet record
 // @Summary Update a pet
-// @Description Updates a pet record with details like name, species, age, owner ID, etc.
+// @Description Updates a pet record with details like name, species, dob, owner ID, etc.
 // @Tags Pets
 // @Accept json
 // @Produce json
-// @Param request body object{id=string,name=string,species=string,age=integer,owner_id=string,color=string,weight=number,size=string} true "Updated pet details"
-// @Success 200 {object} object{id=string,name=string,species=string,age=integer,owner_id=string,color=string,weight=number,size=string} "Pet updated successfully"
+// @Param request body object{id=string,name=string,species=string,dob=string,owner_id=string,color=string,weight=number,identity_mark=string} true "Updated pet details"
+// @Success 200 {object} object{id=string,name=string,species=string,dob=string,owner_id=string,color=string,weight=number,identity_mark=string} "Pet updated successfully"
 // @Failure 400 {object} object{error=string} "Invalid request or ID is required"
 // @Failure 500 {object} object{error=string} "Internal server error"
 // @Router /pets [put]
 func (h *RecordsHandler) UpdatePet(c echo.Context) error {
 	var req struct {
-		ID      string  `json:"id"`
-		Name    string  `json:"name"`
-		Species string  `json:"species"`
-		Age     int32   `json:"age"`
-		OwnerID string  `json:"owner_id"`
-		Color   string  `json:"color"`
-		Weight  float32 `json:"weight"`
-		Size    string  `json:"size"`
+		ID           string  `json:"id"`
+		Name         string  `json:"name"`
+		Species      string  `json:"species"`
+		Dob          string  `json:"dob"`
+		OwnerID      string  `json:"owner_id"`
+		Color        string  `json:"color"`
+		Weight       float32 `json:"weight"`
+		IdentityMark string  `json:"identity_mark"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
@@ -172,14 +172,14 @@ func (h *RecordsHandler) UpdatePet(c echo.Context) error {
 
 	ctx := c.Request().Context()
 	resp, err := h.client.UpdatePet(ctx, &pb.UpdatePetRequest{
-		Id:      req.ID,
-		Name:    req.Name,
-		Species: req.Species,
-		Age:     req.Age,
-		OwnerId: req.OwnerID,
-		Color:   req.Color,
-		Weight:  req.Weight,
-		Size:    req.Size,
+		Id:           req.ID,
+		Name:         req.Name,
+		Species:      req.Species,
+		Dob:          req.Dob,
+		OwnerId:      req.OwnerID,
+		Color:        req.Color,
+		Weight:       req.Weight,
+		IdentityMark: req.IdentityMark,
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
@@ -233,7 +233,7 @@ func (h *RecordsHandler) DeletePet(c echo.Context) error {
 // @Tags Pets
 // @Produce json
 // @Param owner_id path string true "Owner ID"
-// @Success 200 {array} object{id=string,name=string,species=string,age=integer,owner_id=string,color=string,weight=number,size=string} "List of pets"
+// @Success 200 {array} object{id=string,name=string,species=string,dob=string,owner_id=string,color=string,weight=number,identity_mark=string} "List of pets"
 // @Failure 400 {object} object{error=string} "Owner ID is required"
 // @Failure 500 {object} object{error=string} "Internal server error"
 // @Router /pets/owner/{owner_id} [get]

@@ -26,7 +26,7 @@ func NewGrpcHandler(grpcServer *grpc.Server, service RecordsService) {
 
 // --- Pet Methods ---
 func (h *GRPCHandler) CreatePet(ctx context.Context, req *pb.CreatePetRequest) (*pb.CreatePetResponse, error) {
-	id, err := h.service.CreatePet(ctx, req.Name, req.Species, req.Age, req.OwnerId, req.Color, req.Weight, req.Size)
+	id, err := h.service.CreatePet(ctx, req.Name, req.Species, req.Dob, req.OwnerId, req.Color, req.Weight, req.IdentityMark)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "failed to create pet: %v", err)
 	}
@@ -40,33 +40,33 @@ func (h *GRPCHandler) GetPet(ctx context.Context, req *pb.GetPetRequest) (*pb.Ge
 	}
 	return &pb.GetPetResponse{
 		Pet: &pb.Pet{
-			Id:      pet.ID.Hex(),
-			Name:    pet.Name,
-			Species: pet.Species,
-			Age:     pet.Age,
-			OwnerId: pet.OwnerID,
-			Color:   pet.Color,
-			Weight:  pet.Weight,
-			Size:    pet.Size,
+			Id:           pet.ID.Hex(),
+			Name:         pet.Name,
+			Species:      pet.Species,
+			Dob:          pet.Dob,
+			OwnerId:      pet.OwnerID,
+			Color:        pet.Color,
+			Weight:       pet.Weight,
+			IdentityMark: pet.identityMark,
 		},
 	}, nil
 }
 
 func (h *GRPCHandler) UpdatePet(ctx context.Context, req *pb.UpdatePetRequest) (*pb.UpdatePetResponse, error) {
-	pet, err := h.service.UpdatePet(ctx, req.Id, req.Name, req.Species, req.Age, req.OwnerId, req.Color, req.Weight, req.Size)
+	pet, err := h.service.UpdatePet(ctx, req.Id, req.Name, req.Species, req.Dob, req.OwnerId, req.Color, req.Weight, req.IdentityMark)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "failed to update pet: %v", err)
 	}
 	return &pb.UpdatePetResponse{
 		Pet: &pb.Pet{
-			Id:      pet.ID.Hex(),
-			Name:    pet.Name,
-			Species: pet.Species,
-			Age:     pet.Age,
-			OwnerId: pet.OwnerID,
-			Color:   pet.Color,
-			Weight:  pet.Weight,
-			Size:    pet.Size,
+			Id:           pet.ID.Hex(),
+			Name:         pet.Name,
+			Species:      pet.Species,
+			Dob:          pet.Dob,
+			OwnerId:      pet.OwnerID,
+			Color:        pet.Color,
+			Weight:       pet.Weight,
+			IdentityMark: pet.identityMark,
 		},
 	}, nil
 }
@@ -86,14 +86,14 @@ func (h *GRPCHandler) ListPets(ctx context.Context, req *pb.ListPetsRequest) (*p
 	resp := &pb.ListPetsResponse{}
 	for _, pet := range pets {
 		resp.Pets = append(resp.Pets, &pb.Pet{
-			Id:      pet.ID.Hex(),
-			Name:    pet.Name,
-			Species: pet.Species,
-			Age:     pet.Age,
-			OwnerId: pet.OwnerID,
-			Color:   pet.Color,
-			Weight:  pet.Weight,
-			Size:    pet.Size,
+			Id:           pet.ID.Hex(),
+			Name:         pet.Name,
+			Species:      pet.Species,
+			Dob:          pet.Dob,
+			OwnerId:      pet.OwnerID,
+			Color:        pet.Color,
+			Weight:       pet.Weight,
+			IdentityMark: pet.identityMark,
 		})
 	}
 	return resp, nil

@@ -2342,7 +2342,7 @@ const docTemplate = `{
         },
         "/pets": {
             "put": {
-                "description": "Updates a pet record with details like name, species, age, owner ID, etc.",
+                "description": "Updates a pet record with details like name, species, dob, owner ID, etc.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2362,22 +2362,22 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "age": {
-                                    "type": "integer"
-                                },
                                 "color": {
                                     "type": "string"
                                 },
+                                "dob": {
+                                    "type": "string"
+                                },
                                 "id": {
+                                    "type": "string"
+                                },
+                                "identity_mark": {
                                     "type": "string"
                                 },
                                 "name": {
                                     "type": "string"
                                 },
                                 "owner_id": {
-                                    "type": "string"
-                                },
-                                "size": {
                                     "type": "string"
                                 },
                                 "species": {
@@ -2396,22 +2396,22 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "age": {
-                                    "type": "integer"
-                                },
                                 "color": {
                                     "type": "string"
                                 },
+                                "dob": {
+                                    "type": "string"
+                                },
                                 "id": {
+                                    "type": "string"
+                                },
+                                "identity_mark": {
                                     "type": "string"
                                 },
                                 "name": {
                                     "type": "string"
                                 },
                                 "owner_id": {
-                                    "type": "string"
-                                },
-                                "size": {
                                     "type": "string"
                                 },
                                 "species": {
@@ -2448,7 +2448,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Creates a new pet record with details like name, species, age, owner ID, etc.",
+                "description": "Creates a new pet record with details like name, species, dob, owner ID, etc.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2468,19 +2468,19 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "age": {
-                                    "type": "integer"
-                                },
                                 "color": {
+                                    "type": "string"
+                                },
+                                "dob": {
+                                    "type": "string"
+                                },
+                                "identity_mark": {
                                     "type": "string"
                                 },
                                 "name": {
                                     "type": "string"
                                 },
                                 "owner_id": {
-                                    "type": "string"
-                                },
-                                "size": {
                                     "type": "string"
                                 },
                                 "species": {
@@ -2557,22 +2557,22 @@ const docTemplate = `{
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "age": {
-                                        "type": "integer"
-                                    },
                                     "color": {
                                         "type": "string"
                                     },
+                                    "dob": {
+                                        "type": "string"
+                                    },
                                     "id": {
+                                        "type": "string"
+                                    },
+                                    "identity_mark": {
                                         "type": "string"
                                     },
                                     "name": {
                                         "type": "string"
                                     },
                                     "owner_id": {
-                                        "type": "string"
-                                    },
-                                    "size": {
                                         "type": "string"
                                     },
                                     "species": {
@@ -2635,22 +2635,22 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "age": {
-                                    "type": "integer"
-                                },
                                 "color": {
                                     "type": "string"
                                 },
+                                "dob": {
+                                    "type": "string"
+                                },
                                 "id": {
+                                    "type": "string"
+                                },
+                                "identity_mark": {
                                     "type": "string"
                                 },
                                 "name": {
                                     "type": "string"
                                 },
                                 "owner_id": {
-                                    "type": "string"
-                                },
-                                "size": {
                                     "type": "string"
                                 },
                                 "species": {
@@ -4709,6 +4709,9 @@ const docTemplate = `{
                                 "address": {
                                     "type": "string"
                                 },
+                                "branchId": {
+                                    "type": "integer"
+                                },
                                 "email": {
                                     "type": "string"
                                 },
@@ -5352,6 +5355,10 @@ const docTemplate = `{
                 "address": {
                     "type": "string",
                     "example": "123 Main St, City"
+                },
+                "branchId": {
+                    "type": "integer",
+                    "example": 301
                 },
                 "email": {
                     "type": "string",

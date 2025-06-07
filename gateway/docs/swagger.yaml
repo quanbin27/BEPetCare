@@ -30,6 +30,9 @@ definitions:
       address:
         example: 123 Main St, City
         type: string
+      branchId:
+        example: 301
+        type: integer
       email:
         example: johndoe@example.com
         type: string
@@ -1571,7 +1574,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Creates a new pet record with details like name, species, age,
+      description: Creates a new pet record with details like name, species, dob,
         owner ID, etc.
       parameters:
       - description: Pet details
@@ -1580,15 +1583,15 @@ paths:
         required: true
         schema:
           properties:
-            age:
-              type: integer
             color:
+              type: string
+            dob:
+              type: string
+            identity_mark:
               type: string
             name:
               type: string
             owner_id:
-              type: string
-            size:
               type: string
             species:
               type: string
@@ -1625,7 +1628,7 @@ paths:
     put:
       consumes:
       - application/json
-      description: Updates a pet record with details like name, species, age, owner
+      description: Updates a pet record with details like name, species, dob, owner
         ID, etc.
       parameters:
       - description: Updated pet details
@@ -1634,17 +1637,17 @@ paths:
         required: true
         schema:
           properties:
-            age:
-              type: integer
             color:
               type: string
+            dob:
+              type: string
             id:
+              type: string
+            identity_mark:
               type: string
             name:
               type: string
             owner_id:
-              type: string
-            size:
               type: string
             species:
               type: string
@@ -1658,17 +1661,17 @@ paths:
           description: Pet updated successfully
           schema:
             properties:
-              age:
-                type: integer
               color:
                 type: string
+              dob:
+                type: string
               id:
+                type: string
+              identity_mark:
                 type: string
               name:
                 type: string
               owner_id:
-                type: string
-              size:
                 type: string
               species:
                 type: string
@@ -1743,17 +1746,17 @@ paths:
           description: Pet details
           schema:
             properties:
-              age:
-                type: integer
               color:
                 type: string
+              dob:
+                type: string
               id:
+                type: string
+              identity_mark:
                 type: string
               name:
                 type: string
               owner_id:
-                type: string
-              size:
                 type: string
               species:
                 type: string
@@ -1801,17 +1804,17 @@ paths:
           schema:
             items:
               properties:
-                age:
-                  type: integer
                 color:
                   type: string
+                dob:
+                  type: string
                 id:
+                  type: string
+                identity_mark:
                   type: string
                 name:
                   type: string
                 owner_id:
-                  type: string
-                size:
                   type: string
                 species:
                   type: string
@@ -3162,6 +3165,8 @@ paths:
             properties:
               address:
                 type: string
+              branchId:
+                type: integer
               email:
                 type: string
               id:

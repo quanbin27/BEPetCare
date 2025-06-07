@@ -16,18 +16,18 @@ func NewPetRecordService(store RecordsStore) RecordsService {
 }
 
 // --- Pet Methods ---
-func (s *PetRecordService) CreatePet(ctx context.Context, name, species string, age int32, ownerID, color string, weight float32, size string) (string, error) {
+func (s *PetRecordService) CreatePet(ctx context.Context, name, species string, dob string, ownerID, color string, weight float32, identityMark string) (string, error) {
 	if name == "" || species == "" || ownerID == "" {
 		return "", errors.New("name, species, and ownerID are required")
 	}
 	pet := &Pet{
-		Name:    name,
-		Species: species,
-		Age:     age,
-		OwnerID: ownerID,
-		Color:   color,
-		Weight:  weight,
-		Size:    size,
+		Name:         name,
+		Species:      species,
+		Dob:          dob,
+		OwnerID:      ownerID,
+		Color:        color,
+		Weight:       weight,
+		identityMark: identityMark,
 	}
 	return s.store.CreatePet(ctx, pet)
 }
@@ -36,7 +36,7 @@ func (s *PetRecordService) GetPet(ctx context.Context, id string) (*Pet, error) 
 	return s.store.GetPet(ctx, id)
 }
 
-func (s *PetRecordService) UpdatePet(ctx context.Context, id, name, species string, age int32, ownerID, color string, weight float32, size string) (*Pet, error) {
+func (s *PetRecordService) UpdatePet(ctx context.Context, id, name, species string, dob string, ownerID, color string, weight float32, identityMark string) (*Pet, error) {
 	if name == "" || species == "" || ownerID == "" {
 		return nil, errors.New("name, species, and ownerID are required")
 	}
@@ -46,11 +46,11 @@ func (s *PetRecordService) UpdatePet(ctx context.Context, id, name, species stri
 	}
 	pet.Name = name
 	pet.Species = species
-	pet.Age = age
+	pet.Dob = dob
 	pet.OwnerID = ownerID
 	pet.Color = color
 	pet.Weight = weight
-	pet.Size = size
+	pet.identityMark = identityMark
 	if err := s.store.UpdatePet(ctx, pet); err != nil {
 		return nil, err
 	}

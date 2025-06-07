@@ -71,6 +71,8 @@ github.com/quanbin27/commons v0.0.0-20250601101912-bec0f575a99d h1:l00vOeKbwqrzr
 github.com/quanbin27/commons v0.0.0-20250601101912-bec0f575a99d/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
 github.com/quanbin27/commons v0.0.0-20250601103330-b63eb2c62d05 h1:IvTo5RBSAXvD2AeXZgRpbVn1L3vg7EsNGU09/IU9/TE=
 github.com/quanbin27/commons v0.0.0-20250601103330-b63eb2c62d05/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
+github.com/quanbin27/commons v0.0.0-20250607075331-d658fbbaffba h1:VjmnqlvpNEC3jgjcesJs9y0agLxm58N6iCnaoHf/e/s=
+github.com/quanbin27/commons v0.0.0-20250607075331-d658fbbaffba/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=

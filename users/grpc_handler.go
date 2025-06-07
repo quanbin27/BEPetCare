@@ -149,3 +149,13 @@ func (h *UsersGrpcHandler) GetCustomersByName(ctx context.Context, req *pb.GetCu
 	}
 	return &pb.GetCustomersByNameResponse{Users: protoUsers}, nil
 }
+func (h *UsersGrpcHandler) GetBranchByEmployeeID(ctx context.Context, req *pb.GetBranchByEmployeeIDRequest) (*pb.GetBranchByEmployeeIDResponse, error) {
+	branchID, err := h.userService.GetBranchByEmployeeID(ctx, req.EmployeeId)
+	if err != nil {
+		if errors.Is(err, errors.New("no branch found for user ID")) {
+			return nil, status.Errorf(codes.NotFound, err.Error())
+		}
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &pb.GetBranchByEmployeeIDResponse{BranchId: branchID}, nil
+}
