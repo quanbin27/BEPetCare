@@ -30,6 +30,7 @@ func (h *OrderHandler) RegisterRoutes(e *echo.Group) {
 	e.GET("/orders/appointment/:appointment_id", h.GetOrderByAppointmentID)
 	e.PUT("/orders/update-status", h.UpdateOrderStatus)
 	e.GET("/orders/:order_id/items", h.GetOrderItems)
+	e.GET("/orders/customer/:customer_id", h.GetOrderByCustomerID)
 }
 
 // CreateOrder xử lý yêu cầu tạo đơn hàng
@@ -94,6 +95,34 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 		"order_id": resp.OrderId,
 		"status":   resp.Status,
 	})
+}
+func (h *OrderHandler) GetOrderByCustomerID(c echo.Context) error {
+	customerIDStr := c.Param("customer_id")
+	if customerIDStr == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Customer ID is required"})
+	}
+
+	customerID, err := strconv.ParseInt(customerIDStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid customer_id format, must be an integer"})
+	}
+
+	ctx := c.Request().Context()
+
+	resp, err := h.client.GetOrdersByCustomerID(ctx, &pb.GetOrdersByCustomerIDRequest{CustomerId: int32(customerID)})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.NotFound:
+				return c.JSON(http.StatusNotFound, map[string]string{"error": grpcErr.Message()})
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, resp.Orders)
 }
 
 // GetOrder xử lý yêu cầu lấy thông tin đơn hàng
