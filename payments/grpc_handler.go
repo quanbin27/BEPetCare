@@ -38,7 +38,7 @@ func (h *PaymentGrpcHandler) GetPaymentInfo(ctx context.Context, req *pb.GetPaym
 }
 
 func (h *PaymentGrpcHandler) CreatePaymentURL(ctx context.Context, req *pb.CreatePaymentURLRequest) (*pb.CreatePaymentURLResponse, error) {
-	paymentLinkID, checkoutURL, err := h.paymentService.CreatePaymentURL(ctx, req.PaymentId, req.Amount, req.Description)
+	paymentLinkID, checkoutURL, err := h.paymentService.CreatePaymentURL(ctx, req.PaymentId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
@@ -58,6 +58,13 @@ func (h *PaymentGrpcHandler) CancelPaymentLink(ctx context.Context, req *pb.Canc
 
 func (h *PaymentGrpcHandler) UpdatePaymentStatus(ctx context.Context, req *pb.UpdatePaymentStatusRequest) (*pb.UpdatePaymentStatusResponse, error) {
 	statusMsg, err := h.paymentService.UpdatePaymentStatus(ctx, req.PaymentId, fromProtoPaymentStatus(req.Status))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &pb.UpdatePaymentStatusResponse{Status: statusMsg}, nil
+}
+func (h *PaymentGrpcHandler) UpdateBankPaymentStatus(ctx context.Context, req *pb.UpdateBankPaymentStatusRequest) (*pb.UpdatePaymentStatusResponse, error) {
+	statusMsg, err := h.paymentService.UpdateBankPaymentStatus(ctx, req.OrderCode, fromProtoPaymentStatus(req.Status))
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}

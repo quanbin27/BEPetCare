@@ -38,6 +38,26 @@ type AllProductResponse struct {
 	IsAttachable bool    `json:"isAttachable" example:"false" description:"Whether the product can be attached to other products"`
 }
 
+// AvailableProductResponse represents a product available for purchase
+// @Description Product information available for purchase
+type AvailableProductResponse struct {
+	ID                int32   `json:"id" example:"101" description:"Unique identifier of the product"`
+	Name              string  `json:"name" example:"Premium Dog Food" description:"Name of the product"`
+	Price             float32 `json:"price" example:"45.99" description:"Price of the product"`
+	Description       string  `json:"description" example:"High-quality nutrition for dogs" description:"Detailed description of the product"`
+	ImgURL            string  `json:"imgUrl" example:"https://example.com/images/dog-food.jpg" description:"URL to the product image"`
+	ProductType       string  `json:"productType" example:"Food" description:"Type of the product"`
+	IsAttachable      bool    `json:"isAttachable" example:"false" description:"Whether the product can be attached to other products"`
+	AvailableQuantity int32   `json:"availableQuantity" example:"100" description:"Available stock quantity of the product"`
+}
+type OrderItemReq struct {
+	ProductID   int32   `json:"product_id"`
+	ProductType string  `json:"product_type"`
+	Quantity    int32   `json:"quantity"`
+	UnitPrice   float32 `json:"unit_price"`
+	ProductName string  `json:"product_name"`
+}
+
 // ProductResponse represents a basic product
 // @Description Basic product information
 type ProductResponse struct {

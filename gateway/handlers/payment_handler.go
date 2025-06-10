@@ -27,6 +27,7 @@ func (h *PaymentHandler) RegisterRoutes(e *echo.Group) {
 	e.PUT("/payments/update-status", h.UpdatePaymentStatus)
 	e.PUT("/payments/update-method", h.UpdatePaymentMethod)
 	e.PUT("/payments/update-amount", h.UpdatePaymentAmount)
+	e.PUT("/payments/bank/update-status", h.UpdateBankPaymentStatus)
 }
 
 // CreatePayment creates a new payment
@@ -131,16 +132,14 @@ func (h *PaymentHandler) GetPaymentInfo(c echo.Context) error {
 // @Tags Payments
 // @Accept json
 // @Produce json
-// @Param request body object{payment_id=string,amount=number,description=string} true "Payment URL details"
+// @Param request body object{payment_id=string} true "Payment URL details"
 // @Success 200 {object} object{payment_link_id=string,checkout_url=string} "Payment URL created successfully"
 // @Failure 400 {object} object{error=string} "Invalid request or invalid payment_id format"
 // @Failure 500 {object} object{error=string} "Internal server error"
 // @Router /payments/url [post]
 func (h *PaymentHandler) CreatePaymentURL(c echo.Context) error {
 	var req struct {
-		PaymentID   string  `json:"payment_id"`
-		Amount      float32 `json:"amount"`
-		Description string  `json:"description"`
+		PaymentID string `json:"payment_id"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
@@ -156,9 +155,7 @@ func (h *PaymentHandler) CreatePaymentURL(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	resp, err := h.client.CreatePaymentURL(ctx, &pb.CreatePaymentURLRequest{
-		PaymentId:   int32(paymentID),
-		Amount:      req.Amount,
-		Description: req.Description,
+		PaymentId: int32(paymentID),
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
@@ -261,6 +258,53 @@ func (h *PaymentHandler) UpdatePaymentStatus(c echo.Context) error {
 
 	resp, err := h.client.UpdatePaymentStatus(ctx, &pb.UpdatePaymentStatusRequest{
 		PaymentId: int32(paymentID),
+		Status:    pb.PaymentStatus(pbStatus),
+	})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"status": resp.Status,
+	})
+}
+
+// UpdateBankPaymentStatus updates the status of a bank payment
+// @Summary Update bank payment status
+// @Description Updates the status of a bank payment record for a specific order code
+// @Tags Payments
+// @Accept json
+// @Produce json
+// @Param request body object{orderCode=integer,status=string} true "Bank payment status update details"
+// @Success 200 {object} object{status=string} "Bank payment status updated successfully"
+// @Failure 400 {object} object{error=string} "Invalid request or invalid orderCode format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /payments/bank/update-status [put]
+func (h *PaymentHandler) UpdateBankPaymentStatus(c echo.Context) error {
+	var req struct {
+		OrderCode int64  `json:"orderCode"`
+		Status    string `json:"status"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	pbStatus, ok := pb.PaymentStatus_value[req.Status]
+	if !ok {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid payment status"})
+	}
+
+	// Lấy context từ Echo request
+	ctx := c.Request().Context()
+
+	resp, err := h.client.UpdateBankPaymentStatus(ctx, &pb.UpdateBankPaymentStatusRequest{
+		OrderCode: req.OrderCode,
 		Status:    pb.PaymentStatus(pbStatus),
 	})
 	if err != nil {

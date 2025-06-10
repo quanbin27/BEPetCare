@@ -41,6 +41,7 @@ type UserService interface {
 	GetCustomersPaginated(ctx context.Context, page int32, pageSize int32) ([]User, int64, error)
 	GetCustomersByName(ctx context.Context, nameFilter string) ([]User, error)
 	GetBranchByEmployeeID(ctx context.Context, employeeID int32) (int32, error)
+	CreateUser(ctx context.Context, email, name, phoneNumber string) (int32, error)
 }
 
 // User represents a user in the internal system

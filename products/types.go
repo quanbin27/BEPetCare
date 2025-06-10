@@ -52,19 +52,21 @@ type Branch struct {
 
 // BranchProduct - Quản lý tồn kho theo từng chi nhánh
 type BranchProduct struct {
-	BranchID      int32  `gorm:"primaryKey"`
-	ProductID     int32  `gorm:"primaryKey"`
-	ProductType   string `gorm:"size:50;not null"` // "food", "accessory", "medicine"
-	StockQuantity int32  `gorm:"not null"`
+	BranchID         int32  `gorm:"primaryKey"`
+	ProductID        int32  `gorm:"primaryKey"`
+	ProductType      string `gorm:"primaryKey"` // "food", "accessory", "medicine"
+	StockQuantity    int32  `gorm:"not null"`
+	ReservedQuantity int32  `gorm:"default:0"` // Số lượng đã đặt nhưng chưa giao
 }
 type GeneralProduct struct {
-	Name         string
-	Description  string
-	Price        float32
-	ImgUrl       string
-	ProductID    int32
-	ProductType  string
-	IsAttachable bool
+	Name              string
+	Description       string
+	Price             float32
+	ImgUrl            string
+	ProductID         int32
+	ProductType       string
+	IsAttachable      bool
+	AvailableQuantity int32
 }
 
 // ProductStore Interface - Cung cấp các thao tác với database
@@ -99,6 +101,12 @@ type ProductStore interface {
 	UpdateBranchInventory(ctx context.Context, branchID int32, productID int32, productType string, stockQuantity int32) error
 	ListAttachableProducts(ctx context.Context) ([]GeneralProduct, error)
 	ListAllProducts(ctx context.Context) ([]GeneralProduct, error)
+	ListAvailableProductsByBranch(ctx context.Context, branchID int32, productType string) ([]GeneralProduct, error)
+	ListAvailableAllProductsByBranch(ctx context.Context, branchID int32) ([]GeneralProduct, error)
+
+	ReleaseReservation(ctx context.Context, branchID, productID int32, productType string, quantity int32) error
+	ConfirmPickup(ctx context.Context, branchID, productID int32, productType string, quantity int32) error
+	ReserveProduct(ctx context.Context, branchID, productID int32, productType string, quantity int32) error
 }
 
 // ProductService Interface - Implement business logic with internal types
@@ -133,6 +141,12 @@ type ProductService interface {
 	UpdateBranchInventory(ctx context.Context, branchID, productID int32, productType string, stockQuantity int32) (string, error)
 	ListAttachableProducts(ctx context.Context) ([]GeneralProduct, error)
 	ListAllProducts(ctx context.Context) ([]GeneralProduct, error)
+	ListAvailableProductsByBranch(ctx context.Context, branchID int32, productType string) ([]GeneralProduct, error)
+	ListAvailableAllProductsByBranch(ctx context.Context, branchID int32) ([]GeneralProduct, error)
+
+	ReserveProduct(ctx context.Context, branchID, productID int32, productType string, quantity int32) error
+	ConfirmPickup(ctx context.Context, branchID, productID int32, productType string, quantity int32) error
+	ReleaseReservation(ctx context.Context, branchID, productID int32, productType string, quantity int32) error
 }
 
 // Helper functions to convert between internal types and protobuf types
@@ -148,13 +162,14 @@ func toProtoFood(f *Food) *pb.Food {
 }
 func toProtoGeneralProduct(f *GeneralProduct) *pb.GeneralProduct {
 	return &pb.GeneralProduct{
-		Name:         f.Name,
-		Description:  f.Description,
-		Price:        f.Price,
-		Imgurl:       f.ImgUrl,
-		ProductType:  f.ProductType,
-		ProductId:    f.ProductID,
-		IsAttachable: f.IsAttachable,
+		Name:              f.Name,
+		Description:       f.Description,
+		Price:             f.Price,
+		Imgurl:            f.ImgUrl,
+		ProductType:       f.ProductType,
+		ProductId:         f.ProductID,
+		IsAttachable:      f.IsAttachable,
+		AvailableQuantity: f.AvailableQuantity,
 	}
 }
 func toProtoAccessory(a *Accessory) *pb.Accessory {
@@ -189,9 +204,10 @@ func toProtoBranch(b *Branch) *pb.Branch {
 
 func toProtoBranchProduct(bp *BranchProduct) *pb.BranchProduct {
 	return &pb.BranchProduct{
-		BranchId:      bp.BranchID,
-		ProductId:     bp.ProductID,
-		ProductType:   bp.ProductType,
-		StockQuantity: bp.StockQuantity,
+		BranchId:         bp.BranchID,
+		ProductId:        bp.ProductID,
+		ProductType:      bp.ProductType,
+		StockQuantity:    bp.StockQuantity,
+		ReservedQuantity: bp.ReservedQuantity,
 	}
 }

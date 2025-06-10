@@ -354,3 +354,22 @@ func (s *Service) GetCustomersByName(ctx context.Context, nameFilter string) ([]
 	}
 	return users, nil
 }
+func (s *Service) CreateUser(ctx context.Context, email, name, phoneNumber string) (int32, error) {
+	if _, err := s.userStore.GetUserByEmail(ctx, email); err == nil {
+		return 0, errors.New("user already exists")
+	}
+	userID, err := s.userStore.CreateUser(ctx, &User{
+		Email:       email,
+		Name:        name,
+		PhoneNumber: phoneNumber,
+	})
+	if err != nil {
+		return 0, fmt.Errorf("failed to create user: %w", err)
+	}
+	err = s.userStore.CreateRole(ctx, userID, 3)
+	if err != nil {
+		return userID, err
+	}
+
+	return userID, nil
+}

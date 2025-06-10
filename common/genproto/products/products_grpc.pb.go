@@ -19,27 +19,32 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ProductService_GetFoodByID_FullMethodName            = "/ProductService/GetFoodByID"
-	ProductService_GetAccessoryByID_FullMethodName       = "/ProductService/GetAccessoryByID"
-	ProductService_GetMedicineByID_FullMethodName        = "/ProductService/GetMedicineByID"
-	ProductService_ListFoods_FullMethodName              = "/ProductService/ListFoods"
-	ProductService_ListAccessories_FullMethodName        = "/ProductService/ListAccessories"
-	ProductService_ListMedicines_FullMethodName          = "/ProductService/ListMedicines"
-	ProductService_CreateFood_FullMethodName             = "/ProductService/CreateFood"
-	ProductService_CreateAccessory_FullMethodName        = "/ProductService/CreateAccessory"
-	ProductService_CreateMedicine_FullMethodName         = "/ProductService/CreateMedicine"
-	ProductService_UpdateFood_FullMethodName             = "/ProductService/UpdateFood"
-	ProductService_UpdateAccessory_FullMethodName        = "/ProductService/UpdateAccessory"
-	ProductService_UpdateMedicine_FullMethodName         = "/ProductService/UpdateMedicine"
-	ProductService_DeleteFood_FullMethodName             = "/ProductService/DeleteFood"
-	ProductService_DeleteAccessory_FullMethodName        = "/ProductService/DeleteAccessory"
-	ProductService_DeleteMedicine_FullMethodName         = "/ProductService/DeleteMedicine"
-	ProductService_GetBranchByID_FullMethodName          = "/ProductService/GetBranchByID"
-	ProductService_ListBranches_FullMethodName           = "/ProductService/ListBranches"
-	ProductService_GetBranchInventory_FullMethodName     = "/ProductService/GetBranchInventory"
-	ProductService_UpdateBranchInventory_FullMethodName  = "/ProductService/UpdateBranchInventory"
-	ProductService_ListAttachableProducts_FullMethodName = "/ProductService/ListAttachableProducts"
-	ProductService_ListAllProducts_FullMethodName        = "/ProductService/ListAllProducts"
+	ProductService_GetFoodByID_FullMethodName                      = "/ProductService/GetFoodByID"
+	ProductService_GetAccessoryByID_FullMethodName                 = "/ProductService/GetAccessoryByID"
+	ProductService_GetMedicineByID_FullMethodName                  = "/ProductService/GetMedicineByID"
+	ProductService_ListFoods_FullMethodName                        = "/ProductService/ListFoods"
+	ProductService_ListAccessories_FullMethodName                  = "/ProductService/ListAccessories"
+	ProductService_ListMedicines_FullMethodName                    = "/ProductService/ListMedicines"
+	ProductService_CreateFood_FullMethodName                       = "/ProductService/CreateFood"
+	ProductService_CreateAccessory_FullMethodName                  = "/ProductService/CreateAccessory"
+	ProductService_CreateMedicine_FullMethodName                   = "/ProductService/CreateMedicine"
+	ProductService_UpdateFood_FullMethodName                       = "/ProductService/UpdateFood"
+	ProductService_UpdateAccessory_FullMethodName                  = "/ProductService/UpdateAccessory"
+	ProductService_UpdateMedicine_FullMethodName                   = "/ProductService/UpdateMedicine"
+	ProductService_DeleteFood_FullMethodName                       = "/ProductService/DeleteFood"
+	ProductService_DeleteAccessory_FullMethodName                  = "/ProductService/DeleteAccessory"
+	ProductService_DeleteMedicine_FullMethodName                   = "/ProductService/DeleteMedicine"
+	ProductService_GetBranchByID_FullMethodName                    = "/ProductService/GetBranchByID"
+	ProductService_ListBranches_FullMethodName                     = "/ProductService/ListBranches"
+	ProductService_GetBranchInventory_FullMethodName               = "/ProductService/GetBranchInventory"
+	ProductService_UpdateBranchInventory_FullMethodName            = "/ProductService/UpdateBranchInventory"
+	ProductService_ListAttachableProducts_FullMethodName           = "/ProductService/ListAttachableProducts"
+	ProductService_ListAllProducts_FullMethodName                  = "/ProductService/ListAllProducts"
+	ProductService_ListAvailableProductsByBranch_FullMethodName    = "/ProductService/ListAvailableProductsByBranch"
+	ProductService_ListAvailableAllProductsByBranch_FullMethodName = "/ProductService/ListAvailableAllProductsByBranch"
+	ProductService_ReserveProduct_FullMethodName                   = "/ProductService/ReserveProduct"
+	ProductService_ConfirmPickup_FullMethodName                    = "/ProductService/ConfirmPickup"
+	ProductService_ReleaseReservation_FullMethodName               = "/ProductService/ReleaseReservation"
 )
 
 // ProductServiceClient is the client API for ProductService service.
@@ -67,6 +72,11 @@ type ProductServiceClient interface {
 	UpdateBranchInventory(ctx context.Context, in *UpdateBranchInventoryRequest, opts ...grpc.CallOption) (*UpdateBranchInventoryResponse, error)
 	ListAttachableProducts(ctx context.Context, in *ListAttachableProductsRequest, opts ...grpc.CallOption) (*ListAttachableProductsResponse, error)
 	ListAllProducts(ctx context.Context, in *ListAllProductsRequest, opts ...grpc.CallOption) (*ListAllProductsResponse, error)
+	ListAvailableProductsByBranch(ctx context.Context, in *ListAvailableProductsByBranchRequest, opts ...grpc.CallOption) (*ListAvailableProductsByBranchResponse, error)
+	ListAvailableAllProductsByBranch(ctx context.Context, in *ListAvailableAllProductsByBranchRequest, opts ...grpc.CallOption) (*ListAvailableAllProductsByBranchResponse, error)
+	ReserveProduct(ctx context.Context, in *ReserveProductRequest, opts ...grpc.CallOption) (*ReserveProductResponse, error)
+	ConfirmPickup(ctx context.Context, in *ConfirmPickupRequest, opts ...grpc.CallOption) (*ConfirmPickupResponse, error)
+	ReleaseReservation(ctx context.Context, in *ReleaseReservationRequest, opts ...grpc.CallOption) (*ReleaseReservationResponse, error)
 }
 
 type productServiceClient struct {
@@ -287,6 +297,56 @@ func (c *productServiceClient) ListAllProducts(ctx context.Context, in *ListAllP
 	return out, nil
 }
 
+func (c *productServiceClient) ListAvailableProductsByBranch(ctx context.Context, in *ListAvailableProductsByBranchRequest, opts ...grpc.CallOption) (*ListAvailableProductsByBranchResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAvailableProductsByBranchResponse)
+	err := c.cc.Invoke(ctx, ProductService_ListAvailableProductsByBranch_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productServiceClient) ListAvailableAllProductsByBranch(ctx context.Context, in *ListAvailableAllProductsByBranchRequest, opts ...grpc.CallOption) (*ListAvailableAllProductsByBranchResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAvailableAllProductsByBranchResponse)
+	err := c.cc.Invoke(ctx, ProductService_ListAvailableAllProductsByBranch_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productServiceClient) ReserveProduct(ctx context.Context, in *ReserveProductRequest, opts ...grpc.CallOption) (*ReserveProductResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ReserveProductResponse)
+	err := c.cc.Invoke(ctx, ProductService_ReserveProduct_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productServiceClient) ConfirmPickup(ctx context.Context, in *ConfirmPickupRequest, opts ...grpc.CallOption) (*ConfirmPickupResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConfirmPickupResponse)
+	err := c.cc.Invoke(ctx, ProductService_ConfirmPickup_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productServiceClient) ReleaseReservation(ctx context.Context, in *ReleaseReservationRequest, opts ...grpc.CallOption) (*ReleaseReservationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ReleaseReservationResponse)
+	err := c.cc.Invoke(ctx, ProductService_ReleaseReservation_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProductServiceServer is the server API for ProductService service.
 // All implementations must embed UnimplementedProductServiceServer
 // for forward compatibility.
@@ -312,6 +372,11 @@ type ProductServiceServer interface {
 	UpdateBranchInventory(context.Context, *UpdateBranchInventoryRequest) (*UpdateBranchInventoryResponse, error)
 	ListAttachableProducts(context.Context, *ListAttachableProductsRequest) (*ListAttachableProductsResponse, error)
 	ListAllProducts(context.Context, *ListAllProductsRequest) (*ListAllProductsResponse, error)
+	ListAvailableProductsByBranch(context.Context, *ListAvailableProductsByBranchRequest) (*ListAvailableProductsByBranchResponse, error)
+	ListAvailableAllProductsByBranch(context.Context, *ListAvailableAllProductsByBranchRequest) (*ListAvailableAllProductsByBranchResponse, error)
+	ReserveProduct(context.Context, *ReserveProductRequest) (*ReserveProductResponse, error)
+	ConfirmPickup(context.Context, *ConfirmPickupRequest) (*ConfirmPickupResponse, error)
+	ReleaseReservation(context.Context, *ReleaseReservationRequest) (*ReleaseReservationResponse, error)
 	mustEmbedUnimplementedProductServiceServer()
 }
 
@@ -384,6 +449,21 @@ func (UnimplementedProductServiceServer) ListAttachableProducts(context.Context,
 }
 func (UnimplementedProductServiceServer) ListAllProducts(context.Context, *ListAllProductsRequest) (*ListAllProductsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAllProducts not implemented")
+}
+func (UnimplementedProductServiceServer) ListAvailableProductsByBranch(context.Context, *ListAvailableProductsByBranchRequest) (*ListAvailableProductsByBranchResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAvailableProductsByBranch not implemented")
+}
+func (UnimplementedProductServiceServer) ListAvailableAllProductsByBranch(context.Context, *ListAvailableAllProductsByBranchRequest) (*ListAvailableAllProductsByBranchResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAvailableAllProductsByBranch not implemented")
+}
+func (UnimplementedProductServiceServer) ReserveProduct(context.Context, *ReserveProductRequest) (*ReserveProductResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReserveProduct not implemented")
+}
+func (UnimplementedProductServiceServer) ConfirmPickup(context.Context, *ConfirmPickupRequest) (*ConfirmPickupResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfirmPickup not implemented")
+}
+func (UnimplementedProductServiceServer) ReleaseReservation(context.Context, *ReleaseReservationRequest) (*ReleaseReservationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReleaseReservation not implemented")
 }
 func (UnimplementedProductServiceServer) mustEmbedUnimplementedProductServiceServer() {}
 func (UnimplementedProductServiceServer) testEmbeddedByValue()                        {}
@@ -784,6 +864,96 @@ func _ProductService_ListAllProducts_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProductService_ListAvailableProductsByBranch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAvailableProductsByBranchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).ListAvailableProductsByBranch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_ListAvailableProductsByBranch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).ListAvailableProductsByBranch(ctx, req.(*ListAvailableProductsByBranchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProductService_ListAvailableAllProductsByBranch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAvailableAllProductsByBranchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).ListAvailableAllProductsByBranch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_ListAvailableAllProductsByBranch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).ListAvailableAllProductsByBranch(ctx, req.(*ListAvailableAllProductsByBranchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProductService_ReserveProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReserveProductRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).ReserveProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_ReserveProduct_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).ReserveProduct(ctx, req.(*ReserveProductRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProductService_ConfirmPickup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConfirmPickupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).ConfirmPickup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_ConfirmPickup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).ConfirmPickup(ctx, req.(*ConfirmPickupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProductService_ReleaseReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReleaseReservationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).ReleaseReservation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_ReleaseReservation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).ReleaseReservation(ctx, req.(*ReleaseReservationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProductService_ServiceDesc is the grpc.ServiceDesc for ProductService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -874,6 +1044,26 @@ var ProductService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListAllProducts",
 			Handler:    _ProductService_ListAllProducts_Handler,
+		},
+		{
+			MethodName: "ListAvailableProductsByBranch",
+			Handler:    _ProductService_ListAvailableProductsByBranch_Handler,
+		},
+		{
+			MethodName: "ListAvailableAllProductsByBranch",
+			Handler:    _ProductService_ListAvailableAllProductsByBranch_Handler,
+		},
+		{
+			MethodName: "ReserveProduct",
+			Handler:    _ProductService_ReserveProduct_Handler,
+		},
+		{
+			MethodName: "ConfirmPickup",
+			Handler:    _ProductService_ConfirmPickup_Handler,
+		},
+		{
+			MethodName: "ReleaseReservation",
+			Handler:    _ProductService_ReleaseReservation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

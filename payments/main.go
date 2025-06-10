@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/payOSHQ/payos-lib-golang"
 	"github.com/quanbin27/commons/config"
 	"google.golang.org/grpc"
 	"gorm.io/driver/mysql"
@@ -28,6 +29,10 @@ func initStorage(db *gorm.DB) {
 	log.Println("Successfully connected to database")
 }
 func main() {
+	err := payos.Key(config.Envs.ClientID, config.Envs.ApiKey, config.Envs.CheckSumKey)
+	if err != nil {
+		log.Fatal("Failed to initialize PayOS keys:", err)
+	}
 	dsn := config.Envs.PaymentsDSN
 	log.Println("Connecting to database ...", dsn)
 	grpcAddr := config.Envs.PaymentsGrpcAddr

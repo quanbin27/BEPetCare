@@ -159,3 +159,13 @@ func (h *UsersGrpcHandler) GetBranchByEmployeeID(ctx context.Context, req *pb.Ge
 	}
 	return &pb.GetBranchByEmployeeIDResponse{BranchId: branchID}, nil
 }
+func (h *UsersGrpcHandler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+	userID, err := h.userService.CreateUser(ctx, req.Email, req.Name, req.PhoneNumber)
+	if err != nil {
+		if errors.Is(err, errors.New("user already exists")) {
+			return nil, status.Errorf(codes.AlreadyExists, err.Error())
+		}
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &pb.CreateUserResponse{UserId: userID}, nil
+}

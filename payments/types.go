@@ -26,10 +26,13 @@ const (
 // Payment - Bảng lưu trữ thông tin thanh toán
 type Payment struct {
 	ID            int32 `gorm:"primaryKey"`
+	OrderCode     int64 // Mã đơn hàng từ hệ thống bên ngoài (PayOS)
 	OrderID       int32
 	AppointmentID int32
 	Amount        float32       `gorm:"not null"`
 	Description   string        `gorm:"type:text"`
+	PaymentLinkID string        `gorm:"type:varchar(100)"` // ID của link thanh toán
+	CheckoutURL   string        `gorm:"type:varchar(255)"` // URL thanh toán
 	Status        PaymentStatus `gorm:"type:varchar(20);not null"`
 	Method        PaymentMethod `gorm:"type:varchar(20);not null"`
 	CreatedAt     time.Time     `gorm:"autoCreateTime"`
@@ -43,17 +46,21 @@ type PaymentStore interface {
 	UpdatePaymentStatus(ctx context.Context, paymentID int32, status PaymentStatus) error
 	UpdatePaymentMethod(ctx context.Context, paymentID int32, method PaymentMethod) error
 	UpdatePaymentAmount(ctx context.Context, paymentID int32, amount float32) error
+	UpdateCheckoutURL(ctx context.Context, paymentID int32, checkoutURL, paymentLinkID string) error
+	UpdateOrderCode(ctx context.Context, paymentID int32, orderCode int64) error
+	GetPaymentByOrderCode(ctx context.Context, orderCode int64) (*Payment, error)
 }
 
 // PaymentService - Interface cho logic xử lý thanh toán với dữ liệu nội bộ
 type PaymentService interface {
 	CreatePayment(ctx context.Context, orderID, appointmentID int32, amount float32, description string, method PaymentMethod) (int32, error)
 	GetPaymentInfo(ctx context.Context, paymentID int32) (*Payment, error)
-	CreatePaymentURL(ctx context.Context, paymentID int32, amount float32, description string) (string, string, error) // Trả về payment_link_id, checkout_url, error
-	CancelPaymentLink(ctx context.Context, paymentID int32, cancellationReason string) (string, error)                 // Trả về status
-	UpdatePaymentStatus(ctx context.Context, paymentID int32, status PaymentStatus) (string, error)                    // Trả về status
-	UpdatePaymentMethod(ctx context.Context, paymentID int32, method PaymentMethod) (string, error)                    // Trả về status
-	UpdatePaymentAmount(ctx context.Context, paymentID int32, amount float32) (string, error)                          // Trả về status
+	CreatePaymentURL(ctx context.Context, paymentID int32) (string, string, error)                     // Trả về payment_link_id, checkout_url, error
+	CancelPaymentLink(ctx context.Context, paymentID int32, cancellationReason string) (string, error) // Trả về status
+	UpdatePaymentStatus(ctx context.Context, paymentID int32, status PaymentStatus) (string, error)    // Trả về status
+	UpdatePaymentMethod(ctx context.Context, paymentID int32, method PaymentMethod) (string, error)    // Trả về status
+	UpdatePaymentAmount(ctx context.Context, paymentID int32, amount float32) (string, error)
+	UpdateBankPaymentStatus(ctx context.Context, orderCode int64, status PaymentStatus) (string, error) // Trả về status
 }
 
 // Helper functions to convert between internal types and protobuf types

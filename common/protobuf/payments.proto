@@ -29,8 +29,6 @@ message CreatePaymentResponse {
 }
 message CreatePaymentURLRequest{
   int32 payment_id=1;
-  float amount = 2;       // Số tiền cần thanh toán
-  string description = 3; // Mô tả thanh toán
 }
 message CreatePaymentURLResponse {
   string payment_link_id = 1;         // ID thanh toán payos
@@ -38,7 +36,7 @@ message CreatePaymentURLResponse {
 }
 message CancelPaymentLinkRequest{
   int32 payment_id=1;
-    string cancellation_reason=2;
+  string cancellation_reason=2;
 }
 message CancelPaymentLinkResponse{
   string status=1;
@@ -53,12 +51,19 @@ message GetPaymentInfoResponse {
   int32 appointment_id = 4; // ID lịch hẹn từ AppointmentService (nếu có)
   float amount = 5;       // Số tiền cần thanh toán
   string description = 6; // Mô tả thanh toán
+  string checkout_url = 7; // URL thanh toán của PayOS
+  string payment_link_id = 8; // ID thanh toán payos
+  int64 order_code = 9; // Mã đơn hàng từ PayOS
 }
 message UpdatePaymentStatusResponse{
   string status=1;
 }
 message UpdatePaymentStatusRequest {
   int32 payment_id = 1;
+  PaymentStatus status = 2;
+}
+message UpdateBankPaymentStatusRequest {
+  int64 order_code = 1;
   PaymentStatus status = 2;
 }
 message UpdatePaymentAmountRequest{
@@ -84,4 +89,5 @@ service PaymentService {
   rpc UpdatePaymentStatus(UpdatePaymentStatusRequest) returns (UpdatePaymentStatusResponse);
   rpc UpdatePaymentMethod(UpdatePaymentMethodRequest) returns (UpdatePaymentMethodResponse);
   rpc UpdatePaymentAmount(UpdatePaymentAmountRequest) returns (UpdatePaymentAmountResponse);
+  rpc UpdateBankPaymentStatus(UpdateBankPaymentStatusRequest) returns (UpdatePaymentStatusResponse);
 }

@@ -34,6 +34,17 @@ func (h *OrderHandler) RegisterRoutes(e *echo.Group) {
 }
 
 // CreateOrder xử lý yêu cầu tạo đơn hàng
+// CreateOrder creates a new order
+// @Summary Create a new order
+// @Description Creates a new order with details like customer ID, branch ID, appointment ID, items, and pickup time
+// @Tags Orders
+// @Accept json
+// @Produce json
+// @Param request body object{customer_id=integer,branch_id=integer,appointment_id=integer,items=array{product_id=integer,product_type=string,quantity=integer,unit_price=number,product_name=string},pickup_time=string} true "Order details"
+// @Success 200 {object} object{order_id=integer,status=string} "Order created successfully"
+// @Failure 400 {object} object{error=string} "Invalid request"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /orders [post]
 func (h *OrderHandler) CreateOrder(c echo.Context) error {
 	fmt.Println("CREATE ORDERS")
 	type OrderItemReq struct {
@@ -48,10 +59,11 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 		BranchID      int32          `json:"branch_id"`
 		AppointmentID int32          `json:"appointment_id"`
 		Items         []OrderItemReq `json:"items"`
+		PickupTime    string         `json:"pickup_time"`
 	}
 
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request" + err.Error()})
 	}
 
 	// Chuyển đổi items từ HTTP request sang gRPC request
@@ -80,6 +92,7 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 		Items:         pbItems,
 		AppointmentId: req.AppointmentID,
 		Email:         user.Email,
+		PickupTime:    req.PickupTime,
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
@@ -96,6 +109,18 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 		"status":   resp.Status,
 	})
 }
+
+// GetOrderByCustomerID retrieves orders by customer ID
+// @Summary Get orders by customer
+// @Description Retrieves a list of order records for a specific customer ID
+// @Tags Orders
+// @Produce json
+// @Param customer_id path int true "Customer ID"
+// @Success 200 {array} object{id=integer,customer_id=integer,branch_id=integer,appointment_id=integer,pickup_time=string,status=string} "List of orders"
+// @Failure 400 {object} object{error=string} "Customer ID is required or invalid format"
+// @Failure 404 {object} object{error=string} "Orders not found"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /orders/customer/{customer_id} [get]
 func (h *OrderHandler) GetOrderByCustomerID(c echo.Context) error {
 	customerIDStr := c.Param("customer_id")
 	if customerIDStr == "" {
@@ -125,7 +150,17 @@ func (h *OrderHandler) GetOrderByCustomerID(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp.Orders)
 }
 
-// GetOrder xử lý yêu cầu lấy thông tin đơn hàng
+// GetOrder retrieves order details by ID
+// @Summary Get order details
+// @Description Retrieves detailed information for a specific order ID
+// @Tags Orders
+// @Produce json
+// @Param order_id path int true "Order ID"
+// @Success 200 {object} object{id=integer,customer_id=integer,branch_id=integer,appointment_id=integer,pickup_time=string,status=string} "Order details"
+// @Failure 400 {object} object{error=string} "Order ID is required or invalid format"
+// @Failure 404 {object} object{error=string} "Order not found"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /orders/{order_id} [get]
 func (h *OrderHandler) GetOrder(c echo.Context) error {
 	orderIDStr := c.Param("order_id")
 	if orderIDStr == "" {
@@ -154,6 +189,18 @@ func (h *OrderHandler) GetOrder(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, resp.Order)
 }
+
+// GetOrderByAppointmentID retrieves order by appointment ID
+// @Summary Get order by appointment ID
+// @Description Retrieves the order associated with a specific appointment ID
+// @Tags Orders
+// @Produce json
+// @Param appointment_id path int true "Appointment ID"
+// @Success 200 {object} object{id=integer,customer_id=integer,branch_id=integer,appointment_id=integer,pickup_time=string,status=string} "Order details"
+// @Failure 400 {object} object{error=string} "Appointment ID is required or invalid format"
+// @Failure 404 {object} object{error=string} "Order not found"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /orders/appointment/{appointment_id} [get]
 func (h *OrderHandler) GetOrderByAppointmentID(c echo.Context) error {
 	appointmentIDStr := c.Param("appointment_id")
 	if appointmentIDStr == "" {
@@ -182,7 +229,17 @@ func (h *OrderHandler) GetOrderByAppointmentID(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp.Order)
 }
 
-// UpdateOrderStatus xử lý yêu cầu cập nhật trạng thái đơn hàng
+// UpdateOrderStatus updates the status of an order
+// @Summary Update order status
+// @Description Updates the status of an order for a specific order ID
+// @Tags Orders
+// @Accept json
+// @Produce json
+// @Param request body object{order_id=string,status=string} true "Order statusSy status update details"
+// @Success 200 {object} object{status=string} "Order status updated successfully"
+// @Failure 400 {object} object{error=string} "Invalid request, invalid order_id format, or invalid status"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /orders/update-status [put]
 func (h *OrderHandler) UpdateOrderStatus(c echo.Context) error {
 	var req struct {
 		OrderID string `json:"order_id"`
@@ -226,7 +283,16 @@ func (h *OrderHandler) UpdateOrderStatus(c echo.Context) error {
 	})
 }
 
-// GetOrderItems xử lý yêu cầu lấy danh sách items của đơn hàng
+// GetOrderItems retrieves items of an order
+// @Summary Get order items
+// @Description Retrieves a list of items for a specific order ID
+// @Tags Orders
+// @Produce json
+// @Param order_id path int true "Order ID"
+// @Success 200 {array} object{product_id=integer,product_type=string,quantity=integer,unit_price=number,product_name=string} "List of order items"
+// @Failure 400 {object} object{error=string} "Order ID is required or invalid format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /orders/{order_id}/items [get]
 func (h *OrderHandler) GetOrderItems(c echo.Context) error {
 	orderIDStr := c.Param("order_id")
 	if orderIDStr == "" {

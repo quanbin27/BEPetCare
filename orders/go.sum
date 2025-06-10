@@ -28,10 +28,10 @@ github.com/pierrec/lz4/v4 v4.1.15 h1:MO0/ucJhngq7299dKLwIMtgTfbkoSPF6AoMYDd8Q4q0
 github.com/pierrec/lz4/v4 v4.1.15/go.mod h1:gZWDp/Ze/IJXGXf23ltt2EXimqmTUXEy0GFuRQyBid4=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/quanbin27/commons v0.0.0-20250511124218-3e10d6de4d39 h1:a5emlAENwG4p+0LdUGF53rkTljCDKJ2G9rwpOC/Xoy0=
-github.com/quanbin27/commons v0.0.0-20250511124218-3e10d6de4d39/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
 github.com/quanbin27/commons v0.0.0-20250607075331-d658fbbaffba h1:VjmnqlvpNEC3jgjcesJs9y0agLxm58N6iCnaoHf/e/s=
 github.com/quanbin27/commons v0.0.0-20250607075331-d658fbbaffba/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
+github.com/quanbin27/commons v0.0.0-20250608083034-a2d726147c65 h1:OqL32LOoCepKqU1kTx1mZNB43Lt+b6jL1H6XG574YqY=
+github.com/quanbin27/commons v0.0.0-20250608083034-a2d726147c65/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
 github.com/segmentio/kafka-go v0.4.47 h1:IqziR4pA3vrZq7YdRxaT3w1/5fvIH5qpCwstUanQQB0=
 github.com/segmentio/kafka-go v0.4.47/go.mod h1:HjF6XbOKh0Pjlkr5GVZxt6CsjjwnmhVOfURM5KMd8qg=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

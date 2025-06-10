@@ -153,6 +153,12 @@ func (s *ProductServiceImpl) ListAttachableProducts(ctx context.Context) ([]Gene
 func (s *ProductServiceImpl) ListAllProducts(ctx context.Context) ([]GeneralProduct, error) {
 	return s.store.ListAllProducts(ctx)
 }
+func (s *ProductServiceImpl) ListAvailableAllProductsByBranch(ctx context.Context, branchID int32) ([]GeneralProduct, error) {
+	return s.store.ListAvailableAllProductsByBranch(ctx, branchID)
+}
+func (s *ProductServiceImpl) ListAvailableProductsByBranch(ctx context.Context, branchID int32, productType string) ([]GeneralProduct, error) {
+	return s.store.ListAvailableProductsByBranch(ctx, branchID, productType)
+}
 
 // Tồn kho
 func (s *ProductServiceImpl) GetBranchInventory(ctx context.Context, branchID int32) ([]BranchProduct, error) {
@@ -164,4 +170,15 @@ func (s *ProductServiceImpl) UpdateBranchInventory(ctx context.Context, branchID
 		return "Failed", err
 	}
 	return "Success", nil
+}
+func (s *ProductServiceImpl) ReserveProduct(ctx context.Context, branchID, productID int32, productType string, quantity int32) error {
+	return s.store.ReserveProduct(ctx, branchID, productID, productType, quantity)
+}
+
+func (s *ProductServiceImpl) ConfirmPickup(ctx context.Context, branchID, productID int32, productType string, quantity int32) error {
+	return s.store.ConfirmPickup(ctx, branchID, productID, productType, quantity)
+}
+
+func (s *ProductServiceImpl) ReleaseReservation(ctx context.Context, branchID, productID int32, productType string, quantity int32) error {
+	return s.store.ReleaseReservation(ctx, branchID, productID, productType, quantity)
 }

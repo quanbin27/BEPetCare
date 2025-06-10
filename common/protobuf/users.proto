@@ -15,6 +15,7 @@ service UserService{
   rpc GetCustomersPaginated(GetCustomersPaginatedRequest) returns (GetCustomersPaginatedResponse) {}
   rpc GetCustomersByName(GetCustomersByNameRequest) returns (GetCustomersByNameResponse) {}
   rpc GetBranchByEmployeeID(GetBranchByEmployeeIDRequest) returns (GetBranchByEmployeeIDResponse) {}
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {}
 }
 message User{
   int32 ID = 1;
@@ -24,6 +25,15 @@ message User{
   string Address = 5;
   string PhoneNumber =6;
   google.protobuf.Timestamp CreatedAt=7;
+}
+message CreateUserRequest {
+  string Email = 1;
+  string Name = 2;
+  string PhoneNumber = 5;
+}
+message CreateUserResponse {
+  string Status = 1;
+  int32 user_id = 2; // Trả về thông tin người dùng đã tạo
 }
 message RegisterRequest{
   string Email = 1;

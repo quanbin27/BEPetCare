@@ -741,6 +741,116 @@ paths:
       summary: Get branch inventory
       tags:
       - Inventory
+  /branches/{branch_id}/products/available:
+    get:
+      description: Retrieves a list of available products (foods, accessories, medicines)
+        for a specific branch by product type
+      parameters:
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: integer
+      - description: Product type (FOOD, ACCESSORY, MEDICINE)
+        in: query
+        name: product_type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of available products
+          schema:
+            items:
+              properties:
+                available_quantity:
+                  type: integer
+                description:
+                  type: string
+                id:
+                  type: integer
+                imgurl:
+                  type: string
+                is_attachable:
+                  type: boolean
+                name:
+                  type: string
+                price:
+                  type: number
+                product_type:
+                  type: string
+              type: object
+            type: array
+        "400":
+          description: Invalid branch ID or product type
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: List available products by branch and type
+      tags:
+      - Products
+  /branches/{branch_id}/products/available/all:
+    get:
+      description: Retrieves a list of all available products (foods, accessories,
+        medicines) for a specific branch
+      parameters:
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of available products
+          schema:
+            items:
+              properties:
+                available_quantity:
+                  type: integer
+                description:
+                  type: string
+                id:
+                  type: integer
+                imgurl:
+                  type: string
+                is_attachable:
+                  type: boolean
+                name:
+                  type: string
+                price:
+                  type: number
+                product_type:
+                  type: string
+              type: object
+            type: array
+        "400":
+          description: Branch ID is required or invalid format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: List all available products by branch
+      tags:
+      - Products
   /branches/{id}:
     get:
       description: Retrieves a branch record using its unique ID
@@ -1236,6 +1346,323 @@ paths:
       summary: Test endpoint
       tags:
       - General
+  /orders:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new order with details like customer ID, branch ID, appointment
+        ID, items, and pickup time
+      parameters:
+      - description: Order details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            appointment_id:
+              type: integer
+            branch_id:
+              type: integer
+            customer_id:
+              type: integer
+            items:
+              allOf:
+              - type: array
+              - properties:
+                  product_id:
+                    type: integer
+                  product_name:
+                    type: string
+                  product_type:
+                    type: string
+                  quantity:
+                    type: integer
+                  unit_price:
+                    type: number
+                type: object
+            pickup_time:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order created successfully
+          schema:
+            properties:
+              order_id:
+                type: integer
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Create a new order
+      tags:
+      - Orders
+  /orders/{order_id}:
+    get:
+      description: Retrieves detailed information for a specific order ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: order_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order details
+          schema:
+            properties:
+              appointment_id:
+                type: integer
+              branch_id:
+                type: integer
+              customer_id:
+                type: integer
+              id:
+                type: integer
+              pickup_time:
+                type: string
+              status:
+                type: string
+            type: object
+        "400":
+          description: Order ID is required or invalid format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "404":
+          description: Order not found
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get order details
+      tags:
+      - Orders
+  /orders/{order_id}/items:
+    get:
+      description: Retrieves a list of items for a specific order ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: order_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of order items
+          schema:
+            items:
+              properties:
+                product_id:
+                  type: integer
+                product_name:
+                  type: string
+                product_type:
+                  type: string
+                quantity:
+                  type: integer
+                unit_price:
+                  type: number
+              type: object
+            type: array
+        "400":
+          description: Order ID is required or invalid format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get order items
+      tags:
+      - Orders
+  /orders/appointment/{appointment_id}:
+    get:
+      description: Retrieves the order associated with a specific appointment ID
+      parameters:
+      - description: Appointment ID
+        in: path
+        name: appointment_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order details
+          schema:
+            properties:
+              appointment_id:
+                type: integer
+              branch_id:
+                type: integer
+              customer_id:
+                type: integer
+              id:
+                type: integer
+              pickup_time:
+                type: string
+              status:
+                type: string
+            type: object
+        "400":
+          description: Appointment ID is required or invalid format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "404":
+          description: Order not found
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get order by appointment ID
+      tags:
+      - Orders
+  /orders/customer/{customer_id}:
+    get:
+      description: Retrieves a list of order records for a specific customer ID
+      parameters:
+      - description: Customer ID
+        in: path
+        name: customer_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of orders
+          schema:
+            items:
+              properties:
+                appointment_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                customer_id:
+                  type: integer
+                id:
+                  type: integer
+                pickup_time:
+                  type: string
+                status:
+                  type: string
+              type: object
+            type: array
+        "400":
+          description: Customer ID is required or invalid format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "404":
+          description: Orders not found
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get orders by customer
+      tags:
+      - Orders
+  /orders/update-status:
+    put:
+      consumes:
+      - application/json
+      description: Updates the status of an order for a specific order ID
+      parameters:
+      - description: Order statusSy status update details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            order_id:
+              type: string
+            status:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order status updated successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request, invalid order_id format, or invalid status
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Update order status
+      tags:
+      - Orders
   /payments:
     post:
       consumes:
@@ -1340,6 +1767,51 @@ paths:
                 type: string
             type: object
       summary: Get payment by ID
+      tags:
+      - Payments
+  /payments/bank/update-status:
+    put:
+      consumes:
+      - application/json
+      description: Updates the status of a bank payment record for a specific order
+        code
+      parameters:
+      - description: Bank payment status update details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            orderCode:
+              type: integer
+            status:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Bank payment status updated successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request or invalid orderCode format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Update bank payment status
       tags:
       - Payments
   /payments/cancel:
@@ -1534,10 +2006,6 @@ paths:
         required: true
         schema:
           properties:
-            amount:
-              type: number
-            description:
-              type: string
             payment_id:
               type: string
           type: object
@@ -3046,6 +3514,62 @@ paths:
       security:
       - BearerAuth: []
       summary: Update user info
+      tags:
+      - Users
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user with email, name, and phone number. Requires
+        role 2 or 3.
+      parameters:
+      - description: User creation details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            email:
+              type: string
+            name:
+              type: string
+            phoneNumber:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User created successfully with user ID
+          schema:
+            properties:
+              userId:
+                type: integer
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "409":
+          description: User already exists
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new user
       tags:
       - Users
   /users/{id}:

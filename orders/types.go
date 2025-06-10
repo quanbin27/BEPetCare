@@ -26,6 +26,7 @@ type Order struct {
 	TotalPrice    float32     `gorm:"not null"`
 	Status        OrderStatus `gorm:"not null"`
 	CreatedAt     time.Time   `gorm:"autoCreateTime"`
+	PickupTime    *time.Time  `gorm:"column:pickup_time"`
 	UpdatedAt     time.Time   `gorm:"autoUpdateTime"`
 	Items         []OrderItem `gorm:"foreignKey:OrderID"`
 }
@@ -52,7 +53,7 @@ type OrderStore interface {
 
 // OrderService interface cho logic xử lý với dữ liệu nội bộ
 type OrderService interface {
-	CreateOrder(ctx context.Context, customerID, branchID int32, items []OrderItem, appointmentID *int32) (int32, string, error) // Trả về orderID, status
+	CreateOrder(ctx context.Context, customerID, branchID int32, items []OrderItem, appointmentID *int32, pickupTime *time.Time) (int32, string, error) // Trả về orderID, status
 	GetOrder(ctx context.Context, orderID int32) (*Order, error)
 	UpdateOrderStatus(ctx context.Context, orderID int32, status OrderStatus) (string, error) // Trả về status
 	GetOrderItems(ctx context.Context, orderID int32) ([]OrderItem, error)
@@ -96,6 +97,12 @@ func toPbOrder(o *Order) *pb.Order {
 	if o.AppointmentID != nil {
 		appointmentID = *o.AppointmentID
 	}
+	var pbPickupTime string
+	if o.PickupTime != nil {
+		pbPickupTime = o.PickupTime.Format(time.RFC3339)
+	} else {
+		pbPickupTime = ""
+	}
 	pbItems := make([]*pb.OrderItem, len(o.Items))
 	for i, item := range o.Items {
 		pbItems[i] = &pb.OrderItem{
@@ -117,6 +124,7 @@ func toPbOrder(o *Order) *pb.Order {
 		CreatedAt:     o.CreatedAt.Format(time.RFC3339),
 		UpdatedAt:     o.UpdatedAt.Format(time.RFC3339),
 		Items:         pbItems,
+		PickupTime:    pbPickupTime,
 	}
 }
 

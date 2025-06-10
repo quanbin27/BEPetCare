@@ -15,7 +15,7 @@ func NewOrderService(store OrderStore) OrderService {
 }
 
 // CreateOrder tạo đơn hàng mới
-func (s *Service) CreateOrder(ctx context.Context, customerID, branchID int32, items []OrderItem, appointmentID *int32) (int32, string, error) {
+func (s *Service) CreateOrder(ctx context.Context, customerID, branchID int32, items []OrderItem, appointmentID *int32, pickupTime *time.Time) (int32, string, error) {
 	order := &Order{
 		CustomerID:    customerID,
 		BranchID:      branchID,
@@ -23,6 +23,7 @@ func (s *Service) CreateOrder(ctx context.Context, customerID, branchID int32, i
 		Status:        OrderStatusPending,
 		CreatedAt:     time.Now(),
 		Items:         items,
+		PickupTime:    pickupTime,
 	}
 	var total float32 = 0
 	for _, item := range items {

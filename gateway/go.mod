@@ -6,7 +6,7 @@ toolchain go1.24.3
 
 require (
 	github.com/labstack/echo/v4 v4.13.3
-	github.com/quanbin27/commons v0.0.0-20250607075331-d658fbbaffba
+	github.com/quanbin27/commons v0.0.0-20250610061641-d4185804de38
 	github.com/swaggo/echo-swagger v1.4.1
 	github.com/swaggo/swag v1.16.4
 	google.golang.org/grpc v1.72.2
@@ -29,6 +29,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/payOSHQ/payos-lib-golang v1.0.7 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect

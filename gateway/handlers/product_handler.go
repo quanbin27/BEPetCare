@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	pb "github.com/quanbin27/commons/genproto/products"
@@ -51,6 +52,9 @@ func (h *ProductHandler) RegisterRoutes(e *echo.Group) {
 
 	e.GET("/products/is_attachable", h.ListAttachableProduct)
 	e.GET("/products", h.ListAllProduct)
+
+	e.GET("/branches/:branch_id/products/available/all", h.ListAllAvailableProductsByBranch)
+	e.GET("/branches/:branch_id/products/available", h.ListAvailableProductsByBranch)
 }
 
 // --- Thực phẩm ---
@@ -887,4 +891,89 @@ func (h *ProductHandler) ListAllProduct(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, products)
+}
+
+// ListAvailableAllProductsByBranch lists all available products by branch
+// @Summary List all available products by branch
+// @Description Retrieves a list of all available products (foods, accessories, medicines) for a specific branch
+// @Tags Products
+// @Produce json
+// @Param branch_id path int true "Branch ID"
+// @Success 200 {array} object{id=int32,name=string,description=string,price=number,imgurl=string,product_type=string,is_attachable=boolean,available_quantity=int32} "List of available products"
+// @Failure 400 {object} object{error=string} "Branch ID is required or invalid format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /branches/{branch_id}/products/available/all [get]
+func (h *ProductHandler) ListAllAvailableProductsByBranch(c echo.Context) error {
+	branchIDStr := c.Param("branch_id")
+	if branchIDStr == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Branch ID is required"})
+	}
+
+	branchID, err := strconv.ParseInt(branchIDStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid branch_id format, must be an integer"})
+	}
+
+	ctx := c.Request().Context()
+	resp, err := h.client.ListAvailableAllProductsByBranch(ctx, &pb.ListAvailableAllProductsByBranchRequest{BranchId: int32(branchID)})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error"})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, resp.Products)
+}
+
+// ListAvailableProductsByBranch lists available products by branch
+// @Summary List available products by branch and type
+// @Description Retrieves a list of available products (foods, accessories, medicines) for a specific branch by product type
+// @Tags Products
+// @Produce json
+// @Param branch_id path int true "Branch ID"
+// @Param product_type query string false "Product type (FOOD, ACCESSORY, MEDICINE)"
+// @Success 200 {array} object{id=int32,name=string,description=string,price=number,imgurl=string,product_type=string,is_attachable=boolean,available_quantity=int32} "List of available products"
+// @Failure 400 {object} object{error=string} "Invalid branch ID or product type"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /branches/{branch_id}/products/available [get]
+func (h *ProductHandler) ListAvailableProductsByBranch(c echo.Context) error {
+	branchIDStr := c.Param("branch_id")
+	productType := strings.ToUpper(c.QueryParam("product_type"))
+
+	if branchIDStr == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Branch ID is required"})
+	}
+
+	branchID, err := strconv.ParseInt(branchIDStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid branch_id format, must be an integer"})
+	}
+
+	if productType != "" {
+		validTypes := map[string]bool{"FOOD": true, "ACCESSORY": true, "MEDICINE": true}
+		if !validTypes[productType] {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid product_type. Must be one of: FOOD, ACCESSORY, MEDICINE"})
+		}
+	}
+
+	ctx := c.Request().Context()
+	resp, err := h.client.ListAvailableProductsByBranch(ctx, &pb.ListAvailableProductsByBranchRequest{
+		BranchId:    int32(branchID),
+		ProductType: productType,
+	})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error"})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, resp.Products)
 }

@@ -3,35 +3,45 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"github.com/quanbin27/commons/config"
 	pb "github.com/quanbin27/commons/genproto/orders"
+	pbProduct "github.com/quanbin27/commons/genproto/products"
 	"github.com/segmentio/kafka-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 	"log"
 	"strconv"
+	"time"
 )
 
 type OrderGrpcHandler struct {
 	orderService OrderService
 	pb.UnimplementedOrderServiceServer
-	kafkaWriter *kafka.Writer
+	kafkaWriter   *kafka.Writer
+	productClient pbProduct.ProductServiceClient
 }
 
-func NewOrderGrpcHandler(grpc *grpc.Server, orderService OrderService, kafkaAddr string) *OrderGrpcHandler {
+func NewOrderGrpcHandler(grpcServer *grpc.Server, orderService OrderService, kafkaAddr string) *OrderGrpcHandler {
 	writer := &kafka.Writer{
 		Addr:     kafka.TCP(kafkaAddr),
 		Topic:    "order_topic",
 		Balancer: &kafka.LeastBytes{}, // hoặc RoundRobin nếu bạn muốn chia đều
 		Async:    false,               // true nếu bạn chấp nhận gửi async
 	}
-
+	productsServiceAddr := config.Envs.ProductsGrpcAddr
+	productsConn, err := grpc.NewClient(productsServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Failed to dial user server: %v", err)
+	}
 	handler := &OrderGrpcHandler{
-		orderService: orderService,
-		kafkaWriter:  writer,
+		orderService:  orderService,
+		kafkaWriter:   writer,
+		productClient: pbProduct.NewProductServiceClient(productsConn),
 	}
 
-	pb.RegisterOrderServiceServer(grpc, handler)
+	pb.RegisterOrderServiceServer(grpcServer, handler)
 	return handler
 }
 
@@ -48,11 +58,56 @@ func (h *OrderGrpcHandler) CreateOrder(ctx context.Context, req *pb.CreateOrderR
 		}
 	}
 
-	orderID, statusMsg, err := h.orderService.CreateOrder(ctx, req.CustomerId, req.BranchId, items, &req.AppointmentId)
+	var pickupTime *time.Time
+	if req.PickupTime != "" {
+		t, err := time.Parse(time.RFC3339, req.PickupTime)
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "invalid pickup_time format: %v", err)
+		}
+		pickupTime = &t
+	}
+
+	// ====== Gọi ReserveProduct cho từng item ======
+	var reservedItems []*pbProduct.ReserveProductRequest
+	for _, item := range req.Items {
+		reserveReq := &pbProduct.ReserveProductRequest{
+			ProductId:   item.ProductId,
+			ProductType: item.ProductType,
+			Quantity:    item.Quantity,
+			BranchId:    req.BranchId,
+		}
+		_, err := h.productClient.ReserveProduct(ctx, reserveReq)
+		if err != nil {
+			// Rollback các item đã reserve trước đó
+			for _, reserved := range reservedItems {
+				_, _ = h.productClient.ReleaseReservation(ctx, &pbProduct.ReleaseReservationRequest{
+					ProductId:   reserved.ProductId,
+					ProductType: reserved.ProductType,
+					Quantity:    reserved.Quantity,
+					BranchId:    reserved.BranchId,
+				})
+			}
+			return nil, status.Errorf(codes.Internal, "failed to reserve product: %v", err)
+		}
+		reservedItems = append(reservedItems, reserveReq)
+	}
+
+	// ====== Gọi orderService để tạo order ======
+	orderID, statusMsg, err := h.orderService.CreateOrder(ctx, req.CustomerId, req.BranchId, items, &req.AppointmentId, pickupTime)
 	if err != nil {
+		// Rollback nếu tạo order thất bại
+		for _, reserved := range reservedItems {
+			_, _ = h.productClient.ReleaseReservation(ctx, &pbProduct.ReleaseReservationRequest{
+				ProductId:   reserved.ProductId,
+				ProductType: reserved.ProductType,
+				Quantity:    reserved.Quantity,
+				BranchId:    reserved.BranchId,
+			})
+		}
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
+	// ====== Gửi Kafka async ======
 	go func() {
 		orderData := map[string]interface{}{
 			"order_id":    orderID,
@@ -62,18 +117,15 @@ func (h *OrderGrpcHandler) CreateOrder(ctx context.Context, req *pb.CreateOrderR
 			"status":      statusMsg,
 			"email":       req.Email,
 		}
-
 		orderJSON, err := json.Marshal(orderData)
 		if err != nil {
 			log.Printf("Failed to marshal order data: %v", err)
 			return
 		}
-
 		msg := kafka.Message{
 			Key:   []byte(strconv.FormatInt(int64(orderID), 10)),
 			Value: orderJSON,
 		}
-
 		if err := h.kafkaWriter.WriteMessages(context.Background(), msg); err != nil {
 			log.Printf("Failed to write message to Kafka: %v", err)
 		} else {
@@ -130,7 +182,7 @@ func (h *OrderGrpcHandler) GetOrdersByCustomerID(ctx context.Context, req *pb.Ge
 	}
 	pbOrders := make([]*pb.Order, len(orders))
 	for i, order := range orders {
-		pbOrders[i] = toPbOrder(&order)
+		pbOrders[len(orders)-1-i] = toPbOrder(&order)
 	}
 	return &pb.GetOrdersByCustomerIDResponse{Orders: pbOrders}, nil
 }

@@ -28,6 +28,7 @@ func (h *UserHandler) RegisterRoutes(e *echo.Group) {
 	e.POST("/auth/reset-password", h.ResetPassword)
 
 	// User Management Routes
+	e.POST("/users", h.CreateUser, auth.RoleMiddleware(2, 3)) // Only roles 2 and 3 can create users
 	e.GET("/users/me", h.GetMyInfo, auth.WithJWTAuth())
 	e.PUT("/users/me", h.ChangeInfo, auth.WithJWTAuth())
 	e.PUT("/users/me/password", h.ChangePassword, auth.WithJWTAuth())
@@ -641,4 +642,50 @@ func (h *UserHandler) GetCustomersByName(c echo.Context) error {
 		}
 	}
 	return c.JSON(http.StatusOK, users)
+}
+
+// CreateUser creates a new user
+// @Summary Create a new user
+// @Description Creates a new user with email, name, and phone number. Requires role 2 or 3.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body object{email=string,name=string,phoneNumber=string} true "User creation details"
+// @Success 200 {object} object{userId=int32} "User created successfully with user ID"
+// @Failure 400 {object} object{error=string} "Invalid request"
+// @Failure 409 {object} object{error=string} "User already exists"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /users [post]
+func (h *UserHandler) CreateUser(c echo.Context) error {
+	var req struct {
+		Email       string `json:"email"`
+		Name        string `json:"name"`
+		PhoneNumber string `json:"phoneNumber"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	ctx := c.Request().Context()
+	resp, err := h.client.CreateUser(ctx, &pb.CreateUserRequest{
+		Email:       req.Email,
+		Name:        req.Name,
+		PhoneNumber: req.PhoneNumber,
+	})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.AlreadyExists:
+				return c.JSON(http.StatusConflict, map[string]string{"error": grpcErr.Message()})
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, map[string]int32{
+		"userId": resp.UserId,
+	})
 }

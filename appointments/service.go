@@ -68,7 +68,13 @@ func (s *AppService) CreateAppointment(ctx context.Context, customerID int32, cu
 	for _, svc := range serviceList {
 		servicePriceMap[svc.ID] = svc.Price
 	}
-
+	for i, item := range services {
+		price, exists := servicePriceMap[item.ServiceID]
+		if !exists {
+			return 0, "Failed", fmt.Errorf("service ID %d not found", item.ServiceID)
+		}
+		services[i].ServicePrice = price
+	}
 	total, err := s.priceStrategy.CalculateTotal(services, servicePriceMap)
 
 	// Gọi Store để tạo lịch hẹn

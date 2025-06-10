@@ -30,6 +30,9 @@ type Config struct {
 	BaseURL                string
 	RedisAddr              string
 	KafkaAddr              string
+	ClientID               string
+	ApiKey                 string
+	CheckSumKey            string
 }
 
 var Envs = initConfig()
@@ -63,6 +66,9 @@ func initConfig() Config {
 		BaseURL:                getEnv("BASE_URL", "http://26.30.229.237:3000"),
 		RedisAddr:              getEnv("REDIS_ADDR", "localhost:6379"),
 		KafkaAddr:              getEnv("KAFKA_ADDR", "localhost:9092"),
+		ClientID:               getEnv("CLIENT_ID", "your-client-id"),
+		ApiKey:                 getEnv("API_KEY", "your-api-key"),
+		CheckSumKey:            getEnv("CHECKSUM_KEY", "your-checksum-key"),
 	}
 }
 func getEnv(key, fallback string) string {

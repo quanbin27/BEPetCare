@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"log"
 )
 
 // Store - Triển khai ProductStore
@@ -241,4 +244,257 @@ func (s *Store) ListAllProducts(ctx context.Context) ([]GeneralProduct, error) {
 	}
 
 	return products, nil
+}
+func (s *Store) ListAvailableProductsByBranch(ctx context.Context, branchID int32, productType string) ([]GeneralProduct, error) {
+	var results []GeneralProduct
+	log.Printf("Listing available products for branch %d with type %s", branchID, productType)
+	// Helper xử lý 1 loại sản phẩm
+	handle := func(tableName string, productTypeVal string, dest interface{}, getProductInfo func(interface{}) GeneralProduct) error {
+		// Query tồn kho còn hàng
+		var inventories []BranchProduct
+		log.Printf("Querying inventory for branch %d and product type %s", branchID, productTypeVal)
+		if err := s.db.
+			Where("branch_id = ? AND product_type = ? AND stock_quantity > 0", branchID, productTypeVal).
+			Find(&inventories).Error; err != nil {
+			return err
+		}
+
+		// Lấy danh sách product_id
+		productIDs := make([]int32, 0, len(inventories))
+		log.Println("Found inventories:", len(inventories))
+		log.Println("PRODUCTS:", inventories)
+		stockMap := make(map[int32]int32)
+		for _, inv := range inventories {
+			productIDs = append(productIDs, inv.ProductID)
+			stockMap[inv.ProductID] = inv.StockQuantity - inv.ReservedQuantity
+		}
+
+		if len(productIDs) == 0 {
+			return nil // không có sản phẩm nào
+		}
+
+		// Lấy chi tiết sản phẩm
+		if err := s.db.
+			Where("id IN (?)", productIDs).
+			Find(dest).Error; err != nil {
+			return err
+		}
+
+		// Chuyển đổi kết quả
+		switch list := dest.(type) {
+		case *[]Food:
+			for _, p := range *list {
+				res := getProductInfo(p)
+				res.AvailableQuantity = stockMap[p.ID]
+				results = append(results, res)
+			}
+		case *[]Accessory:
+			for _, p := range *list {
+				res := getProductInfo(p)
+				res.AvailableQuantity = stockMap[p.ID]
+				results = append(results, res)
+			}
+		case *[]Medicine:
+			for _, p := range *list {
+				res := getProductInfo(p)
+				res.AvailableQuantity = stockMap[p.ID]
+				results = append(results, res)
+			}
+		}
+
+		return nil
+	}
+
+	// Tùy theo productType lọc
+	switch productType {
+	case "food", "FOOD":
+		if err := handle("foods", "food", &[]Food{}, func(p interface{}) GeneralProduct {
+			f := p.(Food)
+			return GeneralProduct{
+				ProductID:   f.ID,
+				ProductType: "food",
+				Name:        f.Name,
+				Description: f.Description,
+				Price:       f.Price,
+				ImgUrl:      f.ImgUrl,
+			}
+		}); err != nil {
+			return nil, err
+		}
+	case "accessory", "ACCESSORY":
+		if err := handle("accessories", "accessory", &[]Accessory{}, func(p interface{}) GeneralProduct {
+			a := p.(Accessory)
+			return GeneralProduct{
+				ProductID:   a.ID,
+				ProductType: "accessory",
+				Name:        a.Name,
+				Description: a.Description,
+				Price:       a.Price,
+				ImgUrl:      a.ImgUrl,
+			}
+		}); err != nil {
+			return nil, err
+		}
+	case "medicine", "MEDICINE":
+		if err := handle("medicines", "medicine", &[]Medicine{}, func(p interface{}) GeneralProduct {
+			m := p.(Medicine)
+			return GeneralProduct{
+				ProductID:   m.ID,
+				ProductType: "medicine",
+				Name:        m.Name,
+				Description: m.Description,
+				Price:       m.Price,
+				ImgUrl:      m.ImgUrl,
+			}
+		}); err != nil {
+			return nil, err
+		}
+	}
+
+	return results, nil
+}
+func (s *Store) ListAvailableAllProductsByBranch(ctx context.Context, branchID int32) ([]GeneralProduct, error) {
+	var products []GeneralProduct
+
+	// 1. Query Food
+	var foods []struct {
+		Food
+		StockQty    int32
+		ReservedQty int32
+	}
+	if err := s.db.
+		Table("foods").
+		Select("foods.*, bp.stock_quantity AS stock_qty, bp.reserved_quantity AS reserved_qty").
+		Joins("JOIN branch_products bp ON bp.product_id = foods.id AND bp.product_type = ?", "food").
+		Where("bp.branch_id = ? AND bp.stock_quantity > 0", branchID).
+		Scan(&foods).Error; err != nil {
+		return nil, err
+	}
+	for _, food := range foods {
+		products = append(products, GeneralProduct{
+			Name:              food.Name,
+			Description:       food.Description,
+			Price:             food.Price,
+			ImgUrl:            food.ImgUrl,
+			ProductID:         food.ID,
+			ProductType:       "food",
+			IsAttachable:      food.IsAttachable,
+			AvailableQuantity: food.StockQty, // Tính số lượng có sẵn
+		})
+	}
+
+	// 2. Query Accessory
+	var accessories []struct {
+		Accessory
+		StockQty    int32
+		ReservedQty int32
+	}
+	if err := s.db.
+		Table("accessories").
+		Select("accessories.*, bp.stock_quantity AS stock_qty, bp.reserved_quantity AS reserved_qty").
+		Joins("JOIN branch_products bp ON bp.product_id = accessories.id AND bp.product_type = ?", "accessory").
+		Where("bp.branch_id = ? AND bp.stock_quantity - bp.reserved_quantity > 0", branchID).
+		Scan(&accessories).Error; err != nil {
+		return nil, err
+	}
+	for _, acc := range accessories {
+		products = append(products, GeneralProduct{
+			Name:              acc.Name,
+			Description:       acc.Description,
+			Price:             acc.Price,
+			ImgUrl:            acc.ImgUrl,
+			ProductID:         acc.ID,
+			ProductType:       "accessory",
+			IsAttachable:      acc.IsAttachable,
+			AvailableQuantity: acc.StockQty,
+		})
+	}
+
+	// 3. Query Medicine
+	var medicines []struct {
+		Medicine
+		StockQty    int32
+		ReservedQty int32
+	}
+	if err := s.db.
+		Table("medicines").
+		Select("medicines.*, bp.stock_quantity AS stock_qty, bp.reserved_quantity AS reserved_qty").
+		Joins("JOIN branch_products bp ON bp.product_id = medicines.id AND bp.product_type = ?", "medicine").
+		Where("bp.branch_id = ? AND bp.stock_quantity - bp.reserved_quantity > 0", branchID).
+		Scan(&medicines).Error; err != nil {
+		return nil, err
+	}
+	for _, med := range medicines {
+		products = append(products, GeneralProduct{
+			Name:              med.Name,
+			Description:       med.Description,
+			Price:             med.Price,
+			ImgUrl:            med.ImgUrl,
+			ProductID:         med.ID,
+			ProductType:       "medicine",
+			IsAttachable:      med.IsAttachable,
+			AvailableQuantity: med.StockQty, // Tính số lượng có sẵn
+		})
+	}
+
+	return products, nil
+}
+func (s *Store) ReserveProduct(ctx context.Context, branchID, productID int32, productType string, quantity int32) error {
+	return s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var stock BranchProduct
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where("branch_id = ? AND product_id = ? AND product_type = ?", branchID, productID, productType).
+			First(&stock).Error; err != nil {
+			return err
+		}
+
+		if stock.StockQuantity < quantity {
+			return fmt.Errorf("not enough stock available")
+		}
+
+		stock.StockQuantity -= quantity
+		stock.ReservedQuantity += quantity
+
+		return tx.Save(&stock).Error
+	})
+}
+
+func (s *Store) ConfirmPickup(ctx context.Context, branchID, productID int32, productType string, quantity int32) error {
+	return s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var stock BranchProduct
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where("branch_id = ? AND product_id = ? AND product_type = ?", branchID, productID, productType).
+			First(&stock).Error; err != nil {
+			return err
+		}
+
+		if stock.ReservedQuantity < quantity {
+			return fmt.Errorf("not enough reserved stock to confirm")
+		}
+
+		stock.ReservedQuantity -= quantity
+		// Không cộng lại vào available vì đã lấy ra.
+
+		return tx.Save(&stock).Error
+	})
+}
+
+func (s *Store) ReleaseReservation(ctx context.Context, branchID, productID int32, productType string, quantity int32) error {
+	return s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var stock BranchProduct
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where("branch_id = ? AND product_id = ? AND product_type = ?", branchID, productID, productType).
+			First(&stock).Error; err != nil {
+			return err
+		}
+
+		if stock.ReservedQuantity < quantity {
+			return fmt.Errorf("not enough reserved stock to release")
+		}
+
+		stock.ReservedQuantity -= quantity
+		stock.StockQuantity += quantity
+
+		return tx.Save(&stock).Error
+	})
 }

@@ -20,6 +20,7 @@ message Order {
   string updated_at = 7;
   repeated OrderItem items = 8;
   int32 appointment_id=9;
+  string pickup_time=10; // Thời gian lấy hàng
 }
 
 message OrderItem {
@@ -34,7 +35,7 @@ message OrderItem {
 enum OrderStatus {
   ORDER_STATUS_UNSPECIFIED = 0; // Giá trị mặc định (bắt buộc trong Protobuf)
   PENDING = 1;
-  PAID = 2;
+    PAID = 2;
   COMPLETED = 3;
   CANCELLED = 4;
 }
@@ -44,6 +45,7 @@ message CreateOrderRequest {
   repeated OrderItem items = 3;
   int32 appointment_id=4;
   string email=5;
+  string pickup_time=6; // Thời gian lấy hàng
 }
 
 message CreateOrderResponse {

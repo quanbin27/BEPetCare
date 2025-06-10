@@ -218,3 +218,48 @@ func (h *ProductGrpcHandler) ListAllProducts(ctx context.Context, req *pb.ListAl
 	}
 	return resp, nil
 }
+func (h *ProductGrpcHandler) ListAvailableProductsByBranch(ctx context.Context, req *pb.ListAvailableProductsByBranchRequest) (*pb.ListAvailableProductsByBranchResponse, error) {
+	products, err := h.productService.ListAvailableProductsByBranch(ctx, req.BranchId, req.ProductType)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	resp := &pb.ListAvailableProductsByBranchResponse{}
+	for _, p := range products {
+		resp.Products = append(resp.Products, toProtoGeneralProduct(&p))
+	}
+	return resp, nil
+}
+func (h *ProductGrpcHandler) ListAvailableAllProductsByBranch(ctx context.Context, req *pb.ListAvailableAllProductsByBranchRequest) (*pb.ListAvailableAllProductsByBranchResponse, error) {
+	products, err := h.productService.ListAvailableAllProductsByBranch(ctx, req.BranchId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	resp := &pb.ListAvailableAllProductsByBranchResponse{}
+	for _, p := range products {
+		resp.Products = append(resp.Products, toProtoGeneralProduct(&p))
+	}
+	return resp, nil
+}
+func (h *ProductGrpcHandler) ReserveProduct(ctx context.Context, req *pb.ReserveProductRequest) (*pb.ReserveProductResponse, error) {
+	err := h.productService.ReserveProduct(ctx, req.BranchId, req.ProductId, req.ProductType, req.Quantity)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to reserve product: %v", err)
+	}
+	return &pb.ReserveProductResponse{}, nil
+}
+
+func (h *ProductGrpcHandler) ConfirmPickup(ctx context.Context, req *pb.ConfirmPickupRequest) (*pb.ConfirmPickupResponse, error) {
+	err := h.productService.ConfirmPickup(ctx, req.BranchId, req.ProductId, req.ProductType, req.Quantity)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to confirm pickup: %v", err)
+	}
+	return &pb.ConfirmPickupResponse{}, nil
+}
+
+func (h *ProductGrpcHandler) ReleaseReservation(ctx context.Context, req *pb.ReleaseReservationRequest) (*pb.ReleaseReservationResponse, error) {
+	err := h.productService.ReleaseReservation(ctx, req.BranchId, req.ProductId, req.ProductType, req.Quantity)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to release reservation: %v", err)
+	}
+	return &pb.ReleaseReservationResponse{}, nil
+}
