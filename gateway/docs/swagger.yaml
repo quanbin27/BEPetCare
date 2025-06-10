@@ -369,6 +369,50 @@ paths:
       summary: Get appointments by employee
       tags:
       - Appointments
+  /appointments/update-employee:
+    put:
+      consumes:
+      - application/json
+      description: Updates the employee assigned to a specific appointment ID
+      parameters:
+      - description: Appointment employee update details
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            appointment_id:
+              type: string
+            employee_id:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Employee updated successfully
+          schema:
+            properties:
+              status:
+                type: string
+            type: object
+        "400":
+          description: Invalid request, invalid appointment_id or employee_id format
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Update employee for appointment
+      tags:
+      - Appointments
   /appointments/update-status:
     put:
       consumes:

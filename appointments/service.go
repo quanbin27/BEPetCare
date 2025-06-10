@@ -176,3 +176,9 @@ func (s *AppService) DeleteService(ctx context.Context, serviceID int32) (string
 	}
 	return "Success", nil
 }
+func (s *AppService) UpdateEmployeeForAppointment(ctx context.Context, appointmentID, employeeID int32) (string, error) {
+	if err := s.store.UpdateAppointmentEmployee(ctx, appointmentID, employeeID); err != nil {
+		return "Failed", err
+	}
+	return "Success", nil
+}

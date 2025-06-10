@@ -160,3 +160,9 @@ func (s *Store) DeleteService(ctx context.Context, serviceID int32) error {
 		Where("id = ?", serviceID).
 		Delete(&Service{}).Error
 }
+func (s *Store) UpdateAppointmentEmployee(ctx context.Context, appointmentID, employeeID int32) error {
+	return s.db.WithContext(ctx).
+		Model(&Appointment{}).
+		Where("id = ?", appointmentID).
+		Update("employee_id", employeeID).Error
+}

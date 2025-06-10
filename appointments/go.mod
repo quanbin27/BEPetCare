@@ -3,7 +3,7 @@ module github.com/quanbin27/BEPetCare-appointments
 go 1.22.5
 
 require (
-	github.com/quanbin27/commons v0.0.0-20250608083034-a2d726147c65
+	github.com/quanbin27/commons v0.0.0-20250610092013-aa838e811e9f
 	google.golang.org/grpc v1.70.0
 	google.golang.org/protobuf v1.35.2
 	gorm.io/driver/mysql v1.5.7

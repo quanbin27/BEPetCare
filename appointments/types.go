@@ -72,6 +72,7 @@ type AppointmentStore interface {
 	DeleteService(ctx context.Context, serviceID int32) error
 	GetServicesByIDs(ctx context.Context, serviceIDs []int32) ([]Service, error)
 	GetServiceByID(ctx context.Context, serviceID int32) (Service, error)
+	UpdateAppointmentEmployee(ctx context.Context, appointmentID, employeeID int32) error
 }
 
 // --- INTERFACE CHO APPOINTMENT SERVICE (SỬ DỤNG DỮ LIỆU NỘI BỘ) ---
@@ -84,7 +85,7 @@ type AppointmentService interface {
 	GetAppointmentsByBranch(ctx context.Context, branchID int32) ([]Appointment, error)
 	// Updated to include service information
 	GetAppointmentDetails(ctx context.Context, appointmentID int32) (*Appointment, []AppointmentDetailWithService, error)
-
+	UpdateEmployeeForAppointment(ctx context.Context, appointmentID, employeeID int32) (string, error)
 	// Service-related methods
 	CreateService(ctx context.Context, name, description string, price float32) (int32, string, error)
 	GetServices(ctx context.Context) ([]Service, error)

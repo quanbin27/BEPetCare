@@ -6,7 +6,7 @@ toolchain go1.24.3
 
 require (
 	github.com/labstack/echo/v4 v4.13.3
-	github.com/quanbin27/commons v0.0.0-20250610061641-d4185804de38
+	github.com/quanbin27/commons v0.0.0-20250610092013-aa838e811e9f
 	github.com/swaggo/echo-swagger v1.4.1
 	github.com/swaggo/swag v1.16.4
 	google.golang.org/grpc v1.72.2

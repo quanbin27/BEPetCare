@@ -85,6 +85,13 @@ func (h *AppointmentGrpcHandler) UpdateAppointmentStatus(ctx context.Context, re
 	}
 	return &pb.UpdateAppointmentStatusResponse{Status: statusMsg}, nil
 }
+func (h *AppointmentGrpcHandler) UpdateEmployeeForAppointment(ctx context.Context, req *pb.UpdateEmployeeForAppointmentRequest) (*pb.UpdateEmployeeForAppointmentResponse, error) {
+	statusMsg, err := h.appointmentService.UpdateEmployeeForAppointment(ctx, req.AppointmentId, req.EmployeeId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &pb.UpdateEmployeeForAppointmentResponse{Status: statusMsg}, nil
+}
 
 // Updated GetAppointmentDetails handler to include service names
 func (h *AppointmentGrpcHandler) GetAppointmentDetails(ctx context.Context, req *pb.GetAppointmentDetailsRequest) (*pb.GetAppointmentDetailsResponse, error) {

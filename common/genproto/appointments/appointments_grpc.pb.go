@@ -19,16 +19,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AppointmentService_CreateAppointment_FullMethodName         = "/appointments.AppointmentService/CreateAppointment"
-	AppointmentService_GetAppointmentsByCustomer_FullMethodName = "/appointments.AppointmentService/GetAppointmentsByCustomer"
-	AppointmentService_GetAppointmentsByEmployee_FullMethodName = "/appointments.AppointmentService/GetAppointmentsByEmployee"
-	AppointmentService_GetAppointmentsByBranch_FullMethodName   = "/appointments.AppointmentService/GetAppointmentsByBranch"
-	AppointmentService_UpdateAppointmentStatus_FullMethodName   = "/appointments.AppointmentService/UpdateAppointmentStatus"
-	AppointmentService_GetAppointmentDetails_FullMethodName     = "/appointments.AppointmentService/GetAppointmentDetails"
-	AppointmentService_CreateService_FullMethodName             = "/appointments.AppointmentService/CreateService"
-	AppointmentService_GetServices_FullMethodName               = "/appointments.AppointmentService/GetServices"
-	AppointmentService_UpdateService_FullMethodName             = "/appointments.AppointmentService/UpdateService"
-	AppointmentService_DeleteService_FullMethodName             = "/appointments.AppointmentService/DeleteService"
+	AppointmentService_CreateAppointment_FullMethodName            = "/appointments.AppointmentService/CreateAppointment"
+	AppointmentService_GetAppointmentsByCustomer_FullMethodName    = "/appointments.AppointmentService/GetAppointmentsByCustomer"
+	AppointmentService_GetAppointmentsByEmployee_FullMethodName    = "/appointments.AppointmentService/GetAppointmentsByEmployee"
+	AppointmentService_GetAppointmentsByBranch_FullMethodName      = "/appointments.AppointmentService/GetAppointmentsByBranch"
+	AppointmentService_UpdateAppointmentStatus_FullMethodName      = "/appointments.AppointmentService/UpdateAppointmentStatus"
+	AppointmentService_UpdateEmployeeForAppointment_FullMethodName = "/appointments.AppointmentService/UpdateEmployeeForAppointment"
+	AppointmentService_GetAppointmentDetails_FullMethodName        = "/appointments.AppointmentService/GetAppointmentDetails"
+	AppointmentService_CreateService_FullMethodName                = "/appointments.AppointmentService/CreateService"
+	AppointmentService_GetServices_FullMethodName                  = "/appointments.AppointmentService/GetServices"
+	AppointmentService_UpdateService_FullMethodName                = "/appointments.AppointmentService/UpdateService"
+	AppointmentService_DeleteService_FullMethodName                = "/appointments.AppointmentService/DeleteService"
 )
 
 // AppointmentServiceClient is the client API for AppointmentService service.
@@ -43,6 +44,7 @@ type AppointmentServiceClient interface {
 	GetAppointmentsByBranch(ctx context.Context, in *GetAppointmentsByBranchRequest, opts ...grpc.CallOption) (*GetAppointmentsResponse, error)
 	// Cập nhật trạng thái lịch hẹn
 	UpdateAppointmentStatus(ctx context.Context, in *UpdateAppointmentStatusRequest, opts ...grpc.CallOption) (*UpdateAppointmentStatusResponse, error)
+	UpdateEmployeeForAppointment(ctx context.Context, in *UpdateEmployeeForAppointmentRequest, opts ...grpc.CallOption) (*UpdateEmployeeForAppointmentResponse, error)
 	// Lấy chi tiết lịch hẹn
 	GetAppointmentDetails(ctx context.Context, in *GetAppointmentDetailsRequest, opts ...grpc.CallOption) (*GetAppointmentDetailsResponse, error)
 	// Quản lý danh sách dịch vụ
@@ -104,6 +106,16 @@ func (c *appointmentServiceClient) UpdateAppointmentStatus(ctx context.Context, 
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UpdateAppointmentStatusResponse)
 	err := c.cc.Invoke(ctx, AppointmentService_UpdateAppointmentStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appointmentServiceClient) UpdateEmployeeForAppointment(ctx context.Context, in *UpdateEmployeeForAppointmentRequest, opts ...grpc.CallOption) (*UpdateEmployeeForAppointmentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateEmployeeForAppointmentResponse)
+	err := c.cc.Invoke(ctx, AppointmentService_UpdateEmployeeForAppointment_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -172,6 +184,7 @@ type AppointmentServiceServer interface {
 	GetAppointmentsByBranch(context.Context, *GetAppointmentsByBranchRequest) (*GetAppointmentsResponse, error)
 	// Cập nhật trạng thái lịch hẹn
 	UpdateAppointmentStatus(context.Context, *UpdateAppointmentStatusRequest) (*UpdateAppointmentStatusResponse, error)
+	UpdateEmployeeForAppointment(context.Context, *UpdateEmployeeForAppointmentRequest) (*UpdateEmployeeForAppointmentResponse, error)
 	// Lấy chi tiết lịch hẹn
 	GetAppointmentDetails(context.Context, *GetAppointmentDetailsRequest) (*GetAppointmentDetailsResponse, error)
 	// Quản lý danh sách dịch vụ
@@ -203,6 +216,9 @@ func (UnimplementedAppointmentServiceServer) GetAppointmentsByBranch(context.Con
 }
 func (UnimplementedAppointmentServiceServer) UpdateAppointmentStatus(context.Context, *UpdateAppointmentStatusRequest) (*UpdateAppointmentStatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateAppointmentStatus not implemented")
+}
+func (UnimplementedAppointmentServiceServer) UpdateEmployeeForAppointment(context.Context, *UpdateEmployeeForAppointmentRequest) (*UpdateEmployeeForAppointmentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateEmployeeForAppointment not implemented")
 }
 func (UnimplementedAppointmentServiceServer) GetAppointmentDetails(context.Context, *GetAppointmentDetailsRequest) (*GetAppointmentDetailsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAppointmentDetails not implemented")
@@ -330,6 +346,24 @@ func _AppointmentService_UpdateAppointmentStatus_Handler(srv interface{}, ctx co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppointmentService_UpdateEmployeeForAppointment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateEmployeeForAppointmentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppointmentServiceServer).UpdateEmployeeForAppointment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AppointmentService_UpdateEmployeeForAppointment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppointmentServiceServer).UpdateEmployeeForAppointment(ctx, req.(*UpdateEmployeeForAppointmentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AppointmentService_GetAppointmentDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetAppointmentDetailsRequest)
 	if err := dec(in); err != nil {
@@ -446,6 +480,10 @@ var AppointmentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateAppointmentStatus",
 			Handler:    _AppointmentService_UpdateAppointmentStatus_Handler,
+		},
+		{
+			MethodName: "UpdateEmployeeForAppointment",
+			Handler:    _AppointmentService_UpdateEmployeeForAppointment_Handler,
 		},
 		{
 			MethodName: "GetAppointmentDetails",

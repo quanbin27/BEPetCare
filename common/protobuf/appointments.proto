@@ -15,7 +15,7 @@ service AppointmentService {
   rpc GetAppointmentsByBranch(GetAppointmentsByBranchRequest) returns (GetAppointmentsResponse);
   // Cập nhật trạng thái lịch hẹn
   rpc UpdateAppointmentStatus(UpdateAppointmentStatusRequest) returns (UpdateAppointmentStatusResponse);
-
+  rpc UpdateEmployeeForAppointment(UpdateEmployeeForAppointmentRequest) returns (UpdateEmployeeForAppointmentResponse);
   // Lấy chi tiết lịch hẹn
   rpc GetAppointmentDetails(GetAppointmentDetailsRequest) returns (GetAppointmentDetailsResponse);
 
@@ -117,7 +117,13 @@ message UpdateAppointmentStatusRequest {
 message UpdateAppointmentStatusResponse {
   string status = 1;
 }
-
+message UpdateEmployeeForAppointmentRequest {
+  int32 appointment_id = 1;
+  int32 employee_id = 2;
+}
+message UpdateEmployeeForAppointmentResponse {
+  string status = 1;
+}
 // Lấy chi tiết lịch hẹn
 message GetAppointmentDetailsRequest {
   int32 appointment_id = 1;

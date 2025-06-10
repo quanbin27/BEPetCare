@@ -31,6 +31,7 @@ func (h *AppointmentHandler) RegisterRoutes(e *echo.Group) {
 	e.GET("/appointments/branch/:branch_id", h.GetAppointmentsByBranch)
 	e.GET("/appointments/employee/:employee_id", h.GetAppointmentsByEmployee)
 	e.PUT("/appointments/update-status", h.UpdateAppointmentStatus)
+	e.PUT("/appointments/update-employee", h.UpdateEmployeeForAppointment)
 	e.GET("/appointments/:appointment_id", h.GetAppointmentDetails)
 
 	// Routes cho dịch vụ
@@ -281,6 +282,56 @@ func (h *AppointmentHandler) UpdateAppointmentStatus(c echo.Context) error {
 	resp, err := h.client.UpdateAppointmentStatus(ctx, &pb.UpdateAppointmentStatusRequest{
 		AppointmentId: int32(appointmentID),
 		Status:        pb.AppointmentStatus(pbStatus),
+	})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"status": resp.Status,
+	})
+}
+
+// UpdateEmployeeForAppointment updates the employee assigned to an appointment
+// @Summary Update employee for appointment
+// @Description Updates the employee assigned to a specific appointment ID
+// @Tags Appointments
+// @Accept json
+// @Produce json
+// @Param request body object{appointment_id=string,employee_id=string} true "Appointment employee update details"
+// @Success 200 {object} object{status=string} "Employee updated successfully"
+// @Failure 400 {object} object{error=string} "Invalid request, invalid appointment_id or employee_id format"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /appointments/update-employee [put]
+func (h *AppointmentHandler) UpdateEmployeeForAppointment(c echo.Context) error {
+	var req struct {
+		AppointmentID string `json:"appointment_id"`
+		EmployeeID    string `json:"employee_id"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	appointmentID, err := strconv.ParseInt(req.AppointmentID, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid appointment_id format, must be an integer"})
+	}
+	employeeID, err := strconv.ParseInt(req.EmployeeID, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid employee_id format, must be an integer"})
+	}
+	// Lấy context từ Echo request
+	ctx := c.Request().Context()
+
+	resp, err := h.client.UpdateEmployeeForAppointment(ctx, &pb.UpdateEmployeeForAppointmentRequest{
+		AppointmentId: int32(appointmentID),
+		EmployeeId:    int32(employeeID),
 	})
 	if err != nil {
 		if grpcErr, ok := status.FromError(err); ok {
