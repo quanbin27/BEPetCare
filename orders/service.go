@@ -60,6 +60,13 @@ func (s *Service) GetOrderByAppointmentID(ctx context.Context, appointmentID int
 	}
 	return order, nil
 }
+func (s *Service) GetAllOrders(ctx context.Context) ([]Order, error) {
+	orders, err := s.store.GetAllOrders(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return orders, nil
+}
 
 // UpdateOrderStatus cập nhật trạng thái đơn hàng
 func (s *Service) UpdateOrderStatus(ctx context.Context, orderID int32, status OrderStatus) (string, error) {

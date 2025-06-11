@@ -102,6 +102,11 @@ func (s *Store) GetAppointmentsByBranch(ctx context.Context, branchID int32) ([]
 	err := s.db.WithContext(ctx).Where("branch_id = ?", branchID).Find(&appointments).Error
 	return appointments, err
 }
+func (s *Store) GetAllAppointments(ctx context.Context) ([]Appointment, error) {
+	var appointments []Appointment
+	err := s.db.WithContext(ctx).Find(&appointments).Error
+	return appointments, err
+}
 
 // Cập nhật trạng thái lịch hẹn
 func (s *Store) UpdateAppointmentStatus(ctx context.Context, appointmentID int32, status AppointmentStatus) error {

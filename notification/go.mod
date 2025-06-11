@@ -6,7 +6,7 @@ toolchain go1.24.3
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/quanbin27/commons v0.0.0-20250607075331-d658fbbaffba
+	github.com/quanbin27/commons v0.0.0-20250611070035-af1d46661758
 	github.com/segmentio/kafka-go v0.4.47
 	google.golang.org/grpc v1.72.2
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df

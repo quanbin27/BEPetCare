@@ -92,6 +92,46 @@ info:
   version: "1.0"
 paths:
   /appointments:
+    get:
+      description: Retrieves a list of all appointment records
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of all appointments
+          schema:
+            items:
+              properties:
+                branch_id:
+                  type: integer
+                customer_address:
+                  type: string
+                customer_id:
+                  type: integer
+                employee_id:
+                  type: integer
+                id:
+                  type: integer
+                note:
+                  type: string
+                scheduled_time:
+                  type: string
+                status:
+                  type: string
+              type: object
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all appointments
+      tags:
+      - Appointments
     post:
       consumes:
       - application/json
@@ -1414,6 +1454,40 @@ paths:
       tags:
       - General
   /orders:
+    get:
+      description: Retrieves a list of all orders in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of all orders
+          schema:
+            items:
+              properties:
+                appointment_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                customer_id:
+                  type: integer
+                id:
+                  type: integer
+                pickup_time:
+                  type: string
+                status:
+                  type: string
+              type: object
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get all orders
+      tags:
+      - Orders
     post:
       consumes:
       - application/json

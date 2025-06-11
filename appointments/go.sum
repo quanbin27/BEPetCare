@@ -24,6 +24,8 @@ github.com/quanbin27/commons v0.0.0-20250608083034-a2d726147c65 h1:OqL32LOoCepKq
 github.com/quanbin27/commons v0.0.0-20250608083034-a2d726147c65/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
 github.com/quanbin27/commons v0.0.0-20250610092013-aa838e811e9f h1:ud1nFAiiI5VtFVlccLg0JScYNq7taS4JYFSuthnni+w=
 github.com/quanbin27/commons v0.0.0-20250610092013-aa838e811e9f/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
+github.com/quanbin27/commons v0.0.0-20250611070035-af1d46661758 h1:uAysW8O6dH9YsVXKcNIBgbJRV/vrYnP+/9UWGk/Cf1I=
+github.com/quanbin27/commons v0.0.0-20250611070035-af1d46661758/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
 go.opentelemetry.io/otel v1.32.0 h1:WnBN+Xjcteh0zdk01SVqV55d/m62NJLJdIyb4y/WO5U=
 go.opentelemetry.io/otel v1.32.0/go.mod h1:00DCVSB0RQcnzlwyTfqtxSm+DRr9hpYrHjNGiBHVQIg=
 go.opentelemetry.io/otel/metric v1.32.0 h1:xV2umtmNcThh2/a/aCP+h64Xx5wsj8qqnkYZktzNa0M=

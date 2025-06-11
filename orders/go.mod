@@ -5,7 +5,7 @@ go 1.23
 toolchain go1.24.3
 
 require (
-	github.com/quanbin27/commons v0.0.0-20250608083034-a2d726147c65
+	github.com/quanbin27/commons v0.0.0-20250611070035-af1d46661758
 	github.com/segmentio/kafka-go v0.4.47
 	google.golang.org/grpc v1.72.2
 	gorm.io/driver/mysql v1.5.7

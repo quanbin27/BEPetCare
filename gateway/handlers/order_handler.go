@@ -26,6 +26,7 @@ func NewOrderHandler(client pb.OrderServiceClient, userClient pbUser.UserService
 // RegisterRoutes đăng ký các route cho Orders service với tiền tố "/orders"
 func (h *OrderHandler) RegisterRoutes(e *echo.Group) {
 	e.POST("/orders", h.CreateOrder)
+	e.GET("/orders", h.GetAllOrders)
 	e.GET("/orders/:order_id", h.GetOrder)
 	e.GET("/orders/appointment/:appointment_id", h.GetOrderByAppointmentID)
 	e.PUT("/orders/update-status", h.UpdateOrderStatus)
@@ -140,6 +141,31 @@ func (h *OrderHandler) GetOrderByCustomerID(c echo.Context) error {
 			switch grpcErr.Code() {
 			case codes.NotFound:
 				return c.JSON(http.StatusNotFound, map[string]string{"error": grpcErr.Message()})
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, resp.Orders)
+}
+
+// GetAllOrders retrieves all orders
+// @Summary Get all orders
+// @Description Retrieves a list of all orders in the system
+// @Tags Orders
+// @Produce json
+// @Success 200 {array} object{id=integer,customer_id=integer,branch_id=integer,appointment_id=integer,pickup_time=string,status=string} "List of all orders"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /orders [get]
+func (h *OrderHandler) GetAllOrders(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	resp, err := h.client.GetAllOrders(ctx, &pb.GetAllOrdersRequest{})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
 			case codes.Internal:
 				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
 			}

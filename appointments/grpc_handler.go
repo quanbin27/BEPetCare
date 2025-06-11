@@ -3,9 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/quanbin27/commons/config"
 	pb "github.com/quanbin27/commons/genproto/appointments"
+	pbUser "github.com/quanbin27/commons/genproto/users"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 	"log"
 )
@@ -13,13 +16,21 @@ import (
 type AppointmentGrpcHandler struct {
 	appointmentService AppointmentService
 	pb.UnimplementedAppointmentServiceServer
+	userClient pbUser.UserServiceClient
 }
 
-func NewAppointmentGrpcHandler(grpc *grpc.Server, appointmentService AppointmentService) {
+func NewAppointmentGrpcHandler(grpcServer *grpc.Server, appointmentService AppointmentService) {
+
+	usersServiceAddr := config.Envs.UsersGrpcAddr
+	usersConn, err := grpc.NewClient(usersServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Failed to dial user server: %v", err)
+	}
 	grpcHandler := &AppointmentGrpcHandler{
 		appointmentService: appointmentService,
+		userClient:         pbUser.NewUserServiceClient(usersConn),
 	}
-	pb.RegisterAppointmentServiceServer(grpc, grpcHandler)
+	pb.RegisterAppointmentServiceServer(grpcServer, grpcHandler)
 }
 
 // --- LỊCH HẸN ---
@@ -146,4 +157,29 @@ func (h *AppointmentGrpcHandler) DeleteService(ctx context.Context, req *pb.Dele
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 	return &pb.DeleteServiceResponse{Status: statusMsg}, nil
+}
+func (h *AppointmentGrpcHandler) GetAllAppointments(ctx context.Context, req *pb.GetAllAppointmentsRequest) (*pb.GetAllAppointmentsResponse, error) {
+	appointments, err := h.appointmentService.GetAllAppointments(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	pbAppointments := make([]*pb.AppointmentWithCustomerName, len(appointments))
+	for i, a := range appointments {
+		customer, err := h.userClient.GetUserInfo(ctx, &pbUser.GetUserInfoRequest{ID: a.CustomerID})
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to get customer info: %v", err)
+		}
+		employee, err := h.userClient.GetUserInfo(ctx, &pbUser.GetUserInfoRequest{ID: a.EmployeeID})
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to get employee info: %v", err)
+		}
+		pbAppointments[len(appointments)-1-i] = &pb.AppointmentWithCustomerName{
+			Appointment:   toProtoAppointment(&a),
+			CustomerName:  customer.Name,
+			CustomerEmail: customer.Email,
+			EmployeeEmail: employee.Email,
+			EmployeeName:  employee.Name,
+		}
+	}
+	return &pb.GetAllAppointmentsResponse{Appointments: pbAppointments}, nil
 }

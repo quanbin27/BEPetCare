@@ -73,6 +73,7 @@ type AppointmentStore interface {
 	GetServicesByIDs(ctx context.Context, serviceIDs []int32) ([]Service, error)
 	GetServiceByID(ctx context.Context, serviceID int32) (Service, error)
 	UpdateAppointmentEmployee(ctx context.Context, appointmentID, employeeID int32) error
+	GetAllAppointments(ctx context.Context) ([]Appointment, error)
 }
 
 // --- INTERFACE CHO APPOINTMENT SERVICE (SỬ DỤNG DỮ LIỆU NỘI BỘ) ---
@@ -91,6 +92,7 @@ type AppointmentService interface {
 	GetServices(ctx context.Context) ([]Service, error)
 	UpdateService(ctx context.Context, serviceID int32, name, description string, price float32) (string, error)
 	DeleteService(ctx context.Context, serviceID int32) (string, error) // Trả về status
+	GetAllAppointments(ctx context.Context) ([]Appointment, error)
 }
 
 // --- CHUYỂN ĐỔI ENUM PROTO <-> GO ---

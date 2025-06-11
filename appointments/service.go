@@ -182,3 +182,6 @@ func (s *AppService) UpdateEmployeeForAppointment(ctx context.Context, appointme
 	}
 	return "Success", nil
 }
+func (s *AppService) GetAllAppointments(ctx context.Context) ([]Appointment, error) {
+	return s.store.GetAllAppointments(ctx)
+}

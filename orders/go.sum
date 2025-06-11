@@ -32,6 +32,8 @@ github.com/quanbin27/commons v0.0.0-20250607075331-d658fbbaffba h1:VjmnqlvpNEC3j
 github.com/quanbin27/commons v0.0.0-20250607075331-d658fbbaffba/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
 github.com/quanbin27/commons v0.0.0-20250608083034-a2d726147c65 h1:OqL32LOoCepKqU1kTx1mZNB43Lt+b6jL1H6XG574YqY=
 github.com/quanbin27/commons v0.0.0-20250608083034-a2d726147c65/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
+github.com/quanbin27/commons v0.0.0-20250611070035-af1d46661758 h1:uAysW8O6dH9YsVXKcNIBgbJRV/vrYnP+/9UWGk/Cf1I=
+github.com/quanbin27/commons v0.0.0-20250611070035-af1d46661758/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
 github.com/segmentio/kafka-go v0.4.47 h1:IqziR4pA3vrZq7YdRxaT3w1/5fvIH5qpCwstUanQQB0=
 github.com/segmentio/kafka-go v0.4.47/go.mod h1:HjF6XbOKh0Pjlkr5GVZxt6CsjjwnmhVOfURM5KMd8qg=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

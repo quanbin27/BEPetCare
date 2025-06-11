@@ -38,7 +38,7 @@ func main() {
 		log.Fatal(err)
 	}
 	initStorage(db)
-	db.AutoMigrate(User{}, Role{}, UserRole{}, EmployeeBranch{})
+	db.AutoMigrate(User{}, Role{}, UserRole{})
 	grpcServer := grpc.NewServer()
 	l, err := net.Listen("tcp", grpcAddr)
 	if err != nil {

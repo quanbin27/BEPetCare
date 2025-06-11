@@ -13,6 +13,7 @@ service AppointmentService {
   rpc GetAppointmentsByCustomer(GetAppointmentsByCustomerRequest) returns (GetAppointmentsResponse);
   rpc GetAppointmentsByEmployee(GetAppointmentsByEmployeeRequest) returns (GetAppointmentsResponse);
   rpc GetAppointmentsByBranch(GetAppointmentsByBranchRequest) returns (GetAppointmentsResponse);
+  rpc GetAllAppointments(GetAllAppointmentsRequest) returns (GetAllAppointmentsResponse);
   // Cập nhật trạng thái lịch hẹn
   rpc UpdateAppointmentStatus(UpdateAppointmentStatusRequest) returns (UpdateAppointmentStatusResponse);
   rpc UpdateEmployeeForAppointment(UpdateEmployeeForAppointmentRequest) returns (UpdateEmployeeForAppointmentResponse);
@@ -174,4 +175,15 @@ message DeleteServiceRequest {
 
 message DeleteServiceResponse {
   string status = 1;
+}
+message GetAllAppointmentsRequest {}
+message AppointmentWithCustomerName {
+  Appointment appointment = 1;
+  string customer_name = 2; // Tên khách hàng
+  string customer_email = 3;
+  string employee_name = 4;
+  string employee_email = 5;  // Địa chỉ khách hàng}
+}
+message GetAllAppointmentsResponse {
+  repeated AppointmentWithCustomerName appointments = 1;
 }

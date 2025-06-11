@@ -6,6 +6,7 @@ import (
 	"github.com/quanbin27/commons/config"
 	pb "github.com/quanbin27/commons/genproto/orders"
 	pbProduct "github.com/quanbin27/commons/genproto/products"
+	pbUser "github.com/quanbin27/commons/genproto/users"
 	"github.com/segmentio/kafka-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -21,6 +22,7 @@ type OrderGrpcHandler struct {
 	pb.UnimplementedOrderServiceServer
 	kafkaWriter   *kafka.Writer
 	productClient pbProduct.ProductServiceClient
+	userClient    pbUser.UserServiceClient
 }
 
 func NewOrderGrpcHandler(grpcServer *grpc.Server, orderService OrderService, kafkaAddr string) *OrderGrpcHandler {
@@ -31,6 +33,8 @@ func NewOrderGrpcHandler(grpcServer *grpc.Server, orderService OrderService, kaf
 		Async:    false,               // true nếu bạn chấp nhận gửi async
 	}
 	productsServiceAddr := config.Envs.ProductsGrpcAddr
+	usersServiceAddr := config.Envs.UsersGrpcAddr
+	usersConn, err := grpc.NewClient(usersServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	productsConn, err := grpc.NewClient(productsServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to dial user server: %v", err)
@@ -39,6 +43,7 @@ func NewOrderGrpcHandler(grpcServer *grpc.Server, orderService OrderService, kaf
 		orderService:  orderService,
 		kafkaWriter:   writer,
 		productClient: pbProduct.NewProductServiceClient(productsConn),
+		userClient:    pbUser.NewUserServiceClient(usersConn),
 	}
 
 	pb.RegisterOrderServiceServer(grpcServer, handler)
@@ -185,4 +190,33 @@ func (h *OrderGrpcHandler) GetOrdersByCustomerID(ctx context.Context, req *pb.Ge
 		pbOrders[len(orders)-1-i] = toPbOrder(&order)
 	}
 	return &pb.GetOrdersByCustomerIDResponse{Orders: pbOrders}, nil
+}
+func (h *OrderGrpcHandler) GetAllOrders(ctx context.Context, req *pb.GetAllOrdersRequest) (*pb.GetAllOrdersResponse, error) {
+	orders, err := h.orderService.GetAllOrders(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get orders: %v", err)
+	}
+
+	pbOrders := make([]*pb.OrderWithCustomer, len(orders))
+
+	for i, order := range orders {
+		// Gọi service để lấy thông tin người dùng
+		userResp, err := h.userClient.GetUserInfo(ctx, &pbUser.GetUserInfoRequest{
+			ID: order.CustomerID,
+		})
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to get user info for customer ID %s: %v", order.CustomerID, err)
+		}
+
+		// Gán ngược thứ tự như ban đầu
+		pbOrders[len(orders)-1-i] = &pb.OrderWithCustomer{
+			Order:         toPbOrder(&order),
+			CustomerName:  userResp.Name,
+			CustomerEmail: userResp.Email,
+		}
+	}
+
+	return &pb.GetAllOrdersResponse{
+		Orders: pbOrders,
+	}, nil
 }

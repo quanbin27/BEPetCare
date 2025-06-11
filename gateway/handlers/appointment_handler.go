@@ -27,6 +27,7 @@ func NewAppointmentHandler(client pb.AppointmentServiceClient, orderClient pbOrd
 func (h *AppointmentHandler) RegisterRoutes(e *echo.Group) {
 	// Routes cho lịch hẹn
 	e.POST("/appointments", h.CreateAppointment, auth.WithJWTAuth())
+	e.GET("/appointments", h.GetAllAppointments, auth.WithJWTAuth())
 	e.GET("/appointments/customer/:customer_id", h.GetAppointmentsByCustomer)
 	e.GET("/appointments/branch/:branch_id", h.GetAppointmentsByBranch)
 	e.GET("/appointments/employee/:employee_id", h.GetAppointmentsByEmployee)
@@ -242,6 +243,33 @@ func (h *AppointmentHandler) GetAppointmentsByBranch(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, responses)
 
+}
+
+// GetAllAppointments retrieves all appointments
+// @Summary Get all appointments
+// @Description Retrieves a list of all appointment records
+// @Tags Appointments
+// @Security BearerAuth
+// @Produce json
+// @Success 200 {array} object{id=integer,customer_id=integer,employee_id=integer,branch_id=integer,scheduled_time=string,status=string,note=string,customer_address=string} "List of all appointments"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /appointments [get]
+func (h *AppointmentHandler) GetAllAppointments(c echo.Context) error {
+	// Lấy context từ Echo request
+	ctx := c.Request().Context()
+
+	resp, err := h.client.GetAllAppointments(ctx, &pb.GetAllAppointmentsRequest{})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, resp.Appointments)
 }
 
 // UpdateAppointmentStatus updates the status of an appointment

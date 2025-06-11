@@ -5,7 +5,7 @@ go 1.23
 toolchain go1.24.3
 
 require (
-	github.com/quanbin27/commons v0.0.0-20250610164949-2c558e4ae28a
+	github.com/quanbin27/commons v0.0.0-20250611070035-af1d46661758
 	google.golang.org/grpc v1.72.2
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gorm v1.25.12

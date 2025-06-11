@@ -216,13 +216,17 @@ func (s *Store) GetCustomersByName(ctx context.Context, nameFilter string) ([]Us
 	return users, nil
 }
 func (s *Store) GetBranchByEmployeeID(ctx context.Context, userID int32) (int32, error) {
-	var eb EmployeeBranch
-	err := s.db.WithContext(ctx).Where("user_id = ?", userID).First(&eb).Error
+	var eb User
+	err := s.db.WithContext(ctx).Where("id = ?", userID).First(&eb).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return 0, fmt.Errorf("no branch found for user ID %d", userID)
 		}
 		return 0, err
 	}
-	return eb.BranchID, nil
+	if eb.BranchID == nil {
+		return -1, fmt.Errorf("no branch associated with user ID %d", userID)
+	}
+	branchID := *eb.BranchID
+	return branchID, nil
 }

@@ -62,6 +62,15 @@ func (s *Store) GetOrdersByCustomerID(ctx context.Context, customerID int32) ([]
 	}
 	return orders, nil
 }
+func (s *Store) GetAllOrders(ctx context.Context) ([]Order, error) {
+	var orders []Order
+	if err := s.db.WithContext(ctx).
+		Preload("Items").
+		Find(&orders).Error; err != nil {
+		return nil, err
+	}
+	return orders, nil
+}
 
 // UpdateOrderStatus cập nhật trạng thái đơn hàng
 func (s *Store) UpdateOrderStatus(ctx context.Context, orderID int32, status OrderStatus) error {
