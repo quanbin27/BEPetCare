@@ -245,6 +245,75 @@ func (s *Store) ListAllProducts(ctx context.Context) ([]GeneralProduct, error) {
 
 	return products, nil
 }
+func (s *Store) ListAllProductsWithStock(ctx context.Context) ([]ProductWithStock, error) {
+	var result []ProductWithStock
+
+	// Lấy toàn bộ tồn kho từ BranchProduct
+	var branchProducts []BranchProduct
+	if err := s.db.Find(&branchProducts).Error; err != nil {
+		return nil, err
+	}
+
+	// Gom tồn kho theo productType + productID
+	typeKey := func(ptype string, pid int32) string {
+		return fmt.Sprintf("%s:%d", ptype, pid)
+	}
+	inventoryMap := make(map[string][]Inventory)
+
+	for _, bp := range branchProducts {
+		key := typeKey(bp.ProductType, bp.ProductID)
+		inventoryMap[key] = append(inventoryMap[key], Inventory{
+			BranchID: bp.BranchID,
+			Quantity: bp.StockQuantity,
+		})
+	}
+
+	// Helper để tạo ProductWithStock từ dữ liệu sản phẩm
+	addProduct := func(name, desc, img string, price float32, id int32, ptype string, isAttachable bool) {
+		key := typeKey(ptype, id)
+		inv := inventoryMap[key] // = nil nếu không có tồn kho
+		result = append(result, ProductWithStock{
+			Name:         name,
+			Description:  desc,
+			Price:        price,
+			ImgUrl:       img,
+			ProductID:    id,
+			ProductType:  ptype,
+			IsAttachable: isAttachable,
+			Inventory:    inv,
+		})
+	}
+
+	// Truy vấn và xử lý Food
+	var foods []Food
+	if err := s.db.Find(&foods).Error; err != nil {
+		return nil, err
+	}
+	for _, food := range foods {
+		addProduct(food.Name, food.Description, food.ImgUrl, food.Price, food.ID, "food", food.IsAttachable)
+	}
+
+	// Truy vấn và xử lý Accessory
+	var accessories []Accessory
+	if err := s.db.Find(&accessories).Error; err != nil {
+		return nil, err
+	}
+	for _, accessory := range accessories {
+		addProduct(accessory.Name, accessory.Description, accessory.ImgUrl, accessory.Price, accessory.ID, "accessory", accessory.IsAttachable)
+	}
+
+	// Truy vấn và xử lý Medicine
+	var medicines []Medicine
+	if err := s.db.Find(&medicines).Error; err != nil {
+		return nil, err
+	}
+	for _, medicine := range medicines {
+		addProduct(medicine.Name, medicine.Description, medicine.ImgUrl, medicine.Price, medicine.ID, "medicine", medicine.IsAttachable)
+	}
+
+	return result, nil
+}
+
 func (s *Store) ListAvailableProductsByBranch(ctx context.Context, branchID int32, productType string) ([]GeneralProduct, error) {
 	var results []GeneralProduct
 	log.Printf("Listing available products for branch %d with type %s", branchID, productType)

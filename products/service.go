@@ -153,6 +153,9 @@ func (s *ProductServiceImpl) ListAttachableProducts(ctx context.Context) ([]Gene
 func (s *ProductServiceImpl) ListAllProducts(ctx context.Context) ([]GeneralProduct, error) {
 	return s.store.ListAllProducts(ctx)
 }
+func (s *ProductServiceImpl) ListAllProductsWithStock(ctx context.Context) ([]ProductWithStock, error) {
+	return s.store.ListAllProductsWithStock(ctx)
+}
 func (s *ProductServiceImpl) ListAvailableAllProductsByBranch(ctx context.Context, branchID int32) ([]GeneralProduct, error) {
 	return s.store.ListAvailableAllProductsByBranch(ctx, branchID)
 }

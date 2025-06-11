@@ -107,6 +107,73 @@ func (s *Store) GetAllCustomers(ctx context.Context) ([]User, error) {
 	}
 	return users, nil
 }
+func (s *Store) GetAllUsers(ctx context.Context) ([]UserWithRole, error) {
+	var users []User
+	err := s.db.WithContext(ctx).
+		Preload("Roles").
+		Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var result []UserWithRole
+	for _, user := range users {
+		var maxRoleID int32
+		for _, role := range user.Roles {
+			if role.ID > maxRoleID {
+				maxRoleID = role.ID
+			}
+		}
+
+		result = append(result, UserWithRole{
+			ID:          user.ID,
+			Email:       user.Email,
+			Name:        user.Name,
+			PhoneNumber: user.PhoneNumber,
+			Address:     user.Address,
+			RoleID:      maxRoleID,
+			BranchID:    user.BranchID,
+		})
+	}
+
+	return result, nil
+}
+func (s *Store) UpdateUser(ctx context.Context, input UserWithRole) error {
+	// 1. Tìm user theo ID
+	var user User
+	if err := s.db.WithContext(ctx).Preload("Roles").First(&user, input.ID).Error; err != nil {
+		return fmt.Errorf("user not found: %w", err)
+	}
+
+	// 2. Cập nhật thông tin cơ bản
+	user.Email = input.Email
+	user.Name = input.Name
+	user.PhoneNumber = input.PhoneNumber
+	user.Address = input.Address
+	user.BranchID = input.BranchID
+
+	// 3. Ghi lại thông tin user
+	if err := s.db.WithContext(ctx).Save(&user).Error; err != nil {
+		return fmt.Errorf("failed to update user: %w", err)
+	}
+
+	// 4. Cập nhật vai trò (Roles): thay toàn bộ roles bằng role mới
+	if err := s.db.WithContext(ctx).Model(&user).Association("Roles").Clear(); err != nil {
+		return fmt.Errorf("failed to clear roles: %w", err)
+	}
+
+	if input.RoleID > 0 {
+		var role Role
+		if err := s.db.WithContext(ctx).First(&role, input.RoleID).Error; err != nil {
+			return fmt.Errorf("invalid role ID %d: %w", input.RoleID, err)
+		}
+		if err := s.db.WithContext(ctx).Model(&user).Association("Roles").Append(&role); err != nil {
+			return fmt.Errorf("failed to assign role: %w", err)
+		}
+	}
+
+	return nil
+}
 
 // Get customers with pagination
 func (s *Store) GetCustomersPaginated(ctx context.Context, page int32, pageSize int32) ([]User, int64, error) {

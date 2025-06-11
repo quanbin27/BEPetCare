@@ -68,6 +68,20 @@ type GeneralProduct struct {
 	IsAttachable      bool
 	AvailableQuantity int32
 }
+type ProductWithStock struct {
+	Name         string
+	Description  string
+	Price        float32
+	ImgUrl       string
+	ProductID    int32
+	ProductType  string
+	IsAttachable bool
+	Inventory    []Inventory
+}
+type Inventory struct {
+	BranchID int32 `json:"branch_id"`
+	Quantity int32 `json:"quantity"`
+}
 
 // ProductStore Interface - Cung cấp các thao tác với database
 type ProductStore interface {
@@ -103,7 +117,7 @@ type ProductStore interface {
 	ListAllProducts(ctx context.Context) ([]GeneralProduct, error)
 	ListAvailableProductsByBranch(ctx context.Context, branchID int32, productType string) ([]GeneralProduct, error)
 	ListAvailableAllProductsByBranch(ctx context.Context, branchID int32) ([]GeneralProduct, error)
-
+	ListAllProductsWithStock(ctx context.Context) ([]ProductWithStock, error)
 	ReleaseReservation(ctx context.Context, branchID, productID int32, productType string, quantity int32) error
 	ConfirmPickup(ctx context.Context, branchID, productID int32, productType string, quantity int32) error
 	ReserveProduct(ctx context.Context, branchID, productID int32, productType string, quantity int32) error
@@ -143,7 +157,7 @@ type ProductService interface {
 	ListAllProducts(ctx context.Context) ([]GeneralProduct, error)
 	ListAvailableProductsByBranch(ctx context.Context, branchID int32, productType string) ([]GeneralProduct, error)
 	ListAvailableAllProductsByBranch(ctx context.Context, branchID int32) ([]GeneralProduct, error)
-
+	ListAllProductsWithStock(ctx context.Context) ([]ProductWithStock, error)
 	ReserveProduct(ctx context.Context, branchID, productID int32, productType string, quantity int32) error
 	ConfirmPickup(ctx context.Context, branchID, productID int32, productType string, quantity int32) error
 	ReleaseReservation(ctx context.Context, branchID, productID int32, productType string, quantity int32) error
@@ -171,6 +185,27 @@ func toProtoGeneralProduct(f *GeneralProduct) *pb.GeneralProduct {
 		IsAttachable:      f.IsAttachable,
 		AvailableQuantity: f.AvailableQuantity,
 	}
+}
+func toProtoProductWithStock(f *ProductWithStock) *pb.ProductWithStock {
+	return &pb.ProductWithStock{
+		Name:         f.Name,
+		Description:  f.Description,
+		Price:        f.Price,
+		Imgurl:       f.ImgUrl,
+		ProductType:  f.ProductType,
+		ProductId:    f.ProductID,
+		IsAttachable: f.IsAttachable,
+		Inventory:    toProtoInventory(f.Inventory)}
+}
+func toProtoInventory(inventory []Inventory) []*pb.Inventory {
+	var protoInventory []*pb.Inventory
+	for _, inv := range inventory {
+		protoInventory = append(protoInventory, &pb.Inventory{
+			BranchId: inv.BranchID,
+			Quantity: inv.Quantity,
+		})
+	}
+	return protoInventory
 }
 func toProtoAccessory(a *Accessory) *pb.Accessory {
 	return &pb.Accessory{

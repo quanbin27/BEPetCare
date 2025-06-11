@@ -52,6 +52,7 @@ func (h *ProductHandler) RegisterRoutes(e *echo.Group) {
 
 	e.GET("/products/is_attachable", h.ListAttachableProduct)
 	e.GET("/products", h.ListAllProduct)
+	e.GET("/products/with_stock", h.ListAllProductsWithStock)
 
 	e.GET("/branches/:branch_id/products/available/all", h.ListAllAvailableProductsByBranch)
 	e.GET("/branches/:branch_id/products/available", h.ListAvailableProductsByBranch)
@@ -891,6 +892,29 @@ func (h *ProductHandler) ListAllProduct(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, products)
+}
+
+// ListAllProductsWithStock lists all products with their stock information
+// @Summary List all products with stock information
+// @Description Retrieves a list of all products (foods, accessories, medicines) along with their stock information
+// @Tags Products
+// @Produce json
+// @Success 200 {array} object{id=int32,name=string,description=string,price=number,imgurl=string,product_type=string,is_attachable=boolean,available_quantity=int32} "List of all products with stock"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /products/with_stock [get]
+func (h *ProductHandler) ListAllProductsWithStock(c echo.Context) error {
+	ctx := c.Request().Context()
+	resp, err := h.client.ListAllProductsWithStock(ctx, &pb.ListAllProductsRequest{})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error"})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, resp.Products)
 }
 
 // ListAvailableAllProductsByBranch lists all available products by branch

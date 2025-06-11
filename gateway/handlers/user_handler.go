@@ -28,7 +28,9 @@ func (h *UserHandler) RegisterRoutes(e *echo.Group) {
 	e.POST("/auth/reset-password", h.ResetPassword)
 
 	// User Management Routes
-	e.POST("/users", h.CreateUser, auth.RoleMiddleware(2, 3)) // Only roles 2 and 3 can create users
+	e.GET("/users", h.GetAllUsers, auth.RoleMiddleware(2, 3))  // Only roles 2 and 3 can access this
+	e.PUT("/users/:id", h.EditUser, auth.RoleMiddleware(2, 3)) // Only roles 2 and 3 can edit users
+	e.POST("/users", h.CreateUser, auth.RoleMiddleware(2, 3))  // Only roles 2 and 3 can create users
 	e.GET("/users/me", h.GetMyInfo, auth.WithJWTAuth())
 	e.PUT("/users/me", h.ChangeInfo, auth.WithJWTAuth())
 	e.PUT("/users/me/password", h.ChangePassword, auth.WithJWTAuth())
@@ -36,7 +38,7 @@ func (h *UserHandler) RegisterRoutes(e *echo.Group) {
 	// User Information Retrieval
 	e.GET("/users/:id", h.GetUserInfo, auth.RoleMiddleware(1, 2, 3))
 	e.GET("/users/email", h.GetUserInfoByEmail, auth.RoleMiddleware(1, 2, 3))
-
+	//e.GET("/users", h.GetAll, auth.WithJWTAuth())
 	e.GET("/customers", h.GetAllCustomers, auth.RoleMiddleware(2, 3))
 	e.GET("/customers/paginated", h.GetCustomersPaginated, auth.RoleMiddleware(2, 3))
 	e.GET("/customers/by-name", h.GetCustomersByName, auth.RoleMiddleware(2, 3))
@@ -538,6 +540,98 @@ func (h *UserHandler) GetAllCustomers(c echo.Context) error {
 		}
 	}
 	return c.JSON(http.StatusOK, users)
+}
+
+// GetAllUsers retrieves all users with their roles
+// @Summary Get all users with roles
+// @Description Retrieves a list of all users with their roles. Requires role 2 or 3.
+// @Tags Users
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} UserWithRole "List of users with roles"
+// @Failure 401 {object} object{error=string} "Unauthorized or insufficient role"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /users [get]
+func (h *UserHandler) GetAllUsers(c echo.Context) error {
+	ctx := c.Request().Context()
+	resp, err := h.client.GetAllUsers(ctx, &pb.GetAllUsersRequest{})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			if grpcErr.Code() == codes.Internal {
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	users := make([]UserWithRole, len(resp.Users))
+	for i, user := range resp.Users {
+		users[i] = UserWithRole{
+			UserID:      user.User.ID,
+			Name:        user.User.Name,
+			Email:       user.User.Email,
+			PhoneNumber: user.User.PhoneNumber,
+			Address:     user.User.Address,
+			RoleID:      user.Role,
+			BranchID:    user.BranchId,
+		}
+	}
+	return c.JSON(http.StatusOK, users)
+}
+
+// EditUser updates user information
+// @Summary Edit user information
+// @Description Updates user information including name, email, phone number, address, role, and branch ID Requires role 2 or 3.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "User ID"
+// @Param request body UserWithRole true "User information to update"
+// @Success 200 {object} UserWithRole "Updated user information"
+// @Failure 400 {object} object{error=string} "Invalid request or missing fields"
+// @Failure 401 {object} object{error=string} "Unauthorized or insufficient role"
+// @Failure 500 {object} object{error=string} "Internal server error"
+// @Router /users/{id} [put]
+func (h *UserHandler) EditUser(c echo.Context) error {
+	// Get user ID from the URL parameter
+	userIDStr := c.Param("id")
+	if userIDStr == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "User ID is required"})
+	}
+	userID, err := strconv.ParseInt(userIDStr, 10, 32)
+	var req UserWithRole
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	if req.UserID == 0 || req.Name == "" || req.Email == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "User ID, name, and email are required"})
+	}
+
+	ctx := c.Request().Context()
+	resp, err := h.client.EditUser(ctx, &pb.EditUserRequest{
+		ID:          int32(userID),
+		Name:        req.Name,
+		Email:       req.Email,
+		PhoneNumber: req.PhoneNumber,
+		Address:     req.Address,
+		Role:        req.RoleID,
+		BranchID:    req.BranchID,
+	})
+	if err != nil {
+		if grpcErr, ok := status.FromError(err); ok {
+			switch grpcErr.Code() {
+			case codes.InvalidArgument:
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": grpcErr.Message()})
+			case codes.Internal:
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": grpcErr.Message()})
+			}
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 // GetCustomersPaginated retrieves customers with pagination

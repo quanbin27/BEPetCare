@@ -5050,6 +5050,66 @@
                 }
             }
         },
+        "/products/with_stock": {
+            "get": {
+                "description": "Retrieves a list of all products (foods, accessories, medicines) along with their stock information",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "List all products with stock information",
+                "responses": {
+                    "200": {
+                        "description": "List of all products with stock",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "available_quantity": {
+                                        "type": "integer"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "imgurl": {
+                                        "type": "string"
+                                    },
+                                    "is_attachable": {
+                                        "type": "boolean"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "price": {
+                                        "type": "number"
+                                    },
+                                    "product_type": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/services": {
             "get": {
                 "description": "Retrieves a list of all service records",
@@ -5396,6 +5456,54 @@
             }
         },
         "/users": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieves a list of all users with their roles. Requires role 2 or 3.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get all users with roles",
+                "responses": {
+                    "200": {
+                        "description": "List of users with roles",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.UserWithRole"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized or insufficient role",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -5775,6 +5883,83 @@
                     },
                     "404": {
                         "description": "User not found",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates user information including name, email, phone number, address, role, and branch ID Requires role 2 or 3.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Edit user information",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "User information to update",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UserWithRole"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated user information",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UserWithRole"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or missing fields",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized or insufficient role",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -6248,6 +6433,38 @@
                 "phoneNumber": {
                     "type": "string",
                     "example": "+84912345678"
+                },
+                "userId": {
+                    "type": "integer",
+                    "example": 1001
+                }
+            }
+        },
+        "handlers.UserWithRole": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "123 Main St, City"
+                },
+                "branchId": {
+                    "type": "integer",
+                    "example": 301
+                },
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "phoneNumber": {
+                    "type": "string",
+                    "example": "+84912345678"
+                },
+                "roleId": {
+                    "type": "integer",
+                    "example": 1
                 },
                 "userId": {
                     "type": "integer",

@@ -21,6 +21,8 @@ type UserStore interface {
 	UpdateRole(ctx context.Context, userId int32, roleId int32) error
 	GetRole(ctx context.Context, userId int32) (int32, error)
 	GetAllCustomers(ctx context.Context) ([]User, error)
+	GetAllUsers(ctx context.Context) ([]UserWithRole, error)
+	UpdateUser(ctx context.Context, input UserWithRole) error
 	GetCustomersPaginated(ctx context.Context, page int32, pageSize int32) ([]User, int64, error)
 	GetCustomersByName(ctx context.Context, nameFilter string) ([]User, error)
 	GetBranchByEmployeeID(ctx context.Context, userID int32) (int32, error)
@@ -38,6 +40,8 @@ type UserService interface {
 	ForgotPassword(ctx context.Context, email string) error
 	ResetPassword(ctx context.Context, userID int32, token, newPassword string) error
 	GetAllCustomers(ctx context.Context) ([]User, error)
+	GetAllUsers(ctx context.Context) ([]UserWithRole, error)
+	EditUser(ctx context.Context, input UserWithRole) error
 	GetCustomersPaginated(ctx context.Context, page int32, pageSize int32) ([]User, int64, error)
 	GetCustomersByName(ctx context.Context, nameFilter string) ([]User, error)
 	GetBranchByEmployeeID(ctx context.Context, employeeID int32) (int32, error)
@@ -82,6 +86,15 @@ type EmployeeBranch struct {
 	UserID   int32 `gorm:"primaryKey"`
 	BranchID int32 `gorm:"primaryKey"`
 }
+type UserWithRole struct {
+	ID          int32  `json:"id"`
+	Email       string `json:"email"`
+	Name        string `json:"name"`
+	PhoneNumber string `json:"phone_number"`
+	Address     string `json:"address"`
+	RoleID      int32  `json:"role_id"`
+	BranchID    *int32 `json:"branch_id,omitempty"`
+}
 
 // Helper functions to convert between internal User and protobuf User
 func toProtoUser(u *User) *users.User {
@@ -89,7 +102,6 @@ func toProtoUser(u *User) *users.User {
 		ID:          u.ID,
 		Email:       u.Email,
 		Name:        u.Name,
-		Password:    u.Password,
 		PhoneNumber: u.PhoneNumber,
 		Address:     u.Address,
 		CreatedAt:   timestamppb.New(u.CreatedAt),

@@ -40,6 +40,7 @@ const (
 	ProductService_UpdateBranchInventory_FullMethodName            = "/ProductService/UpdateBranchInventory"
 	ProductService_ListAttachableProducts_FullMethodName           = "/ProductService/ListAttachableProducts"
 	ProductService_ListAllProducts_FullMethodName                  = "/ProductService/ListAllProducts"
+	ProductService_ListAllProductsWithStock_FullMethodName         = "/ProductService/ListAllProductsWithStock"
 	ProductService_ListAvailableProductsByBranch_FullMethodName    = "/ProductService/ListAvailableProductsByBranch"
 	ProductService_ListAvailableAllProductsByBranch_FullMethodName = "/ProductService/ListAvailableAllProductsByBranch"
 	ProductService_ReserveProduct_FullMethodName                   = "/ProductService/ReserveProduct"
@@ -72,6 +73,7 @@ type ProductServiceClient interface {
 	UpdateBranchInventory(ctx context.Context, in *UpdateBranchInventoryRequest, opts ...grpc.CallOption) (*UpdateBranchInventoryResponse, error)
 	ListAttachableProducts(ctx context.Context, in *ListAttachableProductsRequest, opts ...grpc.CallOption) (*ListAttachableProductsResponse, error)
 	ListAllProducts(ctx context.Context, in *ListAllProductsRequest, opts ...grpc.CallOption) (*ListAllProductsResponse, error)
+	ListAllProductsWithStock(ctx context.Context, in *ListAllProductsRequest, opts ...grpc.CallOption) (*ListAllProductsWithStockResponse, error)
 	ListAvailableProductsByBranch(ctx context.Context, in *ListAvailableProductsByBranchRequest, opts ...grpc.CallOption) (*ListAvailableProductsByBranchResponse, error)
 	ListAvailableAllProductsByBranch(ctx context.Context, in *ListAvailableAllProductsByBranchRequest, opts ...grpc.CallOption) (*ListAvailableAllProductsByBranchResponse, error)
 	ReserveProduct(ctx context.Context, in *ReserveProductRequest, opts ...grpc.CallOption) (*ReserveProductResponse, error)
@@ -297,6 +299,16 @@ func (c *productServiceClient) ListAllProducts(ctx context.Context, in *ListAllP
 	return out, nil
 }
 
+func (c *productServiceClient) ListAllProductsWithStock(ctx context.Context, in *ListAllProductsRequest, opts ...grpc.CallOption) (*ListAllProductsWithStockResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAllProductsWithStockResponse)
+	err := c.cc.Invoke(ctx, ProductService_ListAllProductsWithStock_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *productServiceClient) ListAvailableProductsByBranch(ctx context.Context, in *ListAvailableProductsByBranchRequest, opts ...grpc.CallOption) (*ListAvailableProductsByBranchResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListAvailableProductsByBranchResponse)
@@ -372,6 +384,7 @@ type ProductServiceServer interface {
 	UpdateBranchInventory(context.Context, *UpdateBranchInventoryRequest) (*UpdateBranchInventoryResponse, error)
 	ListAttachableProducts(context.Context, *ListAttachableProductsRequest) (*ListAttachableProductsResponse, error)
 	ListAllProducts(context.Context, *ListAllProductsRequest) (*ListAllProductsResponse, error)
+	ListAllProductsWithStock(context.Context, *ListAllProductsRequest) (*ListAllProductsWithStockResponse, error)
 	ListAvailableProductsByBranch(context.Context, *ListAvailableProductsByBranchRequest) (*ListAvailableProductsByBranchResponse, error)
 	ListAvailableAllProductsByBranch(context.Context, *ListAvailableAllProductsByBranchRequest) (*ListAvailableAllProductsByBranchResponse, error)
 	ReserveProduct(context.Context, *ReserveProductRequest) (*ReserveProductResponse, error)
@@ -449,6 +462,9 @@ func (UnimplementedProductServiceServer) ListAttachableProducts(context.Context,
 }
 func (UnimplementedProductServiceServer) ListAllProducts(context.Context, *ListAllProductsRequest) (*ListAllProductsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAllProducts not implemented")
+}
+func (UnimplementedProductServiceServer) ListAllProductsWithStock(context.Context, *ListAllProductsRequest) (*ListAllProductsWithStockResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAllProductsWithStock not implemented")
 }
 func (UnimplementedProductServiceServer) ListAvailableProductsByBranch(context.Context, *ListAvailableProductsByBranchRequest) (*ListAvailableProductsByBranchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAvailableProductsByBranch not implemented")
@@ -864,6 +880,24 @@ func _ProductService_ListAllProducts_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProductService_ListAllProductsWithStock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAllProductsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).ListAllProductsWithStock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_ListAllProductsWithStock_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).ListAllProductsWithStock(ctx, req.(*ListAllProductsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ProductService_ListAvailableProductsByBranch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListAvailableProductsByBranchRequest)
 	if err := dec(in); err != nil {
@@ -1044,6 +1078,10 @@ var ProductService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListAllProducts",
 			Handler:    _ProductService_ListAllProducts_Handler,
+		},
+		{
+			MethodName: "ListAllProductsWithStock",
+			Handler:    _ProductService_ListAllProductsWithStock_Handler,
 		},
 		{
 			MethodName: "ListAvailableProductsByBranch",

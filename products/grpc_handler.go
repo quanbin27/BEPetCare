@@ -218,6 +218,20 @@ func (h *ProductGrpcHandler) ListAllProducts(ctx context.Context, req *pb.ListAl
 	}
 	return resp, nil
 }
+func (h *ProductGrpcHandler) ListAllProductsWithStock(ctx context.Context, req *pb.ListAllProductsRequest) (*pb.ListAllProductsWithStockResponse, error) {
+	products, err := h.productService.ListAllProductsWithStock(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	resp := &pb.ListAllProductsWithStockResponse{}
+
+	for _, p := range products {
+		resp.Products = append(resp.Products, toProtoProductWithStock(&p))
+	}
+	return resp, nil
+}
+
 func (h *ProductGrpcHandler) ListAvailableProductsByBranch(ctx context.Context, req *pb.ListAvailableProductsByBranchRequest) (*pb.ListAvailableProductsByBranchResponse, error) {
 	products, err := h.productService.ListAvailableProductsByBranch(ctx, req.BranchId, req.ProductType)
 	if err != nil {

@@ -119,6 +119,94 @@ func (h *UsersGrpcHandler) GetAllCustomers(ctx context.Context, req *pb.GetAllCu
 	}
 	return &pb.GetAllCustomersResponse{Users: protoUsers}, nil
 }
+func (h *UsersGrpcHandler) GetAllUsers(ctx context.Context, req *pb.GetAllUsersRequest) (*pb.GetAllUsersResponse, error) {
+	users, err := h.userService.GetAllUsers(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	protoUsers := make([]*pb.UserWithRole, len(users))
+	for i, user := range users {
+		protoUsers[i] = &pb.UserWithRole{
+			User: &pb.User{
+				ID:          user.ID,
+				Email:       user.Email,
+				Name:        user.Name,
+				PhoneNumber: user.PhoneNumber,
+				Address:     user.Address,
+			},
+			Role:     user.RoleID,
+			BranchId: 0, // Default = 0 nếu nil
+		}
+
+		if user.BranchID != nil {
+			protoUsers[i].BranchId = *user.BranchID
+		}
+	}
+
+	return &pb.GetAllUsersResponse{
+		Users: protoUsers,
+	}, nil
+}
+func (h *UsersGrpcHandler) EditUser(ctx context.Context, req *pb.EditUserRequest) (*pb.EditUserResponse, error) {
+	input := UserWithRole{
+		ID:          req.GetID(),
+		Email:       req.GetEmail(),
+		Name:        req.GetName(),
+		PhoneNumber: req.GetPhoneNumber(),
+		Address:     req.GetAddress(),
+		RoleID:      req.GetRole(),
+	}
+
+	if req.BranchID != 0 {
+		input.BranchID = &req.BranchID
+	}
+
+	// Gọi service để cập nhật user
+	err := h.userService.EditUser(ctx, input)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to edit user: %v", err)
+	}
+
+	// Trả lại thông tin user đã cập nhật
+	// Lấy lại user sau khi cập nhật để trả về (tuỳ trường hợp, có thể là optional)
+	updatedUsers, err := h.userService.GetAllUsers(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to fetch updated user: %v", err)
+	}
+
+	var updatedUser *UserWithRole
+	for _, u := range updatedUsers {
+		if u.ID == req.GetID() {
+			updatedUser = &u
+			break
+		}
+	}
+	if updatedUser == nil {
+		return nil, status.Errorf(codes.NotFound, "user not found after update")
+	}
+
+	// Build response
+	protoUser := &pb.UserWithRole{
+		User: &pb.User{
+			ID:          updatedUser.ID,
+			Email:       updatedUser.Email,
+			Name:        updatedUser.Name,
+			PhoneNumber: updatedUser.PhoneNumber,
+			Address:     updatedUser.Address,
+		},
+		Role:     updatedUser.RoleID,
+		BranchId: 0,
+	}
+	if updatedUser.BranchID != nil {
+		protoUser.BranchId = *updatedUser.BranchID
+	}
+
+	return &pb.EditUserResponse{
+		Status: "success",
+		User:   protoUser,
+	}, nil
+}
 
 func (h *UsersGrpcHandler) GetCustomersPaginated(ctx context.Context, req *pb.GetCustomersPaginatedRequest) (*pb.GetCustomersPaginatedResponse, error) {
 	users, total, err := h.userService.GetCustomersPaginated(ctx, req.Page, req.PageSize)

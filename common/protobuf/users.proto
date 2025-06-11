@@ -16,6 +16,8 @@ service UserService{
   rpc GetCustomersByName(GetCustomersByNameRequest) returns (GetCustomersByNameResponse) {}
   rpc GetBranchByEmployeeID(GetBranchByEmployeeIDRequest) returns (GetBranchByEmployeeIDResponse) {}
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {}
+  rpc GetAllUsers(GetAllUsersRequest) returns (GetAllUsersResponse) {}
+  rpc EditUser(EditUserRequest) returns (EditUserResponse) {}
 }
 message User{
   int32 ID = 1;
@@ -25,6 +27,11 @@ message User{
   string Address = 5;
   string PhoneNumber =6;
   google.protobuf.Timestamp CreatedAt=7;
+}
+message UserWithRole{
+  User user = 1;
+  int32 Role = 2; // ADMIN, EMPLOYEE, CUSTOMER
+  int32 branch_id = 3; // Chỉ dành cho EMPLOYEE và ADMIN
 }
 message CreateUserRequest {
   string Email = 1;
@@ -104,11 +111,30 @@ message ForgotPasswordResponse{
 message GetAllCustomersRequest {
   // No parameters needed
 }
+message GetAllUsersRequest {
+  // No parameters needed
+}
 
 message GetAllCustomersResponse {
   repeated User users = 1;
 }
+message GetAllUsersResponse {
+  repeated UserWithRole users = 1;
+}
+message EditUserRequest {
+  int32 ID = 1;
+  string Email = 2;
+  string Name = 3;
+  string PhoneNumber = 4;
+  string Address = 5;
+  int32 Role = 6; // 1: CUSTOMER , 2: EMPLOYEE, 3: ADMIN
+  int32 BranchID = 7; // Chỉ dành cho EMPLOYEE và ADMIN
+}
 
+message EditUserResponse {
+  string Status = 1;
+  UserWithRole user = 2; // Trả về thông tin người dùng đã chỉnh sửa
+}
 message GetCustomersPaginatedRequest {
   int32 page = 1;
   int32 page_size = 2;

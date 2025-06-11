@@ -323,6 +323,22 @@ func (s *Service) GetAllCustomers(ctx context.Context) ([]User, error) {
 	}
 	return users, nil
 }
+
+// GetAllUsers retrieves all users
+func (s *Service) GetAllUsers(ctx context.Context) ([]UserWithRole, error) {
+	users, err := s.userStore.GetAllUsers(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get all users: %w", err)
+	}
+	return users, nil
+}
+func (s *Service) EditUser(ctx context.Context, input UserWithRole) error {
+	if err := s.userStore.UpdateUser(ctx, input); err != nil {
+		return fmt.Errorf("failed to update user: %w", err)
+	}
+	return nil
+}
+
 func (s *Service) GetBranchByEmployeeID(ctx context.Context, employeeID int32) (int32, error) {
 	branchID, err := s.userStore.GetBranchByEmployeeID(ctx, employeeID)
 	if err != nil {
@@ -366,7 +382,7 @@ func (s *Service) CreateUser(ctx context.Context, email, name, phoneNumber strin
 	if err != nil {
 		return 0, fmt.Errorf("failed to create user: %w", err)
 	}
-	err = s.userStore.CreateRole(ctx, userID, 3)
+	err = s.userStore.CreateRole(ctx, userID, 1)
 	if err != nil {
 		return userID, err
 	}

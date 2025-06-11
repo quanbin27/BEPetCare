@@ -46,6 +46,29 @@ definitions:
         example: 1001
         type: integer
     type: object
+  handlers.UserWithRole:
+    properties:
+      address:
+        example: 123 Main St, City
+        type: string
+      branchId:
+        example: 301
+        type: integer
+      email:
+        type: string
+      name:
+        example: John Doe
+        type: string
+      phoneNumber:
+        example: "+84912345678"
+        type: string
+      roleId:
+        example: 1
+        type: integer
+      userId:
+        example: 1001
+        type: integer
+    type: object
   handlers.VerifyEmailRequest:
     description: Request to verify email
     properties:
@@ -3336,6 +3359,46 @@ paths:
       summary: Get medicine by ID
       tags:
       - Medicines
+  /products/with_stock:
+    get:
+      description: Retrieves a list of all products (foods, accessories, medicines)
+        along with their stock information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of all products with stock
+          schema:
+            items:
+              properties:
+                available_quantity:
+                  type: integer
+                description:
+                  type: string
+                id:
+                  type: integer
+                imgurl:
+                  type: string
+                is_attachable:
+                  type: boolean
+                name:
+                  type: string
+                price:
+                  type: number
+                product_type:
+                  type: string
+              type: object
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: List all products with stock information
+      tags:
+      - Products
   /services:
     get:
       description: Retrieves a list of all service records
@@ -3561,6 +3624,37 @@ paths:
       tags:
       - Users
   /users:
+    get:
+      description: Retrieves a list of all users with their roles. Requires role 2
+        or 3.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of users with roles
+          schema:
+            items:
+              $ref: '#/definitions/handlers.UserWithRole'
+            type: array
+        "401":
+          description: Unauthorized or insufficient role
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all users with roles
+      tags:
+      - Users
     post:
       consumes:
       - application/json
@@ -3668,6 +3762,56 @@ paths:
       security:
       - BearerAuth: []
       summary: Get user info by ID
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Updates user information including name, email, phone number, address,
+        role, and branch ID Requires role 2 or 3.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User information to update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UserWithRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated user information
+          schema:
+            $ref: '#/definitions/handlers.UserWithRole'
+        "400":
+          description: Invalid request or missing fields
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "401":
+          description: Unauthorized or insufficient role
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Edit user information
       tags:
       - Users
   /users/email:

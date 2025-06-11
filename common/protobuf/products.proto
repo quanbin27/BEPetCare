@@ -30,6 +30,8 @@ service ProductService {
   rpc UpdateBranchInventory(UpdateBranchInventoryRequest) returns (UpdateBranchInventoryResponse) {}
   rpc ListAttachableProducts(ListAttachableProductsRequest) returns (ListAttachableProductsResponse){}
   rpc ListAllProducts(ListAllProductsRequest) returns (ListAllProductsResponse){}
+  rpc ListAllProductsWithStock(ListAllProductsRequest) returns (ListAllProductsWithStockResponse){}
+
   rpc ListAvailableProductsByBranch(ListAvailableProductsByBranchRequest) returns (ListAvailableProductsByBranchResponse);
   rpc ListAvailableAllProductsByBranch(ListAvailableAllProductsByBranchRequest) returns (ListAvailableAllProductsByBranchResponse);
   rpc ReserveProduct(ReserveProductRequest) returns (ReserveProductResponse);
@@ -86,7 +88,10 @@ message BranchProduct {
   int32 stock_quantity = 4;
   int32 reserved_quantity = 5;
 }
-
+message Inventory {
+  int32 branch_id = 1;
+  int32 quantity = 2;
+}
 /* ------------------- Requests & Responses ------------------- */
 
 message GetFoodRequest { int32 id = 1; }
@@ -106,6 +111,19 @@ message ListAttachableProductsResponse{
 }
 message ListAllProductsResponse{
   repeated GeneralProduct products=1;
+}
+message ProductWithStock {
+  string name = 1;
+  string description = 2;
+  float price = 3;
+  string imgurl=4;
+  int32 product_id = 5;
+  string product_type = 6; // "food", "accessory", "medicine"
+  repeated Inventory inventory = 7; // Số lượng có sẵn tại các chi nhánh
+  bool is_attachable=8;
+}
+message ListAllProductsWithStockResponse{
+  repeated ProductWithStock products = 1;
 }
 message ListFoodResponse { repeated Food foods = 1; }
 message ListAccessoryResponse { repeated Accessory accessories = 1; }

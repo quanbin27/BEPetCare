@@ -22,6 +22,10 @@ github.com/quanbin27/commons v0.0.0-20250607075331-d658fbbaffba h1:VjmnqlvpNEC3j
 github.com/quanbin27/commons v0.0.0-20250607075331-d658fbbaffba/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
 github.com/quanbin27/commons v0.0.0-20250608083034-a2d726147c65 h1:OqL32LOoCepKqU1kTx1mZNB43Lt+b6jL1H6XG574YqY=
 github.com/quanbin27/commons v0.0.0-20250608083034-a2d726147c65/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
+github.com/quanbin27/commons v0.0.0-20250610160728-a529c0f0166e h1:NOK5Ngzk5z3JbkTftZDxnaQ7aXPp4PYWxUrCw2ApWCM=
+github.com/quanbin27/commons v0.0.0-20250610160728-a529c0f0166e/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
+github.com/quanbin27/commons v0.0.0-20250610164949-2c558e4ae28a h1:LY0VQztvftPVUFuk0gCOIoRDKWigvzQnnP1sFHBtwAo=
+github.com/quanbin27/commons v0.0.0-20250610164949-2c558e4ae28a/go.mod h1:XgcOzJH1VbBI/0VYYXgA71COHwpzGIMU6FGefo8AhUM=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=
 go.opentelemetry.io/auto/sdk v1.1.0/go.mod h1:3wSPjt5PWp2RhlCcmmOial7AvC4DQqZb7a7wCow3W8A=
 go.opentelemetry.io/otel v1.34.0 h1:zRLXxLCgL1WyKsPVrgbSdMN4c0FMkDAskSTQP+0hdUY=

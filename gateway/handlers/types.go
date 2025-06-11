@@ -37,6 +37,15 @@ type AllProductResponse struct {
 	ProductType  string  `json:"productType" example:"Food" description:"Type of the product"`
 	IsAttachable bool    `json:"isAttachable" example:"false" description:"Whether the product can be attached to other products"`
 }
+type UserWithRole struct {
+	UserID      int32  `json:"userId" example:"1001" description:"Unique identifier of the user"`
+	Name        string `json:"name" example:"John Doe" description:"Full name of the user"`
+	Email       string `json:"email" `
+	Address     string `json:"address" example:"123 Main St, City" description:"Address of the user"`
+	PhoneNumber string `json:"phoneNumber" example:"+84912345678" description:"Phone number of the user"`
+	RoleID      int32  `json:"roleId" example:"1" description:"ID of the user's role"`
+	BranchID    int32  `json:"branchId" example:"301" description:"ID of the branch associated with the user"`
+}
 
 // AvailableProductResponse represents a product available for purchase
 // @Description Product information available for purchase
